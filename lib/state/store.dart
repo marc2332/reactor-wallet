@@ -3,7 +3,6 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 class WalletAccount {
-
   final RPCClient client = RPCClient("https://api.mainnet-beta.solana.com");
 
   final String name;
@@ -11,7 +10,6 @@ class WalletAccount {
   double balance;
 
   WalletAccount(this.address, this.balance, this.name);
-
 
   Future<double> getBalance() async {
     var balance = await client.getBalance(address);
@@ -21,15 +19,12 @@ class WalletAccount {
 }
 
 class AppState {
-  
-
   final accounts = Map();
   late String currentAccountName;
 
-  WalletAccount getCurrentAccount(){
+  WalletAccount getCurrentAccount() {
     return accounts[currentAccountName];
   }
-
 }
 
 class Action {
@@ -37,26 +32,18 @@ class Action {
   dynamic payload;
 }
 
-enum StateActions { 
-  SetBalance,
-  AddAccount
-}
+enum StateActions { SetBalance, AddAccount }
 
 AppState stateReducer(AppState state, dynamic action) {
-
   if (action["type"] == StateActions.SetBalance) {
     state.accounts[action["name"]].balance = action["balance"];
   }
 
-   if (action["type"] == StateActions.AddAccount) {
-
+  if (action["type"] == StateActions.AddAccount) {
     var account = action["account"];
 
     state.accounts[account.name] = account;
-
-
   }
-
 
   return state;
 }
