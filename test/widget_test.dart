@@ -9,9 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:solana_wallet/main.dart';
+import 'package:solana_wallet/state/store.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(App());
+
+    var store = await createStore();
+
+    await tester.pumpWidget(App(store));
   });
 }

@@ -24,7 +24,12 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: StoreConnector<AppState, String>(converter: (store) {
-          return store.state.getCurrentAccount().name;
+          var account = store.state.getCurrentAccount();
+          if(account == null) {
+            return "Not selected";
+          } else {
+            return account.name;
+          } 
         }, builder: (context, balance) {
           return Text('Account: $balance');
         }),
@@ -35,11 +40,16 @@ class HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             StoreConnector<AppState, String>(converter: (store) {
-              var balance = store.state.getCurrentAccount().balance.toString();
-              if (balance.length >= 5) {
-                return balance.substring(0, 5);
+              var account = store.state.getCurrentAccount();
+              if(account == null){
+                return "0";
               } else {
-                return balance;
+                var balance = account.balance.toString();
+                if (balance.length >= 5) {
+                  return balance.substring(0, 5);
+                } else {
+                  return balance;
+                }
               }
             }, builder: (context, balance) {
               return Text(balance, style: TextStyle(fontSize: 40));
@@ -47,6 +57,15 @@ class HomePageState extends State<HomePage> {
             Text(
               ' SOL',
               style: TextStyle(),
+            ),
+            MaterialButton(
+              child: Text("Log off"),
+              onPressed: (){
+                store.dispatch({
+                  "type": StateActions.RemoveAccount,
+                  "name": store.state.currentAccountName
+                });
+              },
             ),
           ],
         ),
