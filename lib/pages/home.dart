@@ -24,52 +24,58 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: StoreConnector<AppState, String>(converter: (store) {
-          var account = store.state.getCurrentAccount();
-          if(account == null) {
+          WalletAccount? account = store.state.getCurrentAccount();
+          if (account == null) {
             return "Not selected";
           } else {
             return account.name;
-          } 
+          }
         }, builder: (context, balance) {
           return Text('Account: $balance');
         }),
       ),
       body: Padding(
         padding: EdgeInsets.all(20.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            StoreConnector<AppState, String>(converter: (store) {
-              var account = store.state.getCurrentAccount();
-              if(account == null){
-                return "0";
-              } else {
-                var balance = account.balance.toString();
-                if (balance.length >= 5) {
-                  return balance.substring(0, 5);
-                } else {
-                  return balance;
-                }
-              }
-            }, builder: (context, balance) {
-              return Text(balance, style: TextStyle(fontSize: 40));
-            }),
-            Text(
-              ' SOL',
-              style: TextStyle(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                StoreConnector<AppState, String>(converter: (store) {
+                  WalletAccount? account = store.state.getCurrentAccount();
+                  if (account == null) {
+                    return "0";
+                  } else {
+                    String balance = account.balance.toString();
+                    if (balance.length >= 5) {
+                      return balance.substring(0, 5);
+                    } else {
+                      return balance;
+                    }
+                  }
+                }, builder: (context, balance) {
+                  return Text(balance, style: TextStyle(fontSize: 50));
+                }),
+                Text(' SOL'),
+              ],
             ),
             MaterialButton(
               child: Text("Log off"),
-              onPressed: (){
-                store.dispatch({
-                  "type": StateActions.RemoveAccount,
-                  "name": store.state.currentAccountName
-                });
-              },
+              onPressed: logOff,
             ),
           ],
         ),
       ),
     );
+  }
+
+  void logOff() {
+    Navigator.pushReplacementNamed(context, "/getting_started");
+
+    store.dispatch({
+      "type": StateActions.RemoveAccount,
+      "name": store.state.currentAccountName
+    });
   }
 }

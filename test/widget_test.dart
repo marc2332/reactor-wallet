@@ -13,7 +13,6 @@ import 'package:solana_wallet/state/store.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-
     var store = await createStore();
 
     await tester.pumpWidget(App(store));

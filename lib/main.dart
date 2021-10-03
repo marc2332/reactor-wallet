@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:solana_wallet/pages/getting_started.dart';
-import 'state/store.dart'
-    show AppState, StateActions, WalletAccount, createStore;
+import 'state/store.dart' show AppState, createStore;
 import 'pages/home.dart';
 import 'package:redux/redux.dart';
 
@@ -12,20 +11,20 @@ main() async {
 }
 
 class App extends StatelessWidget {
-
   final Store<AppState> store;
-  var initialRoute = "/home";
+  late String initialRoute = "/home";
 
   App(this.store) {
-    // No account created yet
-    if(store.state.currentAccountName == ""){
+    /*
+     * If there isn't any account created yet, then launch Getting Started Page
+     */
+    if (store.state.currentAccountName == "") {
       this.initialRoute = "/getting_started";
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    print(this.initialRoute);
     return StoreProvider<AppState>(
       store: this.store,
       child: MaterialApp(
@@ -35,8 +34,11 @@ class App extends StatelessWidget {
         ),
         initialRoute: this.initialRoute,
         routes: {
-          '/home': (context) => HomePage(store: this.store,),
-          '/getting_started': (context) => GettingStartedPage(store: this.store),
+          '/home': (context) => HomePage(
+                store: this.store,
+              ),
+          '/getting_started': (context) =>
+              GettingStartedPage(store: this.store),
         },
       ),
     );
