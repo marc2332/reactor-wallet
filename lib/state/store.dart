@@ -63,7 +63,7 @@ class AppState {
     });
 
     return {
-      'accounts': savedAccounts, // FAILS
+      'accounts': savedAccounts,
       'currentAccountName': currentAccountName
     };
   }
