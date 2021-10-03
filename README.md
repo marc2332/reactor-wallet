@@ -1,6 +1,6 @@
-This is a mobile Solana wallet.
+This is a mobile Solana wallet (not yet wallet).
 
-*Important*: It doesn't have wallet funcionalities yet, you can just type an address and see how many SOLs it has.
+*IMPORTANT*: It doesn't have wallet funcionalities yet, you can just type an address and see how many SOLs it has.
 
 WIP.
 
