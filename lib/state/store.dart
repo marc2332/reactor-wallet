@@ -7,22 +7,20 @@ import 'dart:convert';
 import 'package:http/http.dart' as Http;
 
 Future<double> solToUsdt(double sols) async {
-	
-    Map<String, String> headers = new Map();
-	
-    headers.putIfAbsent('Accept', () => 'application/json');
-	
-    Http.Response response = await Http.get(
-      Uri.http('api.binance.com', '/api/v3/ticker/price',{ 'symbol': 'SOLUSDT' }),
-      headers: headers,
-    );
+  Map<String, String> headers = new Map();
+  headers['Accept'] = 'application/json';
 
-    final body = json.decode(response.body);
-    
-    final double value = double.parse(body['price']) * sols;
+  Http.Response response = await Http.get(
+    Uri.http('api.binance.com', '/api/v3/ticker/price', {'symbol': 'SOLUSDT'}),
+    headers: headers,
+  );
 
-    return value;
-  }
+  final body = json.decode(response.body);
+
+  final double value = double.parse(body['price']) * sols;
+
+  return value;
+}
 
 class WalletAccount {
   late RPCClient client;
@@ -30,7 +28,7 @@ class WalletAccount {
   final String url;
   final String name;
   final String address;
-  double balance;
+  late double balance;
   late double usdtBalance = 0;
 
   WalletAccount(this.address, this.balance, this.name, this.url) {
@@ -38,9 +36,13 @@ class WalletAccount {
   }
 
   Future<void> refreshBalance() async {
-    var balance = await client.getBalance(address);
+    int balance = await client.getBalance(address);
     this.balance = balance.toDouble() / 1000000000;
-    this.usdtBalance = await solToUsdt(this.balance );
+    this.usdtBalance = await solToUsdt(this.balance);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {"name": name, "address": address, "balance": balance, "url": url};
   }
 }
 
@@ -59,30 +61,27 @@ class AppState {
       return null;
     }
 
-    var accounts = data["accounts"];
-    var currentAccountName = data["currentAccountName"];
+    Map<String, dynamic> accounts = data["accounts"];
+    String currentAccountName = data["currentAccountName"];
 
-    Map<String, WalletAccount> mappedAccounts = Map();
-
-    accounts.forEach((name, account) {
-      mappedAccounts[name] = WalletAccount(
-          account["address"], account["balance"], name, account["url"]);
-    });
+    Map<String, WalletAccount> mappedAccounts = accounts.map(
+      (name, account) => MapEntry(
+        name,
+        WalletAccount(
+          account["address"],
+          account["balance"],
+          name,
+          account["url"],
+        ),
+      ),
+    );
 
     return AppState(mappedAccounts, currentAccountName);
   }
 
-  dynamic toJson() {
-    var savedAccounts = {};
-
-    accounts.forEach((name, account) {
-      savedAccounts[name] = {
-        "name": account.name,
-        "address": account.address,
-        "balance": account.balance,
-        "url": account.url
-      };
-    });
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> savedAccounts =
+        accounts.map((name, account) => MapEntry(name, account.toJson()));
 
     return {
       'accounts': savedAccounts,
@@ -99,31 +98,41 @@ class Action {
 enum StateActions { SetBalance, AddAccount, RemoveAccount }
 
 AppState stateReducer(AppState state, dynamic action) {
-  if (action["type"] == StateActions.SetBalance) {
-    state.accounts[action["name"]].balance = action["balance"];
-  }
+  final actionType = action['type'];
 
-  if (action["type"] == StateActions.AddAccount) {
-    var account = action["account"];
+  switch (actionType) {
+    case StateActions.SetBalance:
+      final accountName = action['name'];
+      final accountBalance = action['balance'];
+      state.accounts[accountName].balance = accountBalance;
+      break;
 
-    state.accounts[account.name] = account;
+    case StateActions.AddAccount:
+      final Map<String, dynamic> account = action['balance'];
+      final accountName = account['name'];
 
-    state.currentAccountName = account.name;
-  }
+      // Add the account to the settings
+      state.accounts[accountName] = account;
 
-  if (action["type"] == StateActions.RemoveAccount) {
-    // Remove the account from the settings
-    state.accounts.remove(action["name"]);
+      // Select it as the current one
+      state.currentAccountName = accountName;
 
-    /*
-     * Select the first configured account if available
-     */
-    if (state.accounts.isNotEmpty) {
-      WalletAccount account = state.accounts.entries.first as WalletAccount;
-      state.currentAccountName = account.name;
-    } else {
-      state.currentAccountName = "";
-    }
+      break;
+
+    case StateActions.RemoveAccount:
+      // Remove the account from the settings
+      state.accounts.remove(action["name"]);
+
+      /*
+        * Select the first configured account if available
+        */
+      if (state.accounts.isNotEmpty) {
+        WalletAccount account = state.accounts.entries.first as WalletAccount;
+        state.currentAccountName = account.name;
+      } else {
+        state.currentAccountName = "";
+      }
+      break;
   }
 
   return state;
@@ -141,7 +150,7 @@ Future<Store<AppState>> createStore() async {
 
   if (initialState != null) {
     for (var name in initialState.accounts.keys) {
-      var account = initialState.accounts[name];
+      WalletAccount account = initialState.accounts[name];
       // Fetch every saved account's balance
       await account.refreshBalance();
     }

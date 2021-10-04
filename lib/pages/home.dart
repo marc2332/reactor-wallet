@@ -73,7 +73,8 @@ class HomePageState extends State<HomePage> {
                 }
               }
             }, builder: (context, usdBalance) {
-              return Text('$usdBalance\$', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold));
+              return Text('$usdBalance\$',
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold));
             }),
             MaterialButton(
               child: Text("Log off"),

@@ -12,14 +12,14 @@ main() async {
 
 class App extends StatelessWidget {
   final Store<AppState> store;
-  late String initialRoute = "/home";
+  late String initialRoute = '/home';
 
   App(this.store) {
     /*
      * If there isn't any account created yet, then launch Getting Started Page
      */
-    if (store.state.currentAccountName == "") {
-      this.initialRoute = "/getting_started";
+    if (store.state.currentAccountName == '') {
+      this.initialRoute = '/getting_started';
     }
   }
 
