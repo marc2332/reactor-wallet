@@ -3,6 +3,26 @@ import 'package:solana/solana.dart' show RPCClient;
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as Http;
+
+Future<double> solToUsdt(double sols) async {
+	
+    Map<String, String> headers = new Map();
+	
+    headers.putIfAbsent('Accept', () => 'application/json');
+	
+    Http.Response response = await Http.get(
+      Uri.http('api.binance.com', '/api/v3/ticker/price',{ 'symbol': 'SOLUSDT' }),
+      headers: headers,
+    );
+
+    final body = json.decode(response.body);
+    
+    final double value = double.parse(body['price']) * sols;
+
+    return value;
+  }
 
 class WalletAccount {
   late RPCClient client;
@@ -11,6 +31,7 @@ class WalletAccount {
   final String name;
   final String address;
   double balance;
+  late double usdtBalance = 0;
 
   WalletAccount(this.address, this.balance, this.name, this.url) {
     client = RPCClient(this.url);
@@ -19,6 +40,7 @@ class WalletAccount {
   Future<void> refreshBalance() async {
     var balance = await client.getBalance(address);
     this.balance = balance.toDouble() / 1000000000;
+    this.usdtBalance = await solToUsdt(this.balance );
   }
 }
 

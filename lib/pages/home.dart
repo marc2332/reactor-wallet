@@ -60,6 +60,21 @@ class HomePageState extends State<HomePage> {
                 Text(' SOL'),
               ],
             ),
+            StoreConnector<AppState, String>(converter: (store) {
+              WalletAccount? account = store.state.getCurrentAccount();
+              if (account == null) {
+                return "0";
+              } else {
+                var usdtBalance = account.usdtBalance.toString();
+                if (usdtBalance.length >= 6) {
+                  return usdtBalance.substring(0, 6);
+                } else {
+                  return usdtBalance;
+                }
+              }
+            }, builder: (context, usdBalance) {
+              return Text('$usdBalance\$', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold));
+            }),
             MaterialButton(
               child: Text("Log off"),
               onPressed: logOff,
