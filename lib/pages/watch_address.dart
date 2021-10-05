@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:solana/solana.dart';
 import '../state/store.dart';
+import 'package:bip39/bip39.dart' as bip39;
 
 /*
  * Getting Started Page
  */
-class GettingStartedPage extends StatefulWidget {
-  GettingStartedPage({Key? key, required this.store}) : super(key: key);
+class WatchAddress extends StatefulWidget {
+  WatchAddress({Key? key, required this.store}) : super(key: key);
 
   final store;
 
   @override
-  GettingStartedPageState createState() => GettingStartedPageState(this.store);
+  WatchAddressState createState() => WatchAddressState(this.store);
 }
 
-class GettingStartedPageState extends State<GettingStartedPage> {
+class WatchAddressState extends State<WatchAddress> {
   final store;
   late String address;
 
-  GettingStartedPageState(this.store);
+  WatchAddressState(this.store);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Getting started')),
+      appBar: AppBar(title: Text('Watch an address')),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -73,8 +75,11 @@ class GettingStartedPageState extends State<GettingStartedPage> {
 
   void addAccount() async {
     // Create the account
-    WalletAccount account = new WalletAccount(
-        address, 0, "Main", "https://api.mainnet-beta.solana.com");
+    ClientAccount account = new ClientAccount(
+        address,
+        0,
+        store.state.generateAccountName(),
+        "https://api.mainnet-beta.solana.com");
 
     // Load the balance
     await account.refreshBalance();
@@ -83,6 +88,6 @@ class GettingStartedPageState extends State<GettingStartedPage> {
     this.store.dispatch({"type": StateActions.AddAccount, "account": account});
 
     // Go to Home page
-    Navigator.pushReplacementNamed(context, "/home");
+    Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
   }
 }

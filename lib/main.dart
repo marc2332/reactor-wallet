@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:solana_wallet/pages/getting_started.dart';
+import 'package:solana_wallet/pages/create_wallet.dart';
+import 'package:solana_wallet/pages/watch_address.dart';
 import 'state/store.dart' show AppState, createStore;
 import 'pages/home.dart';
+import 'pages/account_selection.dart';
 import 'package:redux/redux.dart';
 
 main() async {
@@ -18,8 +20,8 @@ class App extends StatelessWidget {
     /*
      * If there isn't any account created yet, then launch Getting Started Page
      */
-    if (store.state.currentAccountName == '') {
-      this.initialRoute = '/getting_started';
+    if (store.state.accounts.length == 0) {
+      this.initialRoute = '/account_selection';
     }
   }
 
@@ -28,7 +30,7 @@ class App extends StatelessWidget {
     return StoreProvider<AppState>(
       store: this.store,
       child: MaterialApp(
-        title: 'solana wallet',
+        title: 'Solana wallet',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -37,8 +39,10 @@ class App extends StatelessWidget {
           '/home': (context) => HomePage(
                 store: this.store,
               ),
-          '/getting_started': (context) =>
-              GettingStartedPage(store: this.store),
+          '/account_selection': (context) =>
+              AccountSelectionPage(store: this.store),
+          '/watch_address': (context) => WatchAddress(store: this.store),
+          '/create_wallet': (context) => CreateWallet(store: this.store),
         },
       ),
     );

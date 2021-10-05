@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:solana/solana.dart' show RPCClient;
+import 'package:solana/solana.dart' show Ed25519HDKeyPair, RPCClient, Wallet;
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as Http;
+import 'package:bip39/bip39.dart' as bip39;
 
 Future<double> solToUsdt(double sols) async {
   Map<String, String> headers = new Map();
@@ -22,16 +23,90 @@ Future<double> solToUsdt(double sols) async {
   return value;
 }
 
-class WalletAccount {
-  late RPCClient client;
+abstract class Account {
+  final AccountType accountType;
+  final String name;
+  late double balance = 0;
+  late double usdtBalance = 0;
+  late String address;
 
+  Account(this.accountType, this.name);
+
+  Future<void> refreshBalance();
+  Map<String, dynamic> toJson();
+}
+
+enum AccountType { Wallet, Client }
+
+class WalletAccount implements Account {
+  final AccountType accountType = AccountType.Wallet;
+  late RPCClient client;
   final String url;
   final String name;
-  final String address;
-  late double balance;
+  late String address;
+  late double balance = 0;
+  late double usdtBalance = 0;
+  late Wallet wallet;
+  late String mnemonic;
+
+  WalletAccount(this.balance, this.name, this.url, String mnemonic) {
+    this.mnemonic = mnemonic;
+
+    client = RPCClient(url);
+  }
+
+  Future<void> refreshBalance() async {
+    int balance = await client.getBalance(address);
+    this.balance = balance.toDouble() / 1000000000;
+    this.usdtBalance = await solToUsdt(this.balance);
+  }
+
+  Future<void> loadKeyPair() async {
+    final Ed25519HDKeyPair keyPair =
+        await Ed25519HDKeyPair.fromMnemonic(mnemonic);
+    final Wallet wallet = new Wallet(signer: keyPair, rpcClient: client);
+    this.wallet = wallet;
+    this.address = wallet.address;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "address": address,
+      "balance": balance,
+      "url": url,
+      "mnemonic": mnemonic,
+      "accountType": accountType.toString()
+    };
+  }
+
+  static Future<WalletAccount> generate(String name, String url) async {
+    final String randomMnemonic = bip39.generateMnemonic();
+
+    WalletAccount account = new WalletAccount(0, name, url, randomMnemonic);
+    await account.loadKeyPair();
+    await account.refreshBalance();
+    return account;
+  }
+
+  static WalletAccount import(
+      String name, String url, double balance, String mnemonic) {
+    WalletAccount account = new WalletAccount(0, name, url, mnemonic);
+
+    return account;
+  }
+}
+
+class ClientAccount implements Account {
+  final AccountType accountType = AccountType.Client;
+  late RPCClient client;
+  final String url;
+  final String name;
+  late String address;
+  late double balance = 0;
   late double usdtBalance = 0;
 
-  WalletAccount(this.address, this.balance, this.name, this.url) {
+  ClientAccount(this.address, this.balance, this.name, this.url) {
     client = RPCClient(this.url);
   }
 
@@ -42,19 +117,20 @@ class WalletAccount {
   }
 
   Map<String, dynamic> toJson() {
-    return {"name": name, "address": address, "balance": balance, "url": url};
+    return {
+      "name": name,
+      "address": address,
+      "balance": balance,
+      "url": url,
+      "accountType": accountType.toString()
+    };
   }
 }
 
 class AppState {
-  var accounts = Map();
-  late String currentAccountName;
+  late Map<String, Account> accounts = Map();
 
-  AppState(this.accounts, this.currentAccountName);
-
-  WalletAccount? getCurrentAccount() {
-    return accounts[currentAccountName];
-  }
+  AppState(this.accounts);
 
   static AppState? fromJson(dynamic data) {
     if (data == null) {
@@ -62,21 +138,30 @@ class AppState {
     }
 
     Map<String, dynamic> accounts = data["accounts"];
-    String currentAccountName = data["currentAccountName"];
 
-    Map<String, WalletAccount> mappedAccounts = accounts.map(
-      (name, account) => MapEntry(
-        name,
-        WalletAccount(
+    Map<String, Account> mappedAccounts = accounts.map((accountName, account) {
+      // Convert enum from string to enum
+      AccountType accountType =
+          account["accountType"] == AccountType.Client.toString()
+              ? AccountType.Client
+              : AccountType.Wallet;
+
+      if (accountType == AccountType.Client) {
+        ClientAccount clientAccount = ClientAccount(
           account["address"],
           account["balance"],
-          name,
+          accountName,
           account["url"],
-        ),
-      ),
-    );
+        );
+        return MapEntry(accountName, clientAccount);
+      } else {
+        WalletAccount walletAccount = WalletAccount.import(accountName,
+            account["url"], account["balance"], account["mnemonic"]);
+        return MapEntry(accountName, walletAccount);
+      }
+    });
 
-    return AppState(mappedAccounts, currentAccountName);
+    return AppState(mappedAccounts);
   }
 
   Map<String, dynamic> toJson() {
@@ -85,8 +170,11 @@ class AppState {
 
     return {
       'accounts': savedAccounts,
-      'currentAccountName': currentAccountName
     };
+  }
+
+  String generateAccountName() {
+    return "Account ${accounts.length}";
   }
 }
 
@@ -104,34 +192,21 @@ AppState stateReducer(AppState state, dynamic action) {
     case StateActions.SetBalance:
       final accountName = action['name'];
       final accountBalance = action['balance'];
-      state.accounts[accountName].balance = accountBalance;
+      state.accounts
+          .update(accountName, (account) => account.balance = accountBalance);
       break;
 
     case StateActions.AddAccount:
-      final Map<String, dynamic> account = action['balance'];
-      final accountName = account['name'];
+      Account account = action['account'];
 
       // Add the account to the settings
-      state.accounts[accountName] = account;
-
-      // Select it as the current one
-      state.currentAccountName = accountName;
-
+      state.accounts.putIfAbsent(account.name, () => account);
       break;
 
     case StateActions.RemoveAccount:
       // Remove the account from the settings
       state.accounts.remove(action["name"]);
 
-      /*
-        * Select the first configured account if available
-        */
-      if (state.accounts.isNotEmpty) {
-        WalletAccount account = state.accounts.entries.first as WalletAccount;
-        state.currentAccountName = account.name;
-      } else {
-        state.currentAccountName = "";
-      }
       break;
   }
 
@@ -150,13 +225,19 @@ Future<Store<AppState>> createStore() async {
 
   if (initialState != null) {
     for (var name in initialState.accounts.keys) {
-      WalletAccount account = initialState.accounts[name];
+      Account? account = initialState.accounts[name];
       // Fetch every saved account's balance
-      await account.refreshBalance();
+      if (account != null) {
+        if (account.accountType == AccountType.Wallet) {
+          account = account as WalletAccount;
+          await account.loadKeyPair();
+        }
+        await account.refreshBalance();
+      }
     }
   }
 
   return Store<AppState>(stateReducer,
-      initialState: initialState ?? AppState(Map(), ""),
+      initialState: initialState ?? AppState(Map()),
       middleware: [persistor.createMiddleware()]);
 }

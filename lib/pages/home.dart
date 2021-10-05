@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import '../state/store.dart';
 
@@ -21,77 +22,134 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: StoreConnector<AppState, String>(converter: (store) {
-          WalletAccount? account = store.state.getCurrentAccount();
-          if (account == null) {
-            return "Not selected";
-          } else {
-            return account.name;
-          }
-        }, builder: (context, balance) {
-          return Text('Account: $balance');
-        }),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                StoreConnector<AppState, String>(converter: (store) {
-                  WalletAccount? account = store.state.getCurrentAccount();
-                  if (account == null) {
-                    return "0";
-                  } else {
-                    String balance = account.balance.toString();
-                    if (balance.length >= 5) {
-                      return balance.substring(0, 5);
-                    } else {
-                      return balance;
-                    }
-                  }
-                }, builder: (context, balance) {
-                  return Text(balance, style: TextStyle(fontSize: 50));
-                }),
-                Text(' SOL'),
-              ],
+    return StoreConnector<AppState, List<Account>>(converter: (store) {
+      Map<String, Account> accounts = store.state.accounts;
+      List<Account> listedAccounts =
+          accounts.entries.map((entry) => entry.value).toList();
+      return listedAccounts;
+    }, builder: (context, accounts) {
+      return DefaultTabController(
+        length: accounts.length,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text("Solana wallet"),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, "/account_selection");
+                },
+              )
+            ],
+            bottom: TabBar(
+              tabs: accounts
+                  .map(
+                    (account) => Tab(
+                      text: account.name,
+                    ),
+                  )
+                  .toList(),
             ),
-            StoreConnector<AppState, String>(converter: (store) {
-              WalletAccount? account = store.state.getCurrentAccount();
-              if (account == null) {
-                return "0";
-              } else {
-                var usdtBalance = account.usdtBalance.toString();
-                if (usdtBalance.length >= 6) {
-                  return usdtBalance.substring(0, 6);
-                } else {
-                  return usdtBalance;
-                }
-              }
-            }, builder: (context, usdBalance) {
-              return Text('$usdBalance\$',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold));
-            }),
-            MaterialButton(
-              child: Text("Log off"),
-              onPressed: logOff,
-            ),
-          ],
+          ),
+          body: TabBarView(
+            children: accounts
+                .map(
+                  (account) => Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        StoreConnector<AppState, String>(converter: (store) {
+                          return account.accountType.toString();
+                        }, builder: (context, text) {
+                          return Text(text);
+                        }),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            StoreConnector<AppState, String>(
+                                converter: (store) {
+                              String balance = account.balance.toString();
+                              if (balance.length >= 5) {
+                                return balance.substring(0, 5);
+                              } else {
+                                return balance;
+                              }
+                            }, builder: (context, balance) {
+                              return Text(balance,
+                                  style: TextStyle(fontSize: 50));
+                            }),
+                            Text(' SOL'),
+                          ],
+                        ),
+                        StoreConnector<AppState, String>(converter: (store) {
+                          String usdtBalance = account.usdtBalance.toString();
+                          if (usdtBalance.length >= 6) {
+                            return usdtBalance.substring(0, 6);
+                          } else {
+                            return usdtBalance;
+                          }
+                        }, builder: (context, usdBalance) {
+                          return Text('$usdBalance\$',
+                              style: TextStyle(
+                                  fontSize: 25, fontWeight: FontWeight.bold));
+                        }),
+                        MaterialButton(
+                          child: Text("Log off"),
+                          onPressed: () {
+                            logOff(account);
+                          },
+                        ),
+                        MaterialButton(
+                          child: Text("copy mnemonic"),
+                          onPressed: () {
+                            copyMnemonic(account);
+                          },
+                        ),
+                        MaterialButton(
+                          child: Text("copy address"),
+                          onPressed: () {
+                            copyAddress(account);
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
-  void logOff() {
-    Navigator.pushReplacementNamed(context, "/getting_started");
-
-    store.dispatch({
-      "type": StateActions.RemoveAccount,
-      "name": store.state.currentAccountName
+  void copyAddress(Account account) {
+    Clipboard.setData(new ClipboardData(text: account.address)).then((_) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Address copied to clipboard")));
     });
+  }
+
+  void copyMnemonic(Account account) {
+    // Only for wallets
+    if (account.accountType != AccountType.Wallet) return;
+
+    WalletAccount walletAccount =
+        store.state.getCurrentAccount() as WalletAccount;
+
+    Clipboard.setData(new ClipboardData(text: walletAccount.mnemonic))
+        .then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Mnemonic copied to clipboard")));
+    });
+  }
+
+  void logOff(Account account) {
+    Navigator.pushReplacementNamed(context, "/account_selection");
+
+    store.dispatch({"type": StateActions.RemoveAccount, "name": account.name});
   }
 }
