@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:solana_wallet/pages/create_wallet.dart';
+import 'package:solana_wallet/pages/import_wallet.dart';
 import 'package:solana_wallet/pages/watch_address.dart';
 import 'state/store.dart' show AppState, createStore;
 import 'pages/home.dart';
@@ -43,6 +44,7 @@ class App extends StatelessWidget {
               AccountSelectionPage(store: this.store),
           '/watch_address': (context) => WatchAddress(store: this.store),
           '/create_wallet': (context) => CreateWallet(store: this.store),
+          '/import_wallet': (context) => ImportWallet(store: this.store),
         },
       ),
     );

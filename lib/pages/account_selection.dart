@@ -54,12 +54,14 @@ class AccountSelectionPageState extends State<AccountSelectionPage> {
                 child: Card(
                   child: InkWell(
                     splashColor: Theme.of(context).hoverColor,
-                    onTap: () async {},
+                    onTap: () async {
+                      Navigator.pushNamed(context, "/import_wallet");
+                    },
                     child: Flex(
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [Text("Import wallet (not supported yet)")],
+                      children: [Text("Import wallet (DEVNET!)")],
                     ),
                   ),
                 ),
@@ -76,7 +78,7 @@ class AccountSelectionPageState extends State<AccountSelectionPage> {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [Text("Create wallet (devnet for now)")],
+                      children: [Text("Create wallet (DEVNET!)")],
                     ),
                   ),
                 ),

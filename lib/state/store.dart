@@ -137,31 +137,39 @@ class AppState {
       return null;
     }
 
-    Map<String, dynamic> accounts = data["accounts"];
+    try {
+      Map<String, dynamic> accounts = data["accounts"];
 
-    Map<String, Account> mappedAccounts = accounts.map((accountName, account) {
-      // Convert enum from string to enum
-      AccountType accountType =
-          account["accountType"] == AccountType.Client.toString()
-              ? AccountType.Client
-              : AccountType.Wallet;
+      Map<String, Account> mappedAccounts =
+          accounts.map((accountName, account) {
+        // Convert enum from string to enum
+        AccountType accountType =
+            account["accountType"] == AccountType.Client.toString()
+                ? AccountType.Client
+                : AccountType.Wallet;
 
-      if (accountType == AccountType.Client) {
-        ClientAccount clientAccount = ClientAccount(
-          account["address"],
-          account["balance"],
-          accountName,
-          account["url"],
-        );
-        return MapEntry(accountName, clientAccount);
-      } else {
-        WalletAccount walletAccount = WalletAccount.import(accountName,
-            account["url"], account["balance"], account["mnemonic"]);
-        return MapEntry(accountName, walletAccount);
-      }
-    });
+        if (accountType == AccountType.Client) {
+          ClientAccount clientAccount = ClientAccount(
+            account["address"],
+            account["balance"],
+            accountName,
+            account["url"],
+          );
+          return MapEntry(accountName, clientAccount);
+        } else {
+          WalletAccount walletAccount = WalletAccount.import(accountName,
+              account["url"], account["balance"], account["mnemonic"]);
+          return MapEntry(accountName, walletAccount);
+        }
+      });
 
-    return AppState(mappedAccounts);
+      return AppState(mappedAccounts);
+    } catch (err) {
+      /*
+       * Restart the settings if there was any error
+       */
+      return AppState(Map());
+    }
   }
 
   Map<String, dynamic> toJson() {

@@ -137,8 +137,7 @@ class HomePageState extends State<HomePage> {
     // Only for wallets
     if (account.accountType != AccountType.Wallet) return;
 
-    WalletAccount walletAccount =
-        store.state.getCurrentAccount() as WalletAccount;
+    WalletAccount walletAccount = account as WalletAccount;
 
     Clipboard.setData(new ClipboardData(text: walletAccount.mnemonic))
         .then((_) {
