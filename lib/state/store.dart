@@ -29,6 +29,7 @@ abstract class Account {
   late double balance = 0;
   late double usdtBalance = 0;
   late String address;
+  late double solValue = 0;
 
   Account(this.accountType, this.name);
 
@@ -48,6 +49,7 @@ class WalletAccount implements Account {
   late double usdtBalance = 0;
   late Wallet wallet;
   late String mnemonic;
+  late double solValue = 0;
 
   WalletAccount(this.balance, this.name, this.url, String mnemonic) {
     this.mnemonic = mnemonic;
@@ -105,6 +107,7 @@ class ClientAccount implements Account {
   late String address;
   late double balance = 0;
   late double usdtBalance = 0;
+  late double solValue = 0;
 
   ClientAccount(this.address, this.balance, this.name, this.url) {
     client = RPCClient(this.url);
@@ -129,6 +132,7 @@ class ClientAccount implements Account {
 
 class AppState {
   late Map<String, Account> accounts = Map();
+  late double solValue = 0;
 
   AppState(this.accounts);
 
@@ -181,12 +185,36 @@ class AppState {
     };
   }
 
+  Future<void> loadSolValue() async {
+    Map<String, String> headers = new Map();
+    headers['Accept'] = 'application/json';
+
+    Http.Response response = await Http.get(
+      Uri.http(
+          'api.binance.com', '/api/v3/ticker/price', {'symbol': 'SOLUSDT'}),
+      headers: headers,
+    );
+
+    final body = json.decode(response.body);
+
+    solValue = double.parse(body['price']);
+
+    accounts.forEach((_, account) {
+      account.solValue = solValue;
+    });
+  }
+
   String generateAccountName() {
     int accountN = 0;
     while (accounts.containsKey("Account $accountN")) {
       accountN++;
     }
     return "Account $accountN";
+  }
+
+  void addAccount(Account account) {
+    account.solValue = solValue;
+    accounts.putIfAbsent(account.name, () => account);
   }
 }
 
@@ -212,7 +240,7 @@ AppState stateReducer(AppState state, dynamic action) {
       Account account = action['account'];
 
       // Add the account to the settings
-      state.accounts.putIfAbsent(account.name, () => account);
+      state.addAccount(account);
       break;
 
     case StateActions.RemoveAccount:
@@ -235,6 +263,10 @@ Future<Store<AppState>> createStore() async {
 
   AppState? initialState = await persistor.load();
 
+  final Store<AppState> store = Store<AppState>(stateReducer,
+      initialState: initialState ?? AppState(Map()),
+      middleware: [persistor.createMiddleware()]);
+
   if (initialState != null) {
     for (var name in initialState.accounts.keys) {
       Account? account = initialState.accounts[name];
@@ -242,14 +274,27 @@ Future<Store<AppState>> createStore() async {
       if (account != null) {
         if (account.accountType == AccountType.Wallet) {
           account = account as WalletAccount;
-          await account.loadKeyPair();
+          /*
+           * Load the key's pair and then refresh the balance 
+           */
+          account.loadKeyPair().then((_) {
+            account!.refreshBalance().then((value) {
+              store.dispatch(
+                  {"type": StateActions.AddAccount, "account": account});
+            });
+          });
+        } else {
+          /*
+           * Refresh the balance
+           */
+          account.refreshBalance().then((value) {
+            store.dispatch(
+                {"type": StateActions.AddAccount, "account": account});
+          });
         }
-        await account.refreshBalance();
       }
     }
   }
 
-  return Store<AppState>(stateReducer,
-      initialState: initialState ?? AppState(Map()),
-      middleware: [persistor.createMiddleware()]);
+  return store;
 }
