@@ -1,6 +1,6 @@
-This is a mobile Solana wallet (not a wallet yet).
+## Solana Mobile Wallet
 
-*IMPORTANT*: It doesn't have wallet funcionalities yet, you can just type an address and see how many SOLs it has.
+A mobile wallet for Solana made in flutter
 
 WIP.
 
