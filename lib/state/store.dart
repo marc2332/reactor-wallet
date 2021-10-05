@@ -174,7 +174,11 @@ class AppState {
   }
 
   String generateAccountName() {
-    return "Account ${accounts.length}";
+    int accountN = 0;
+    while (accounts.containsKey("Account $accountN")) {
+      accountN++;
+    }
+    return "Account $accountN";
   }
 }
 

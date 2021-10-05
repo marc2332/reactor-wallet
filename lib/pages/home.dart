@@ -148,8 +148,10 @@ class HomePageState extends State<HomePage> {
   }
 
   void logOff(Account account) {
-    Navigator.pushReplacementNamed(context, "/account_selection");
-
     store.dispatch({"type": StateActions.RemoveAccount, "name": account.name});
+
+    if (store.state.accounts.length == 0) {
+      Navigator.pushReplacementNamed(context, "/account_selection");
+    }
   }
 }

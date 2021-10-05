@@ -56,6 +56,6 @@ class CreateWalletState extends State<CreateWallet> {
         .dispatch({"type": StateActions.AddAccount, "account": walletAccount});
 
     // Go to Home page
-    Navigator.pushReplacementNamed(context, "/home");
+    Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
   }
 }
