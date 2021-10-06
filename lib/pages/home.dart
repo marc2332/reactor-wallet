@@ -55,71 +55,59 @@ class HomePageState extends State<HomePage> {
             ),
           ),
           body: TabBarView(
-            children: accounts
-                .map(
-                  (account) => Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Column(
+            children: accounts.map((account) {
+              String accountType = account.accountType.toString();
+              String usdBalance = account.usdtBalance.toString();
+              if (usdBalance.length >= 6) {
+                usdBalance = usdBalance.substring(0, 6);
+              }
+              String solBalance = account.balance.toString();
+              if (solBalance.length >= 5) {
+                solBalance = solBalance.substring(0, 5);
+              }
+              return Padding(
+                padding: EdgeInsets.all(30.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Text(accountType),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        StoreConnector<AppState, String>(converter: (store) {
-                          return account.accountType.toString();
-                        }, builder: (context, text) {
-                          return Text(text);
-                        }),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            StoreConnector<AppState, String>(
-                                converter: (store) {
-                              String balance = account.balance.toString();
-                              if (balance.length >= 5) {
-                                return balance.substring(0, 5);
-                              } else {
-                                return balance;
-                              }
-                            }, builder: (context, balance) {
-                              return Text(balance,
-                                  style: TextStyle(fontSize: 50));
-                            }),
-                            Text(' SOL'),
-                          ],
-                        ),
-                        StoreConnector<AppState, String>(converter: (store) {
-                          String usdtBalance = account.usdtBalance.toString();
-                          if (usdtBalance.length >= 6) {
-                            return usdtBalance.substring(0, 6);
-                          } else {
-                            return usdtBalance;
-                          }
-                        }, builder: (context, usdBalance) {
-                          return Text('$usdBalance\$',
-                              style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold));
-                        }),
-                        MaterialButton(
-                          child: Text("Log off"),
-                          onPressed: () {
-                            logOff(account);
-                          },
-                        ),
-                        MaterialButton(
-                          child: Text("copy mnemonic"),
-                          onPressed: () {
-                            copyMnemonic(account);
-                          },
-                        ),
-                        MaterialButton(
-                          child: Text("copy address"),
-                          onPressed: () {
-                            copyAddress(account);
-                          },
-                        )
+                      children: [
+                        Text(solBalance, style: TextStyle(fontSize: 50)),
+                        Text(' SOL'),
                       ],
                     ),
-                  ),
-                )
-                .toList(),
+                    Text('$usdBalance\$',
+                        style: TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.bold)),
+                    MaterialButton(
+                      child: Text("Log off"),
+                      onPressed: () {
+                        logOff(account);
+                      },
+                    ),
+                    MaterialButton(
+                      child: Text("copy mnemonic"),
+                      onPressed: () {
+                        copyMnemonic(account);
+                      },
+                    ),
+                    MaterialButton(
+                      child: Text("copy address"),
+                      onPressed: () {
+                        copyAddress(account);
+                      },
+                    ),
+                    Column(
+                      children: account.transactions.map((tx) {
+                        return Text("tx");
+                      }).toList(),
+                    )
+                  ],
+                ),
+              );
+            }).toList(),
           ),
         ),
       );

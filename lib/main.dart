@@ -3,13 +3,15 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:solana_wallet/pages/create_wallet.dart';
 import 'package:solana_wallet/pages/import_wallet.dart';
 import 'package:solana_wallet/pages/watch_address.dart';
+import 'package:worker_manager/worker_manager.dart';
 import 'state/store.dart' show AppState, createStore;
 import 'pages/home.dart';
 import 'pages/account_selection.dart';
 import 'package:redux/redux.dart';
 
 main() async {
-  var store = await createStore();
+  await Executor().warmUp();
+  Store<AppState> store = await createStore();
   runApp(App(store));
 }
 

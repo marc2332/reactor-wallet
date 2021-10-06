@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
 import 'package:solana/solana.dart';
 import '../state/store.dart';
 import 'package:bip39/bip39.dart' as bip39;
@@ -9,7 +10,7 @@ import 'package:bip39/bip39.dart' as bip39;
 class ImportWallet extends StatefulWidget {
   ImportWallet({Key? key, required this.store}) : super(key: key);
 
-  final store;
+  Store<AppState> store;
 
   @override
   ImportWalletState createState() => ImportWalletState(this.store);
@@ -80,15 +81,16 @@ class ImportWalletState extends State<ImportWallet> {
     // Create key pair
     await walletAccount.loadKeyPair();
 
-    // Load the balance
-    await walletAccount.refreshBalance();
-
     // Add the account
-    this
-        .store
-        .dispatch({"type": StateActions.AddAccount, "account": walletAccount});
+    store.state.addAccount(walletAccount);
 
-    // Go to Home page
-    Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
+    // Refresh the balances
+    store.state.loadSolValue().then((_) {
+      // Trigger the rendering
+      store.dispatch({"type": StateActions.SolValueRefreshed});
+
+      // Go to Home page
+      Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
+    });
   }
 }

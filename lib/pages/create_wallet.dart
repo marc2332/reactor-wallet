@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
 import 'package:solana/solana.dart';
 import '../state/store.dart';
 import 'package:bip39/bip39.dart' as bip39;
@@ -9,14 +10,14 @@ import 'package:bip39/bip39.dart' as bip39;
 class CreateWallet extends StatefulWidget {
   CreateWallet({Key? key, required this.store}) : super(key: key);
 
-  final store;
+  Store<AppState> store;
 
   @override
   CreateWalletState createState() => CreateWalletState(this.store);
 }
 
 class CreateWalletState extends State<CreateWallet> {
-  final store;
+  Store<AppState> store;
   late String address;
 
   CreateWalletState(this.store);
@@ -47,15 +48,16 @@ class CreateWalletState extends State<CreateWallet> {
     WalletAccount walletAccount = await WalletAccount.generate(
         store.state.generateAccountName(), "https://api.devnet.solana.com");
 
-    // Load the balance
-    await walletAccount.refreshBalance();
-
     // Add the account
-    this
-        .store
-        .dispatch({"type": StateActions.AddAccount, "account": walletAccount});
+    store.state.addAccount(walletAccount);
 
-    // Go to Home page
-    Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
+    // Refresh the balances
+    store.state.loadSolValue().then((_) {
+      // Trigger the rendering
+      store.dispatch({"type": StateActions.SolValueRefreshed});
+
+      // Go to Home page
+      Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
+    });
   }
 }
