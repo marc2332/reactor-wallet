@@ -7,22 +7,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as Http;
 import 'package:bip39/bip39.dart' as bip39;
 
-Future<double> solToUsdt(double sols) async {
-  Map<String, String> headers = new Map();
-  headers['Accept'] = 'application/json';
-
-  Http.Response response = await Http.get(
-    Uri.http('api.binance.com', '/api/v3/ticker/price', {'symbol': 'SOLUSDT'}),
-    headers: headers,
-  );
-
-  final body = json.decode(response.body);
-
-  final double value = double.parse(body['price']) * sols;
-
-  return value;
-}
-
 abstract class Account {
   final AccountType accountType;
   final String name;
@@ -60,7 +44,7 @@ class WalletAccount implements Account {
   Future<void> refreshBalance() async {
     int balance = await client.getBalance(address);
     this.balance = balance.toDouble() / 1000000000;
-    this.usdtBalance = await solToUsdt(this.balance);
+    this.usdtBalance = this.balance * solValue;
   }
 
   Future<void> loadKeyPair() async {
@@ -116,7 +100,7 @@ class ClientAccount implements Account {
   Future<void> refreshBalance() async {
     int balance = await client.getBalance(address);
     this.balance = balance.toDouble() / 1000000000;
-    this.usdtBalance = await solToUsdt(this.balance);
+    this.usdtBalance = this.balance * solValue;
   }
 
   Map<String, dynamic> toJson() {
@@ -263,20 +247,21 @@ Future<Store<AppState>> createStore() async {
 
   AppState? initialState = await persistor.load();
 
-  final Store<AppState> store = Store<AppState>(stateReducer,
-      initialState: initialState ?? AppState(Map()),
-      middleware: [persistor.createMiddleware()]);
+  AppState state = initialState ?? AppState(Map());
 
-  if (initialState != null) {
-    for (var name in initialState.accounts.keys) {
-      Account? account = initialState.accounts[name];
+  final Store<AppState> store = Store<AppState>(stateReducer,
+      initialState: state, middleware: [persistor.createMiddleware()]);
+
+  state.loadSolValue().then((_) {
+    for (var name in state.accounts.keys) {
+      Account? account = state.accounts[name];
       // Fetch every saved account's balance
       if (account != null) {
         if (account.accountType == AccountType.Wallet) {
           account = account as WalletAccount;
           /*
-           * Load the key's pair and then refresh the balance 
-           */
+          * Load the key's pair and then refresh the balance 
+          */
           account.loadKeyPair().then((_) {
             account!.refreshBalance().then((value) {
               store.dispatch(
@@ -285,8 +270,8 @@ Future<Store<AppState>> createStore() async {
           });
         } else {
           /*
-           * Refresh the balance
-           */
+          * Refresh the balance
+          */
           account.refreshBalance().then((value) {
             store.dispatch(
                 {"type": StateActions.AddAccount, "account": account});
@@ -294,7 +279,7 @@ Future<Store<AppState>> createStore() async {
         }
       }
     }
-  }
+  });
 
   return store;
 }
