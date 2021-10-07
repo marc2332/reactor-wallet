@@ -230,16 +230,19 @@ class AppState {
 
     Http.Response response = await Http.get(
       Uri.http(
-        'api.binance.com',
-        '/api/v3/ticker/price',
-        {'symbol': 'SOLUSDT'},
+        'api.coingecko.com',
+        '/api/v3/simple/price',
+        {
+          'ids': 'solana',
+          'vs_currencies': 'USD',
+        },
       ),
       headers: headers,
     );
 
     final body = json.decode(response.body);
 
-    solValue = double.parse(body['price']);
+    solValue = body['solana']['usd'].toDouble();
 
     for (final account in accounts.values) {
       account.solValue = solValue;
