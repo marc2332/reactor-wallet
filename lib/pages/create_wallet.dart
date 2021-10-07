@@ -19,6 +19,7 @@ class CreateWallet extends StatefulWidget {
 class CreateWalletState extends State<CreateWallet> {
   Store<AppState> store;
   late String address;
+  late String accoutName;
 
   CreateWalletState(this.store);
 
@@ -29,6 +30,31 @@ class CreateWalletState extends State<CreateWallet> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(children: [
+            Form(
+              autovalidateMode: AutovalidateMode.always,
+              child: Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(15),
+                  child: TextFormField(
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Empty account name';
+                      } else {
+                        return null;
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Enter an account name',
+                    ),
+                    onChanged: (String value) async {
+                      accoutName = value;
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ]),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -44,20 +70,23 @@ class CreateWalletState extends State<CreateWallet> {
   }
 
   void createWallet() async {
-    // Create the account
-    WalletAccount walletAccount = await WalletAccount.generate(
-        store.state.generateAccountName(), "https://api.devnet.solana.com");
+    if (accoutName.length > 0 &&
+        !store.state.accounts.containsKey(accoutName)) {
+      // Create the account
+      WalletAccount walletAccount = await WalletAccount.generate(
+          accoutName, "https://api.devnet.solana.com");
 
-    // Add the account
-    store.state.addAccount(walletAccount);
+      // Add the account
+      store.state.addAccount(walletAccount);
 
-    // Refresh the balances
-    store.state.loadSolValue().then((_) {
-      // Trigger the rendering
-      store.dispatch({"type": StateActions.SolValueRefreshed});
+      // Refresh the balances
+      store.state.loadSolValue().then((_) {
+        // Trigger the rendering
+        store.dispatch({"type": StateActions.SolValueRefreshed});
 
-      // Go to Home page
-      Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
-    });
+        // Go to Home page
+        Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
+      });
+    }
   }
 }

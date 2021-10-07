@@ -34,9 +34,26 @@ class HomePageState extends State<HomePage> {
           appBar: AppBar(
             title: Text("Solana wallet"),
             actions: <Widget>[
+              Builder(builder: (context) {
+                return IconButton(
+                  icon: Icon(
+                    Icons.logout_outlined,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    TabController? tabController =
+                        DefaultTabController.of(context);
+                    if (tabController != null) {
+                      int tabIndex = tabController.index;
+                      Account currentAccount = accounts[tabIndex];
+                      logOff(currentAccount);
+                    }
+                  },
+                );
+              }),
               IconButton(
                 icon: Icon(
-                  Icons.add,
+                  Icons.person_add_alt_1_outlined,
                   color: Colors.white,
                 ),
                 onPressed: () {
@@ -47,16 +64,21 @@ class HomePageState extends State<HomePage> {
             bottom: TabBar(
               tabs: accounts
                   .map(
-                    (account) => Tab(
-                      text: account.name,
-                    ),
+                    (account) => Tab(text: account.name),
                   )
                   .toList(),
             ),
           ),
           body: TabBarView(
             children: accounts.map((account) {
-              String accountType = account.accountType.toString();
+              String accountType = "";
+
+              if (account.accountType == AccountType.Client) {
+                accountType = "Watcher";
+              } else {
+                accountType = "Wallet";
+              }
+
               String usdBalance = account.usdtBalance.toString();
               if (usdBalance.length >= 6) {
                 usdBalance = usdBalance.substring(0, 6);
@@ -66,35 +88,40 @@ class HomePageState extends State<HomePage> {
                 solBalance = solBalance.substring(0, 5);
               }
               return Padding(
-                padding: EdgeInsets.all(30.0),
+                padding: EdgeInsets.only(top: 40.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text(accountType),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(solBalance, style: TextStyle(fontSize: 50)),
-                        Text(' SOL'),
-                      ],
+                    Text(
+                        '$accountType (${account.address.substring(0, 5)}...)'),
+                    Padding(
+                      padding: EdgeInsets.all(15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(solBalance, style: TextStyle(fontSize: 50)),
+                          Text(' SOL'),
+                        ],
+                      ),
                     ),
-                    Text('$usdBalance\$',
-                        style: TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold)),
-                    MaterialButton(
-                      child: Text("Log off"),
-                      onPressed: () {
-                        logOff(account);
-                      },
+                    Text(
+                      '$usdBalance\$',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    if (account.accountType == AccountType.Wallet) ...[
+                      MaterialButton(
+                        child: Text("Copy seedphrase"),
+                        onPressed: () {
+                          copyMnemonic(account);
+                        },
+                      ),
+                    ],
                     MaterialButton(
-                      child: Text("copy mnemonic"),
-                      onPressed: () {
-                        copyMnemonic(account);
-                      },
-                    ),
-                    MaterialButton(
-                      child: Text("copy address"),
+                      child: Text("Copy address"),
                       onPressed: () {
                         copyAddress(account);
                       },
