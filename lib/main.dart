@@ -4,19 +4,19 @@ import 'package:solana_wallet/pages/create_wallet.dart';
 import 'package:solana_wallet/pages/import_wallet.dart';
 import 'package:solana_wallet/pages/watch_address.dart';
 import 'package:worker_manager/worker_manager.dart';
-import 'state/store.dart' show AppState, createStore;
+import 'state/store.dart' show AppState, StateWrapper, createStore;
 import 'pages/home.dart';
 import 'pages/account_selection.dart';
 import 'package:redux/redux.dart';
 
 main() async {
   await Executor().warmUp();
-  Store<AppState> store = await createStore();
+  StateWrapper store = await createStore();
   runApp(App(store));
 }
 
 class App extends StatelessWidget {
-  final Store<AppState> store;
+  final StateWrapper store;
   late String initialRoute = '/home';
 
   App(this.store) {

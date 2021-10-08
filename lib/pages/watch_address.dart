@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:redux/redux.dart';
-import 'package:solana/solana.dart';
 import '../state/store.dart';
-import 'package:bip39/bip39.dart' as bip39;
 
 /*
  * Getting Started Page
@@ -10,14 +7,14 @@ import 'package:bip39/bip39.dart' as bip39;
 class WatchAddress extends StatefulWidget {
   WatchAddress({Key? key, required this.store}) : super(key: key);
 
-  Store<AppState> store;
+  final StateWrapper store;
 
   @override
   WatchAddressState createState() => WatchAddressState(this.store);
 }
 
 class WatchAddressState extends State<WatchAddress> {
-  Store<AppState> store;
+  StateWrapper store;
   late String address;
 
   WatchAddressState(this.store);
@@ -25,7 +22,7 @@ class WatchAddressState extends State<WatchAddress> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Watch an address')),
+      appBar: AppBar(title: const Text('Watch an address')),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -64,7 +61,7 @@ class WatchAddressState extends State<WatchAddress> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               MaterialButton(
-                child: Text("Continue"),
+                child: const Text("Continue"),
                 onPressed: addAccount,
               )
             ],
@@ -76,20 +73,7 @@ class WatchAddressState extends State<WatchAddress> {
 
   void addAccount() async {
     // Create the account
-    ClientAccount account = new ClientAccount(
-        address,
-        0,
-        store.state.generateAccountName(),
-        "https://api.mainnet-beta.solana.com");
-
-    // Add the account
-    store.state.addAccount(account);
-
-    // Refresh the balances
-    store.state.loadSolValue().then((_) {
-      // Trigger the rendering
-      store.dispatch({"type": StateActions.SolValueRefreshed});
-
+    store.createWatcher(address).then((_) {
       // Go to Home page
       Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
     });

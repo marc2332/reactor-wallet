@@ -264,6 +264,72 @@ class AppState {
   }
 }
 
+/*
+ * Extends Redux's store to make simpler some interactions to the internal state
+ */
+class StateWrapper extends Store<AppState> {
+  StateWrapper(Reducer<AppState> reducer, initialState, middleware)
+      : super(reducer, initialState: initialState, middleware: middleware);
+
+  /*
+   * Create a wallet instance
+   */
+  Future<void> createWallet(String accountName) async {
+    // Create the account
+    WalletAccount walletAccount = await WalletAccount.generate(
+        accountName, "https://api.devnet.solana.com");
+
+    // Add the account
+    state.addAccount(walletAccount);
+
+    // Refresh the balances
+    await state.loadSolValue();
+
+    dispatch({"type": StateActions.SolValueRefreshed});
+  }
+
+  /*
+   * Import a wallet
+   */
+  Future<void> importWallet(String mnemonic) async {
+    // Create the account
+    WalletAccount walletAccount = new WalletAccount(
+      0,
+      state.generateAccountName(),
+      "https://api.devnet.solana.com",
+      mnemonic,
+    );
+
+    // Create key pair
+    await walletAccount.loadKeyPair();
+
+    // Add the account
+    state.addAccount(walletAccount);
+
+    // Refresh the balances
+    await state.loadSolValue();
+
+    // Dispatch the change
+    dispatch({"type": StateActions.SolValueRefreshed});
+  }
+
+  /*
+   * Create an address watcher
+   */
+  Future<void> createWatcher(String address) async {
+    ClientAccount account = new ClientAccount(address, 0,
+        state.generateAccountName(), "https://api.mainnet-beta.solana.com");
+
+    // Add the account
+    state.addAccount(account);
+
+    // Refresh the balances
+    await state.loadSolValue();
+
+    dispatch({"type": StateActions.SolValueRefreshed});
+  }
+}
+
 class Action {
   late StateActions type;
   dynamic payload;
@@ -302,7 +368,7 @@ AppState stateReducer(AppState state, dynamic action) {
   return state;
 }
 
-Future<Store<AppState>> createStore() async {
+Future<StateWrapper> createStore() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final persistor = Persistor<AppState>(
@@ -315,39 +381,39 @@ Future<Store<AppState>> createStore() async {
 
   AppState state = initialState ?? AppState(Map());
 
-  final Store<AppState> store = Store<AppState>(stateReducer,
-      initialState: state, middleware: [persistor.createMiddleware()]);
+  final StateWrapper store = StateWrapper(
+    stateReducer,
+    state,
+    [persistor.createMiddleware()],
+  );
 
   // Fetch the current solana value
   state.loadSolValue().then((_) {
-    for (String name in state.accounts.keys) {
-      Account? account = state.accounts[name];
+    for (Account account in state.accounts.values) {
       // Fetch every saved account's balance
-      if (account != null) {
-        if (account.accountType == AccountType.Wallet) {
-          account = account as WalletAccount;
-          /*
-          * Load the key's pair and the transactions list
-          */
-          account.loadKeyPair().then((_) {
-            account!.loadTransactions().then((_) {
-              store.dispatch({
-                "type": StateActions.AddAccount,
-                "account": account,
-              });
-            });
-          });
-        } else {
-          /*
-           * Load the transactions list
-           */
+      if (account.accountType == AccountType.Wallet) {
+        account = account as WalletAccount;
+        /*
+         * Load the key's pair and the transactions list
+         */
+        account.loadKeyPair().then((_) {
           account.loadTransactions().then((_) {
             store.dispatch({
               "type": StateActions.AddAccount,
               "account": account,
             });
           });
-        }
+        });
+      } else {
+        /*
+         * Load the transactions list
+         */
+        account.loadTransactions().then((_) {
+          store.dispatch({
+            "type": StateActions.AddAccount,
+            "account": account,
+          });
+        });
       }
     }
   });

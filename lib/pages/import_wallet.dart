@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:redux/redux.dart';
-import 'package:solana/solana.dart';
 import '../state/store.dart';
-import 'package:bip39/bip39.dart' as bip39;
 
 /*
  * Getting Started Page
@@ -10,7 +7,7 @@ import 'package:bip39/bip39.dart' as bip39;
 class ImportWallet extends StatefulWidget {
   ImportWallet({Key? key, required this.store}) : super(key: key);
 
-  Store<AppState> store;
+  final StateWrapper store;
 
   @override
   ImportWalletState createState() => ImportWalletState(this.store);
@@ -25,7 +22,7 @@ class ImportWalletState extends State<ImportWallet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Import wallet')),
+      appBar: AppBar(title: const Text('Import wallet')),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -60,7 +57,7 @@ class ImportWalletState extends State<ImportWallet> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               MaterialButton(
-                child: Text("Import Wallet"),
+                child: const Text("Import Wallet"),
                 onPressed: importWallet,
               )
             ],
@@ -72,24 +69,7 @@ class ImportWalletState extends State<ImportWallet> {
 
   void importWallet() async {
     // Create the account
-    WalletAccount walletAccount = new WalletAccount(
-        0,
-        store.state.generateAccountName(),
-        "https://api.devnet.solana.com",
-        mnemonic);
-
-    // Create key pair
-    await walletAccount.loadKeyPair();
-
-    // Add the account
-    store.state.addAccount(walletAccount);
-
-    // Refresh the balances
-    store.state.loadSolValue().then((_) {
-      // Trigger the rendering
-      store.dispatch({"type": StateActions.SolValueRefreshed});
-
-      // Go to Home page
+    store.importWallet(mnemonic).then((_) {
       Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
     });
   }

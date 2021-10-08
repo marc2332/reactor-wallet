@@ -1,31 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import '../state/store.dart';
 
 /*
  * Account Selection Page
  */
-class AccountSelectionPage extends StatefulWidget {
+class AccountSelectionPage extends StatelessWidget {
   AccountSelectionPage({Key? key, required this.store}) : super(key: key);
 
-  final store;
-
-  @override
-  AccountSelectionPageState createState() =>
-      AccountSelectionPageState(this.store);
-}
-
-class AccountSelectionPageState extends State<AccountSelectionPage> {
-  final store;
-
-  AccountSelectionPageState(this.store);
+  final StateWrapper store;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Account"),
+        title: const Text("Account selection"),
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
@@ -44,7 +32,7 @@ class AccountSelectionPageState extends State<AccountSelectionPage> {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [Text("Watch address (mainnet)")],
+                      children: [const Text("Watch address (mainnet)")],
                     ),
                   ),
                 ),
@@ -61,7 +49,7 @@ class AccountSelectionPageState extends State<AccountSelectionPage> {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [Text("Import wallet (DEVNET!)")],
+                      children: [const Text("Import wallet (DEVNET!)")],
                     ),
                   ),
                 ),
@@ -78,7 +66,7 @@ class AccountSelectionPageState extends State<AccountSelectionPage> {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [Text("Create wallet (DEVNET!)")],
+                      children: [const Text("Create wallet (DEVNET!)")],
                     ),
                   ),
                 ),

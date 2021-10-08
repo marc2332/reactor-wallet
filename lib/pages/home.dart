@@ -9,14 +9,14 @@ import '../state/store.dart';
 class HomePage extends StatefulWidget {
   HomePage({Key? key, required this.store}) : super(key: key);
 
-  final store;
+  final StateWrapper store;
 
   @override
   HomePageState createState() => HomePageState(this.store);
 }
 
 class HomePageState extends State<HomePage> {
-  final store;
+  final StateWrapper store;
 
   HomePageState(this.store);
 
@@ -24,15 +24,13 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return StoreConnector<AppState, List<Account>>(converter: (store) {
       Map<String, Account> accounts = store.state.accounts;
-      List<Account> listedAccounts =
-          accounts.entries.map((entry) => entry.value).toList();
-      return listedAccounts;
+      return accounts.entries.map((entry) => entry.value).toList();
     }, builder: (context, accounts) {
       return DefaultTabController(
         length: accounts.length,
         child: Scaffold(
           appBar: AppBar(
-            title: Text("Solana wallet"),
+            title: const Text("Solana wallet"),
             actions: <Widget>[
               Builder(builder: (context) {
                 return IconButton(
@@ -46,7 +44,7 @@ class HomePageState extends State<HomePage> {
                     if (tabController != null) {
                       int tabIndex = tabController.index;
                       Account currentAccount = accounts[tabIndex];
-                      logOff(currentAccount);
+                      removeAccount(currentAccount);
                     }
                   },
                 );
@@ -61,15 +59,21 @@ class HomePageState extends State<HomePage> {
                 },
               )
             ],
-            bottom: TabBar(
-              tabs: accounts
-                  .map(
-                    (account) => Tab(text: account.name),
-                  )
-                  .toList(),
+            bottom: new PreferredSize(
+              preferredSize: new Size(200.0, 60.0),
+              child: TabBar(
+                physics: BouncingScrollPhysics(),
+                isScrollable: true,
+                tabs: accounts
+                    .map(
+                      (account) => Tab(text: account.name),
+                    )
+                    .toList(),
+              ),
             ),
           ),
           body: TabBarView(
+            physics: BouncingScrollPhysics(),
             children: accounts.map((account) {
               String accountType = "";
 
@@ -101,7 +105,7 @@ class HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(solBalance, style: TextStyle(fontSize: 50)),
-                          Text(' SOL'),
+                          const Text(' SOL'),
                         ],
                       ),
                     ),
@@ -114,21 +118,21 @@ class HomePageState extends State<HomePage> {
                     ),
                     if (account.accountType == AccountType.Wallet) ...[
                       MaterialButton(
-                        child: Text("Copy seedphrase"),
+                        child: const Text("Copy seedphrase"),
                         onPressed: () {
                           copyMnemonic(account);
                         },
                       ),
                     ],
                     MaterialButton(
-                      child: Text("Copy address"),
+                      child: const Text("Copy address"),
                       onPressed: () {
                         copyAddress(account);
                       },
                     ),
                     Column(
                       children: account.transactions.map((tx) {
-                        return Text("tx");
+                        return const Text("tx");
                       }).toList(),
                     )
                   ],
@@ -141,6 +145,9 @@ class HomePageState extends State<HomePage> {
     });
   }
 
+  /*
+   * Copy an account's address
+   */
   void copyAddress(Account account) {
     Clipboard.setData(new ClipboardData(text: account.address)).then((_) {
       ScaffoldMessenger.of(context)
@@ -148,6 +155,9 @@ class HomePageState extends State<HomePage> {
     });
   }
 
+  /*
+   * Copy the seedphrase of an account
+   */
   void copyMnemonic(Account account) {
     // Only for wallets
     if (account.accountType != AccountType.Wallet) return;
@@ -161,7 +171,10 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-  void logOff(Account account) {
+  /*
+   * Remove an account by passing it's instance
+   */
+  void removeAccount(Account account) {
     store.dispatch({"type": StateActions.RemoveAccount, "name": account.name});
 
     if (store.state.accounts.length == 0) {

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:redux/redux.dart';
-import 'package:solana/solana.dart';
 import '../state/store.dart';
-import 'package:bip39/bip39.dart' as bip39;
 
 /*
  * Getting Started Page
@@ -10,23 +7,23 @@ import 'package:bip39/bip39.dart' as bip39;
 class CreateWallet extends StatefulWidget {
   CreateWallet({Key? key, required this.store}) : super(key: key);
 
-  Store<AppState> store;
+  final StateWrapper store;
 
   @override
   CreateWalletState createState() => CreateWalletState(this.store);
 }
 
 class CreateWalletState extends State<CreateWallet> {
-  Store<AppState> store;
+  StateWrapper store;
   late String address;
-  late String accoutName;
+  late String accountName;
 
   CreateWalletState(this.store);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create wallet')),
+      appBar: AppBar(title: const Text('Create wallet')),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -48,7 +45,7 @@ class CreateWalletState extends State<CreateWallet> {
                       hintText: 'Enter an account name',
                     ),
                     onChanged: (String value) async {
-                      accoutName = value;
+                      accountName = value;
                     },
                   ),
                 ),
@@ -59,7 +56,7 @@ class CreateWalletState extends State<CreateWallet> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               MaterialButton(
-                child: Text("Create Wallet"),
+                child: const Text("Create Wallet"),
                 onPressed: createWallet,
               )
             ],
@@ -70,20 +67,9 @@ class CreateWalletState extends State<CreateWallet> {
   }
 
   void createWallet() async {
-    if (accoutName.length > 0 &&
-        !store.state.accounts.containsKey(accoutName)) {
-      // Create the account
-      WalletAccount walletAccount = await WalletAccount.generate(
-          accoutName, "https://api.devnet.solana.com");
-
-      // Add the account
-      store.state.addAccount(walletAccount);
-
-      // Refresh the balances
-      store.state.loadSolValue().then((_) {
-        // Trigger the rendering
-        store.dispatch({"type": StateActions.SolValueRefreshed});
-
+    if (accountName.length > 0 &&
+        !store.state.accounts.containsKey(accountName)) {
+      store.createWallet(accountName).then((_) {
         // Go to Home page
         Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
       });
