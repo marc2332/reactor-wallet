@@ -271,6 +271,14 @@ class StateWrapper extends Store<AppState> {
   StateWrapper(Reducer<AppState> reducer, initialState, middleware)
       : super(reducer, initialState: initialState, middleware: middleware);
 
+  Future<void> refreshAccounts() async {
+    // Refresh balances
+    await state.loadSolValue();
+
+    // Dispatch the change
+    dispatch({"type": StateActions.SolValueRefreshed});
+  }
+
   /*
    * Create a wallet instance
    */
@@ -335,7 +343,12 @@ class Action {
   dynamic payload;
 }
 
-enum StateActions { SetBalance, AddAccount, RemoveAccount, SolValueRefreshed }
+enum StateActions {
+  SetBalance,
+  AddAccount,
+  RemoveAccount,
+  SolValueRefreshed,
+}
 
 AppState stateReducer(AppState state, dynamic action) {
   final actionType = action['type'];

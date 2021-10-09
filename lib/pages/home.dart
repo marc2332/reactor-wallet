@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:solana_wallet/components/home_tab_body.dart';
 import '../state/store.dart';
 
 /*
@@ -75,99 +76,27 @@ class HomePageState extends State<HomePage> {
           body: TabBarView(
             physics: BouncingScrollPhysics(),
             children: accounts.map((account) {
-              String accountType = "";
-
-              if (account.accountType == AccountType.Client) {
-                accountType = "Watcher";
-              } else {
-                accountType = "Wallet";
-              }
-
-              String usdBalance = account.usdtBalance.toString();
-              if (usdBalance.length >= 6) {
-                usdBalance = usdBalance.substring(0, 6);
-              }
-              String solBalance = account.balance.toString();
-              if (solBalance.length >= 5) {
-                solBalance = solBalance.substring(0, 5);
-              }
-              return Padding(
-                padding: EdgeInsets.only(top: 40.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                        '$accountType (${account.address.substring(0, 5)}...)'),
-                    Padding(
-                      padding: EdgeInsets.all(15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(solBalance, style: TextStyle(fontSize: 50)),
-                          const Text(' SOL'),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      '$usdBalance\$',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    if (account.accountType == AccountType.Wallet) ...[
-                      MaterialButton(
-                        child: const Text("Copy seedphrase"),
-                        onPressed: () {
-                          copyMnemonic(account);
-                        },
-                      ),
-                    ],
-                    MaterialButton(
-                      child: const Text("Copy address"),
-                      onPressed: () {
-                        copyAddress(account);
-                      },
-                    ),
-                    Column(
-                      children: account.transactions.map((tx) {
-                        return const Text("tx");
-                      }).toList(),
-                    )
-                  ],
+              return RefreshIndicator(
+                onRefresh: () async {
+                  // Refresh all account's balances when pulling
+                  await store.refreshAccounts();
+                },
+                child: NotificationListener<OverscrollIndicatorNotification>(
+                  onNotification: (OverscrollIndicatorNotification overscroll) {
+                    // This disables the Material scroll effect when overscrolling
+                    overscroll.disallowGlow();
+                    return true;
+                  },
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: HomeTabBody(account: account, store: store),
+                  ),
                 ),
               );
             }).toList(),
           ),
         ),
       );
-    });
-  }
-
-  /*
-   * Copy an account's address
-   */
-  void copyAddress(Account account) {
-    Clipboard.setData(new ClipboardData(text: account.address)).then((_) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Address copied to clipboard")));
-    });
-  }
-
-  /*
-   * Copy the seedphrase of an account
-   */
-  void copyMnemonic(Account account) {
-    // Only for wallets
-    if (account.accountType != AccountType.Wallet) return;
-
-    WalletAccount walletAccount = account as WalletAccount;
-
-    Clipboard.setData(new ClipboardData(text: walletAccount.mnemonic))
-        .then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Mnemonic copied to clipboard")));
     });
   }
 
