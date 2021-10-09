@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:solana/solana.dart'
     show Ed25519HDKeyPair, RPCClient, TransactionResponse, Wallet;
@@ -227,6 +229,7 @@ class AppState {
   Future<void> loadSolValue() async {
     Map<String, String> headers = new Map();
     headers['Accept'] = 'application/json';
+    headers['Access-Control-Allow-Origin'] = '*';
 
     Http.Response response = await Http.get(
       Uri.http(

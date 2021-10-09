@@ -66,7 +66,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
                 }), builder: (context, solBalance) {
                   return Text(
                     solBalance,
-                    style: GoogleFonts.lato(
+                    style: GoogleFonts.poppins(
                       textStyle: TextStyle(
                         fontSize: 50,
                       ),

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:solana_wallet/pages/create_wallet.dart';
 import 'package:solana_wallet/pages/import_wallet.dart';
@@ -7,9 +9,14 @@ import 'package:worker_manager/worker_manager.dart';
 import 'state/store.dart' show AppState, StateWrapper, createStore;
 import 'pages/home.dart';
 import 'pages/account_selection.dart';
-import 'package:redux/redux.dart';
 
 main() async {
+
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['fonts'], license);
+  });
+
   await Executor().warmUp();
   StateWrapper store = await createStore();
   runApp(App(store));

@@ -23,4 +23,10 @@ TODO / Ideas:
 - [ ] Ability to display NFTs owned by a wallet 
 WIP.
 
+### Building
+
+```
+flutter build apk --tree-shake-icons --split-per-abi
+```
+
 MIT License
