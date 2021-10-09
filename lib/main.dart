@@ -11,7 +11,6 @@ import 'pages/home.dart';
 import 'pages/account_selection.dart';
 
 main() async {
-
   LicenseRegistry.addLicense(() async* {
     final license = await rootBundle.loadString('fonts/OFL.txt');
     yield LicenseEntryWithLineBreaks(['fonts'], license);
