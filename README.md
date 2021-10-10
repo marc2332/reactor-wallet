@@ -11,8 +11,8 @@ TODO / Ideas:
 - [ ] **A name for the app**
 - [ ] Seedphrases encryption
 - [ ] Mainnet/betanet/custom net support besides devnet
-- [ ] Ability to name and rename imported and created wallets, and watched addresses
-- [ ] Ability to make transactions
+- [x] Ability to name and rename imported and created wallets, and watched addresses
+- [x] Ability to make transactions
 - [x] Ability to refresh the current SOL value by pulling down
 - [ ] Option to use another currency besides dollar as equivalent value
 - [ ] Display latest transactions (waiting for https://github.com/cryptoplease/cryptoplease-dart/pull/83)

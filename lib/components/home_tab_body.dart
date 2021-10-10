@@ -144,8 +144,135 @@ class HomeTabBodyState extends State<HomeTabBody> {
               );
             }
           }),
+          Padding(
+            padding: EdgeInsets.all(30),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  child: const Text("Send"),
+                  onPressed: () {
+                    Account? account = store.state.accounts[accountName];
+                    if (account != null) {
+                      WalletAccount walletAccount = account as WalletAccount;
+
+                      sendTransactionDialog(context, walletAccount);
+                    }
+                  },
+                )
+              ],
+            ),
+          )
         ],
       ),
+    );
+  }
+
+  static String? transactionAddressValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Empty address';
+    }
+    if (value.length != 44) {
+      return 'Address must have a length of 44 characters';
+    } else {
+      return null;
+    }
+  }
+
+  static String? transactionAmmountValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Empty ammount';
+    }
+    if (double.parse(value) <= 0) {
+      return 'You must send at least 0.000000001 SOL';
+    } else {
+      return null;
+    }
+  }
+
+  Future<void> sendTransactionDialog(
+    context,
+    WalletAccount walletAccount,
+  ) async {
+    String destinationAddress = "";
+    double sendAmmount = 0;
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Send SOL'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Form(
+                  autovalidateMode: AutovalidateMode.always,
+                  child: TextFormField(
+                    validator: transactionAddressValidator,
+                    decoration: InputDecoration(
+                      hintText: walletAccount.address,
+                    ),
+                    onChanged: (String value) async {
+                      destinationAddress = value;
+                    },
+                  ),
+                ),
+                Form(
+                  autovalidateMode: AutovalidateMode.always,
+                  child: TextFormField(
+                    validator: transactionAmmountValidator,
+                    decoration: InputDecoration(
+                      hintText: 'Ammount of SOLs',
+                    ),
+                    onChanged: (String value) async {
+                      sendAmmount = double.parse(value);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Send'),
+              onPressed: () {
+                bool addressIsOk =
+                    transactionAddressValidator(destinationAddress) == null;
+                bool balanceIsOk =
+                    transactionAmmountValidator("$sendAmmount") == null;
+
+                // Only let send if the address and the ammount is OK
+                if (addressIsOk && balanceIsOk) {
+                  // 1 SOL = 1000000000 lamports
+                  int lamports = (sendAmmount * 1000000000).toInt();
+
+                  // Make the transfer
+                  walletAccount.wallet.transfer(
+                    destination: destinationAddress,
+                    lamports: lamports,
+                  );
+                  // Close the dialog
+                  Navigator.of(context).pop();
+
+                  // Show some feedback
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text('Sent $sendAmmount SOL to $destinationAddress'),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
