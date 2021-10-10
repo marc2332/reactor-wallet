@@ -43,22 +43,25 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
               children: accounts.map((account) {
                 return Card(
                   child: ListTile(
-                    subtitle: Text(
-                        '${account.address.toString().substring(0, 5)}...'),
+                    subtitle: Text("Press for more info"),
                     trailing: IconButton(
-                      icon: Icon(Icons.info_outline_rounded),
+                      icon: Icon(Icons.mode_edit_outline_outlined),
                       onPressed: () {
-                        accountInfoDialog(context, account);
+                        editAccountDialog(context, account);
                       },
                     ),
                     enableFeedback: true,
-                    title: Text(account.name),
+                    title: Text(
+                        '${account.name} (${account.address.toString().substring(0, 5)}...)'),
                     leading: IconButton(
                       icon: Icon(Icons.remove_circle_outline),
                       onPressed: () {
                         removeAccountDialog(context, account);
                       },
                     ),
+                    onTap: () {
+                      accountInfoDialog(context, account);
+                    },
                   ),
                 );
               }).toList(),
@@ -78,6 +81,65 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
     if (store.state.accounts.length == 0) {
       Navigator.pushReplacementNamed(context, "/account_selection");
     }
+  }
+
+  /*
+   * Apply changes to a new account
+   */
+  void applyAccount(Account account, String accountName) {
+    store.dispatch({"type": StateActions.RemoveAccount, "name": account.name});
+    account.name = accountName;
+    store.dispatch({"type": StateActions.AddAccount, "account": account});
+  }
+
+  Future<void> editAccountDialog(context, account) async {
+    String accountName = account.name;
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Editing ${account.name}'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextFormField(
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Empty name';
+                    } else {
+                      return null;
+                    }
+                  },
+                  initialValue: account.name,
+                  decoration: InputDecoration(
+                    hintText: account.name,
+                  ),
+                  onChanged: (String value) async {
+                    accountName = value;
+                  },
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Apply'),
+              onPressed: () {
+                applyAccount(account, accountName);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> accountInfoDialog(context, Account account) async {

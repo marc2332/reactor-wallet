@@ -120,10 +120,9 @@ class SettingsSubPageState extends State<SettingsSubPage> {
             ),
           ),
           Card(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Text('Made by Marc Espín'),
-            ),
+            child: ListTile(
+                title: const Text('Made by Marc Espín'),
+                trailing: Icon(Icons.info_outline)),
           )
         ],
       ),
@@ -136,8 +135,11 @@ class SettingsSubPageState extends State<SettingsSubPage> {
     if (canOpen) {
       await launch(url);
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Could not open browser.")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Could not open browser."),
+        ),
+      );
     }
   }
 }

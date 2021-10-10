@@ -13,7 +13,7 @@ import 'package:worker_manager/worker_manager.dart';
 
 abstract class Account {
   final AccountType accountType;
-  final String name;
+  late String name;
 
   late double balance = 0;
   late double usdtBalance = 0;
@@ -31,7 +31,7 @@ abstract class Account {
 class BaseAccount {
   final AccountType accountType = AccountType.Wallet;
   final String url;
-  final String name;
+  late String name;
 
   late RPCClient client;
   late String address;
