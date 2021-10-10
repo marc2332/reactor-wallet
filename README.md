@@ -21,6 +21,8 @@ TODO / Ideas:
 - [ ] Have some UI tweaking options, like themes.
 - [ ] Unit tests
 - [ ] Ability to display NFTs owned by a wallet 
+- [ ] Upload to https://itsallwidgets.com/
+
 WIP.
 
 ### Building

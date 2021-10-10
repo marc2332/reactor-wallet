@@ -39,14 +39,31 @@ class HomeTabBodyState extends State<HomeTabBody> {
       accountTypeText = "Wallet";
     }
     return Padding(
-      padding: EdgeInsets.only(top: 40.0),
+      padding: EdgeInsets.only(top: 20.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Text('$accountTypeText (${address.substring(0, 5)}...)'),
+          TextButton(
+            onPressed: () {
+              // Copy the account's address to the clipboard
+              Clipboard.setData(
+                new ClipboardData(text: address),
+              ).then((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Address copied to clipboard"),
+                  ),
+                );
+              });
+            },
+            child: Text(
+              '$accountTypeText (${address.substring(0, 5)}...)',
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
           Padding(
-            padding: EdgeInsets.all(15),
+            padding: EdgeInsets.all(10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -127,56 +144,8 @@ class HomeTabBodyState extends State<HomeTabBody> {
               );
             }
           }),
-          if (accountType == AccountType.Wallet) ...[
-            MaterialButton(
-              child: const Text("Copy seedphrase"),
-              onPressed: () {
-                copyMnemonic();
-              },
-            ),
-          ],
-          MaterialButton(
-            child: const Text("Copy address"),
-            onPressed: () {
-              copyAddress();
-            },
-          )
         ],
       ),
     );
-  }
-
-  /*
-   * Copy an account's address
-   */
-  void copyAddress() {
-    Account? account = store.state.accounts[accountName];
-
-    if (account == null) return;
-
-    Clipboard.setData(new ClipboardData(text: account.address)).then((_) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Address copied to clipboard")));
-    });
-  }
-
-  /*
-   * Copy the seedphrase of an account
-   */
-  void copyMnemonic() {
-    Account? account = store.state.accounts[accountName];
-
-    if (account == null) return;
-
-    // Only for wallets
-    if (account.accountType != AccountType.Wallet) return;
-
-    WalletAccount walletAccount = account as WalletAccount;
-
-    Clipboard.setData(new ClipboardData(text: walletAccount.mnemonic))
-        .then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Mnemonic copied to clipboard")));
-    });
   }
 }

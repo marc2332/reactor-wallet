@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:solana_wallet/pages/create_wallet.dart';
 import 'package:solana_wallet/pages/import_wallet.dart';
+import 'package:solana_wallet/pages/manage_accounts.dart';
 import 'package:solana_wallet/pages/watch_address.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'state/store.dart' show AppState, StateWrapper, createStore;
@@ -53,6 +54,8 @@ class App extends StatelessWidget {
           '/watch_address': (context) => WatchAddress(store: this.store),
           '/create_wallet': (context) => CreateWallet(store: this.store),
           '/import_wallet': (context) => ImportWallet(store: this.store),
+          '/manage_accounts': (context) =>
+              ManageAccountsPage(store: this.store),
         },
       ),
     );

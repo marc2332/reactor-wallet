@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:solana_wallet/components/home_tab_body.dart';
 import '../state/store.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /*
  * Accounts sub page
@@ -21,30 +21,13 @@ class AccountSubPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text("Solana wallet"),
           actions: <Widget>[
-            Builder(builder: (context) {
-              return IconButton(
-                icon: Icon(
-                  Icons.logout_outlined,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  TabController? tabController =
-                      DefaultTabController.of(context);
-                  if (tabController != null) {
-                    int tabIndex = tabController.index;
-                    Account currentAccount = accounts[tabIndex];
-                    removeAccount(context, store, currentAccount);
-                  }
-                },
-              );
-            }),
             IconButton(
               icon: Icon(
-                Icons.person_add_alt_1_outlined,
+                Icons.manage_accounts_outlined,
                 color: Colors.white,
               ),
               onPressed: () {
-                Navigator.pushNamed(context, "/account_selection");
+                Navigator.pushNamed(context, "/manage_accounts");
               },
             )
           ],
@@ -91,16 +74,71 @@ class AccountSubPage extends StatelessWidget {
 /*
  * Settings sub page
  */
-class SettingsSubPage extends StatelessWidget {
+class SettingsSubPage extends StatefulWidget {
+  final StateWrapper store;
+
+  SettingsSubPage(this.store);
+
+  @override
+  State<StatefulWidget> createState() => SettingsSubPageState(this.store);
+}
+
+class SettingsSubPageState extends State<SettingsSubPage> {
+  final StateWrapper store;
+
+  SettingsSubPageState(this.store);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(top: 40, left: 20, right: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [Text("Made by Marc Espín. WIP")],
+      child: ListView(
+        physics: BouncingScrollPhysics(),
+        children: [
+          Card(
+            child: InkWell(
+              splashColor: Theme.of(context).hoverColor,
+              onTap: () async {
+                Navigator.pushNamed(context, '/manage_accounts');
+              },
+              child: ListTile(
+                title: const Text('Manage accounts'),
+                trailing: Icon(Icons.manage_accounts_outlined),
+              ),
+            ),
+          ),
+          Card(
+            child: InkWell(
+              splashColor: Theme.of(context).hoverColor,
+              onTap: () async {
+                openURL('https://github.com/marc2332/solana-mobile-wallet');
+              },
+              child: ListTile(
+                title: const Text('Contribute'),
+                trailing: Icon(Icons.link_outlined),
+              ),
+            ),
+          ),
+          Card(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Text('Made by Marc Espín'),
+            ),
+          )
+        ],
       ),
     );
+  }
+
+  void openURL(url) async {
+    bool canOpen = await canLaunch(url);
+
+    if (canOpen) {
+      await launch(url);
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Could not open browser.")));
+    }
   }
 }
 
@@ -134,7 +172,7 @@ class HomePageState extends State<HomePage> {
       switch (currentPage) {
         // Settings sub page
         case 1:
-          page = SettingsSubPage();
+          page = SettingsSubPage(store);
           break;
 
         // Wallet sub page
@@ -155,24 +193,18 @@ class HomePageState extends State<HomePage> {
           showUnselectedLabels: false,
           items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.account_balance_wallet_outlined),
-                label: 'Accounts'),
+              activeIcon: Icon(Icons.account_balance_wallet),
+              icon: Icon(Icons.account_balance_wallet_outlined),
+              label: 'Accounts',
+            ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.settings), label: 'Settings')
+              activeIcon: Icon(Icons.settings),
+              icon: Icon(Icons.settings_outlined),
+              label: 'Settings',
+            ),
           ],
         ),
       );
     });
-  }
-}
-
-/*
-   * Remove an account by passing it's instance
-   */
-void removeAccount(context, store, Account account) {
-  store.dispatch({"type": StateActions.RemoveAccount, "name": account.name});
-
-  if (store.state.accounts.length == 0) {
-    Navigator.pushReplacementNamed(context, "/account_selection");
   }
 }
