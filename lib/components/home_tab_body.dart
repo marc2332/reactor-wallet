@@ -127,11 +127,10 @@ class HomeTabBodyState extends State<HomeTabBody> {
                 ),
               );
             } else {
-              return Container(
-                width: 100,
-                height: 35,
-                child: Center(
-                  child: Text(
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                 Text(
                     '$usdBalance\$',
                     style: GoogleFonts.lato(
                       textStyle: TextStyle(
@@ -139,8 +138,8 @@ class HomeTabBodyState extends State<HomeTabBody> {
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                  ),
-                ),
+                  )
+                ],
               );
             }
           }),

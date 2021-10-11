@@ -32,7 +32,16 @@ class AccountSelectionPage extends StatelessWidget {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [const Text("Watch address (mainnet)")],
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(15),
+                          child: Icon(
+                            Icons.person_pin_outlined,
+                            size: 30.0,
+                          ),
+                        ),
+                        const Text("Watch address (mainnet)"),
+                      ],
                     ),
                   ),
                 ),
@@ -49,7 +58,16 @@ class AccountSelectionPage extends StatelessWidget {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [const Text("Import wallet (DEVNET!)")],
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(15),
+                          child: Icon(
+                            Icons.import_export_outlined,
+                            size: 30.0,
+                          ),
+                        ),
+                        const Text("Import wallet (DEVNET!)"),
+                      ],
                     ),
                   ),
                 ),
@@ -66,7 +84,16 @@ class AccountSelectionPage extends StatelessWidget {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [const Text("Create wallet (DEVNET!)")],
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(15),
+                          child: Icon(
+                            Icons.create_outlined,
+                            size: 30.0,
+                          ),
+                        ),
+                        const Text("Create wallet (DEVNET!)"),
+                      ],
                     ),
                   ),
                 ),

@@ -36,11 +36,26 @@ class AccountSubPage extends StatelessWidget {
             child: TabBar(
               physics: BouncingScrollPhysics(),
               isScrollable: true,
-              tabs: accounts
-                  .map(
-                    (account) => Tab(text: account.name),
-                  )
-                  .toList(),
+              tabs: accounts.map(
+                (account) {
+                  bool isWallet = account.accountType == AccountType.Wallet;
+                  IconData icon = isWallet
+                      ? Icons.account_balance_wallet_outlined
+                      : Icons.person_pin_outlined;
+
+                  return Tab(
+                    child: Row(
+                      children: [
+                        Icon(icon),
+                        Padding(
+                          padding: EdgeInsets.only(left: 5),
+                          child: Text(account.name),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ).toList(),
             ),
           ),
         ),
