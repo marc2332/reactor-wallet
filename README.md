@@ -25,6 +25,11 @@ TODO / Ideas:
 
 WIP.
 
+### Support this project
+You can support this project by donating any ammount you want to this *Solana* address: 
+
+`uHYMrQiXKQbhh98XiKQ6oWG7pyfcKHf9pizCkqQPwqs`
+
 ### Building
 
 ```
