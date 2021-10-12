@@ -15,7 +15,7 @@ TODO / Ideas:
 - [x] Ability to make transactions
 - [x] Ability to refresh the current SOL value by pulling down
 - [ ] Option to use another currency besides dollar as equivalent value
-- [ ] Display latest transactions (waiting for https://github.com/cryptoplease/cryptoplease-dart/pull/83)
+- [x] Display latest transactions
 - [ ] Better project organization
 - [ ] Ability to easily share an address (QR?)
 - [ ] Have some UI tweaking options, like themes.

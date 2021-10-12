@@ -102,7 +102,7 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
           title: Text('Editing ${account.name}'),
           content: SingleChildScrollView(
             child: ListBody(
-              children: <Widget>[
+              children: [
                 TextFormField(
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {

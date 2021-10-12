@@ -9,6 +9,7 @@ import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as Http;
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:solana/src/rpc_client/rpc_client.dart';
 import 'package:worker_manager/worker_manager.dart';
 
 abstract class Account {
@@ -57,9 +58,8 @@ class BaseAccount {
    */
   Future<void> loadTransactions() async {
     // -> https://github.com/cryptoplease/cryptoplease-dart/pull/83
-    //final response = await client.getTransactionsList(address);
-    //transactions = response.toList();
-    transactions = [];
+    final response = await client.getTransactionsList(address);
+    transactions = response.toList();
   }
 }
 
@@ -150,9 +150,8 @@ class ClientAccount extends BaseAccount implements Account {
 
   Future<void> loadTransactions() async {
     // -> https://github.com/cryptoplease/cryptoplease-dart/pull/83
-    //final response = await client.getTransactionsList(address);
-    //transactions = response.toList();
-    transactions = [];
+    final response = await client.getTransactionsList(address);
+    transactions = response.toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -339,6 +338,17 @@ class StateWrapper extends Store<AppState> {
 
     dispatch({"type": StateActions.SolValueRefreshed});
   }
+
+  Future<void> refreshAccount(String accountName) async {
+    Account? account = state.accounts[accountName];
+
+    if (account != null) {
+      await account.loadTransactions();
+      await account.refreshBalance();
+
+      dispatch({"type": StateActions.SolValueRefreshed});
+    }
+  }
 }
 
 class Action {
@@ -412,12 +422,13 @@ Future<StateWrapper> createStore() async {
         /*
          * Load the key's pair and the transactions list
          */
-        account.loadKeyPair().then((_) {
-          account.loadTransactions().then((_) {
-            store.dispatch({
-              "type": StateActions.AddAccount,
-              "account": account,
-            });
+        Future.wait([
+          account.loadKeyPair(),
+          account.loadTransactions(),
+        ]).then((_) {
+          store.dispatch({
+            "type": StateActions.AddAccount,
+            "account": account,
           });
         });
       } else {
