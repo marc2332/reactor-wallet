@@ -37,10 +37,8 @@ class WatchAddressState extends State<WatchAddress> {
                       validator: (String? value) {
                         if (value == null || value.isEmpty) {
                           return 'Empty address';
-                        } else if (value.length < 44) {
-                          return 'Address is too short';
-                        } else if (value.length > 44) {
-                          return 'Adress is too long';
+                        } else if (value.length >= 43 && value.length < 50) {
+                          return 'Address length is not correct';
                         } else {
                           return null;
                         }
