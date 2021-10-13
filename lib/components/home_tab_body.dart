@@ -267,8 +267,8 @@ class HomeTabBodyState extends State<HomeTabBody> {
     if (value == null || value.isEmpty) {
       return 'Empty address';
     }
-    if (value.length != 44) {
-      return 'Address must have a length of 44 characters';
+    if (value.length >= 43 && value.length < 50) {
+      return 'Address must length is not correct';
     } else {
       return null;
     }
