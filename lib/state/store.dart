@@ -15,6 +15,7 @@ import 'package:worker_manager/worker_manager.dart';
 abstract class Account {
   final AccountType accountType;
   late String name;
+  final String url;
 
   late double balance = 0;
   late double usdtBalance = 0;
@@ -22,7 +23,7 @@ abstract class Account {
   late double solValue = 0;
   late List<TransactionResponse> transactions = [];
 
-  Account(this.accountType, this.name);
+  Account(this.accountType, this.name, this.url);
 
   Future<void> refreshBalance();
   Map<String, dynamic> toJson();
@@ -301,12 +302,12 @@ class StateWrapper extends Store<AppState> {
   /*
    * Import a wallet
    */
-  Future<void> importWallet(String mnemonic) async {
+  Future<void> importWallet(String mnemonic, String url) async {
     // Create the account
     WalletAccount walletAccount = new WalletAccount(
       0,
       state.generateAccountName(),
-      "https://api.devnet.solana.com",
+      url,
       mnemonic,
     );
 
@@ -329,6 +330,9 @@ class StateWrapper extends Store<AppState> {
   Future<void> createWatcher(String address) async {
     ClientAccount account = new ClientAccount(address, 0,
         state.generateAccountName(), "https://api.mainnet-beta.solana.com");
+
+    // Load account transactions
+    await account.loadTransactions();
 
     // Add the account
     state.addAccount(account);

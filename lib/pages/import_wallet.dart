@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:solana_wallet/components/network_selector.dart';
 import '../state/store.dart';
 
 /*
@@ -14,8 +15,9 @@ class ImportWallet extends StatefulWidget {
 }
 
 class ImportWalletState extends State<ImportWallet> {
-  final store;
+  final StateWrapper store;
   late String mnemonic;
+  late String networkURL;
 
   ImportWalletState(this.store);
 
@@ -32,23 +34,34 @@ class ImportWalletState extends State<ImportWallet> {
                 autovalidateMode: AutovalidateMode.always,
                 child: Expanded(
                   child: Padding(
-                    padding: EdgeInsets.all(15),
-                    child: TextFormField(
-                      validator: (String? value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Empty mnemonic';
-                        } else {
-                          return null;
-                        }
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your mnemonic',
-                      ),
-                      onChanged: (String value) async {
-                        mnemonic = value;
-                      },
-                    ),
-                  ),
+                      padding: EdgeInsets.all(15),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            validator: (String? value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Empty mnemonic';
+                              } else {
+                                return null;
+                              }
+                            },
+                            decoration: const InputDecoration(
+                              hintText: 'Enter your mnemonic',
+                            ),
+                            onChanged: (String value) async {
+                              mnemonic = value;
+                            },
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: 20, bottom: 5),
+                            child: NetworkSelector(
+                              (String url) {
+                                networkURL = url;
+                              },
+                            ),
+                          )
+                        ],
+                      )),
                 ),
               )
             ],
@@ -56,7 +69,7 @@ class ImportWalletState extends State<ImportWallet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MaterialButton(
+              ElevatedButton(
                 child: const Text("Import Wallet"),
                 onPressed: importWallet,
               )
@@ -69,7 +82,7 @@ class ImportWalletState extends State<ImportWallet> {
 
   void importWallet() async {
     // Create the account
-    store.importWallet(mnemonic).then((_) {
+    store.importWallet(mnemonic, networkURL).then((_) {
       Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
     });
   }

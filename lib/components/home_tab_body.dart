@@ -267,7 +267,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
     if (value == null || value.isEmpty) {
       return 'Empty address';
     }
-    if (value.length >= 43 && value.length < 50) {
+    if (value.length < 43 || value.length > 50) {
       return 'Address length is not correct';
     } else {
       return null;
@@ -497,13 +497,10 @@ class HomeTabBodyState extends State<HomeTabBody> {
     int lamports,
   ) async {
     try {
-      final res = await wallet.transfer(
+      await wallet.transfer(
         destination: destination,
         lamports: lamports,
       );
-
-      // The transaction hash
-      print(res);
 
       return true;
     } catch (e) {

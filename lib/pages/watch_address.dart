@@ -37,7 +37,7 @@ class WatchAddressState extends State<WatchAddress> {
                       validator: (String? value) {
                         if (value == null || value.isEmpty) {
                           return 'Empty address';
-                        } else if (value.length >= 43 && value.length < 50) {
+                        } else if (value.length < 43 || value.length > 50) {
                           return 'Address length is not correct';
                         } else {
                           return null;
@@ -58,7 +58,7 @@ class WatchAddressState extends State<WatchAddress> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MaterialButton(
+              ElevatedButton(
                 child: const Text("Continue"),
                 onPressed: addAccount,
               )

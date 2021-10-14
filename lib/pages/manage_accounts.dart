@@ -144,6 +144,9 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
 
   Future<void> accountInfoDialog(context, Account account) async {
     String shortAddress = account.address.substring(0, 5);
+    String network = account.url;
+    String accountType =
+        account.accountType == AccountType.Client ? 'Client' : 'Wallet';
 
     return showDialog<void>(
       context: context,
@@ -168,6 +171,14 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
                       );
                     });
                   },
+                ),
+                ListTile(
+                  title: const Text('Network'),
+                  subtitle: Text(network),
+                ),
+                ListTile(
+                  title: const Text('Account type'),
+                  subtitle: Text(accountType),
                 ),
                 if (account.accountType == AccountType.Wallet) ...[
                   ListTile(

@@ -55,7 +55,7 @@ class CreateWalletState extends State<CreateWallet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              MaterialButton(
+              ElevatedButton(
                 child: const Text("Create Wallet"),
                 onPressed: createWallet,
               )
