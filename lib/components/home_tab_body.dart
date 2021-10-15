@@ -5,8 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:solana/solana.dart'
-    show ParsedInstruction, ParsedMessage, TransactionResponse, Wallet;
+import 'package:solana/solana.dart' show Wallet;
 import 'package:solana_wallet/state/store.dart';
 import 'package:tuple/tuple.dart';
 import 'package:worker_manager/worker_manager.dart';
@@ -40,8 +39,12 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String shortAddress = this.from.substring(0, 5);
     return Card(
-      child: Padding(
+      child: InkWell(
+        splashColor: Theme.of(context).hoverColor,
+        onTap: () {},
+        child: Padding(
           padding: EdgeInsets.all(15),
           child: Row(
             children: [
@@ -50,10 +53,13 @@ class TransactionCard extends StatelessWidget {
                   : Icon(Icons.call_made_outlined),
               Padding(
                 padding: EdgeInsets.only(left: 20),
-                child: Text('${ammount.toString()} SOL'),
-              )
+                child: Text(
+                    '${toMe ? '+' : '-'}${ammount.toString()} SOL from $shortAddress...'),
+              ),
             ],
-          )),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -214,8 +220,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
               ],
             ),
           ),
-          StoreConnector<AppState, List<TransactionResponse>>(
-              converter: ((store) {
+          StoreConnector<AppState, List<Transaction?>>(converter: ((store) {
             Account? account = store.state.accounts[accountName];
             if (account != null) {
               return account.transactions;
@@ -229,28 +234,13 @@ class HomeTabBodyState extends State<HomeTabBody> {
                 shrinkWrap: true,
                 physics: BouncingScrollPhysics(),
                 children: transactions.map((tx) {
-                  ParsedMessage? message = tx.transaction.message;
-
-                  if (message != null) {
-                    ParsedInstruction instruction = message.instructions[0];
-                    dynamic res = instruction.toJson();
-                    if (res['program'] == 'system') {
-                      dynamic parsed = res['parsed'].toJson();
-                      switch (parsed['type']) {
-                        case 'transfer':
-                          dynamic transfer = parsed['info'].toJson();
-                          bool toMe = transfer['destination'] == address;
-                          double ammount = transfer['lamports'] / 1000000000;
-                          return TransactionCard(
-                              toMe, transfer['destination'], address, ammount);
-                        default:
-                          // Unsupported transaction type
-                          return UnsupportedTransactionCard();
-                      }
-                    } else {
-                      // Unsupported program
-                      return UnsupportedTransactionCard();
-                    }
+                  if (tx != null) {
+                    return new TransactionCard(
+                      tx.receivedOrNot,
+                      tx.destination,
+                      tx.origin,
+                      tx.ammount,
+                    );
                   } else {
                     return UnsupportedTransactionCard();
                   }

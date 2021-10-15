@@ -10,7 +10,7 @@ Features:
 TODO / Ideas:
 - [ ] **A name for the app**
 - [ ] Seedphrases encryption
-- [ ] Mainnet/betanet/custom net support besides devnet
+- [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses
 - [x] Ability to make transactions
 - [x] Ability to refresh the current SOL value by pulling down

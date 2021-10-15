@@ -1,8 +1,12 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:solana/solana.dart'
-    show Ed25519HDKeyPair, RPCClient, TransactionResponse, Wallet;
+    show
+        Ed25519HDKeyPair,
+        ParsedInstruction,
+        ParsedMessage,
+        RPCClient,
+        TransactionResponse,
+        Wallet;
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
@@ -21,13 +25,22 @@ abstract class Account {
   late double usdtBalance = 0;
   late String address;
   late double solValue = 0;
-  late List<TransactionResponse> transactions = [];
+  late List<Transaction?> transactions = [];
 
   Account(this.accountType, this.name, this.url);
 
   Future<void> refreshBalance();
   Map<String, dynamic> toJson();
   Future<void> loadTransactions();
+}
+
+class Transaction {
+  final String origin;
+  final String destination;
+  final double ammount;
+  final bool receivedOrNot;
+
+  Transaction(this.origin, this.destination, this.ammount, this.receivedOrNot);
 }
 
 class BaseAccount {
@@ -41,7 +54,7 @@ class BaseAccount {
   late double balance = 0;
   late double usdtBalance = 0;
   late double solValue = 0;
-  late List<TransactionResponse> transactions = [];
+  late List<Transaction?> transactions = [];
 
   BaseAccount(this.balance, this.name, this.url);
 
@@ -58,9 +71,36 @@ class BaseAccount {
    * Load the Address's transactions into the account
    */
   Future<void> loadTransactions() async {
-    // -> https://github.com/cryptoplease/cryptoplease-dart/pull/83
     final response = await client.getTransactionsList(address);
-    transactions = response.toList();
+    List<TransactionResponse> responseTransactions = response.toList();
+
+    transactions = responseTransactions.map((tx) {
+      ParsedMessage? message = tx.transaction.message;
+
+      if (message != null) {
+        ParsedInstruction instruction = message.instructions[0];
+        dynamic res = instruction.toJson();
+        if (res['program'] == 'system') {
+          dynamic parsed = res['parsed'].toJson();
+          switch (parsed['type']) {
+            case 'transfer':
+              dynamic transfer = parsed['info'].toJson();
+              bool receivedOrNot = transfer['destination'] == address;
+              double ammount = transfer['lamports'] / 1000000000;
+              return new Transaction(
+                  transfer['destination'], address, ammount, receivedOrNot);
+            default:
+              // Unsupported transaction type
+              return null;
+          }
+        } else {
+          // Unsupported program
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }).toList();
   }
 }
 
@@ -147,12 +187,6 @@ class ClientAccount extends BaseAccount implements Account {
       : super(balance, name, url) {
     this.address = address;
     this.client = RPCClient(this.url);
-  }
-
-  Future<void> loadTransactions() async {
-    // -> https://github.com/cryptoplease/cryptoplease-dart/pull/83
-    final response = await client.getTransactionsList(address);
-    transactions = response.toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -285,10 +319,10 @@ class StateWrapper extends Store<AppState> {
   /*
    * Create a wallet instance
    */
-  Future<void> createWallet(String accountName) async {
+  Future<void> createWallet(String accountName, String url) async {
     // Create the account
-    WalletAccount walletAccount = await WalletAccount.generate(
-        accountName, "https://api.devnet.solana.com");
+    WalletAccount walletAccount =
+        await WalletAccount.generate(accountName, url);
 
     // Add the account
     state.addAccount(walletAccount);
@@ -418,36 +452,38 @@ Future<StateWrapper> createStore() async {
   );
 
   // Fetch the current solana value
-  state.loadSolValue().then((_) {
-    for (Account account in state.accounts.values) {
-      // Fetch every saved account's balance
-      if (account.accountType == AccountType.Wallet) {
-        account = account as WalletAccount;
-        /*
-         * Load the key's pair and the transactions list
-         */
-        Future.wait([
-          account.loadKeyPair(),
-          account.loadTransactions(),
-        ]).then((_) {
-          store.dispatch({
-            "type": StateActions.AddAccount,
-            "account": account,
-          });
+  store.refreshAccounts();
+  for (Account account in state.accounts.values) {
+    // Fetch every saved account's balance
+    if (account.accountType == AccountType.Wallet) {
+      account = account as WalletAccount;
+      /*
+       * Load the key's pair and the transactions list
+       */
+      account.loadKeyPair().then((_) {
+        store.dispatch({
+          "type": StateActions.AddAccount,
+          "account": account,
         });
-      } else {
-        /*
-         * Load the transactions list
-         */
-        account.loadTransactions().then((_) {
-          store.dispatch({
-            "type": StateActions.AddAccount,
-            "account": account,
-          });
+      });
+      account.loadTransactions().then((_) {
+        store.dispatch({
+          "type": StateActions.AddAccount,
+          "account": account,
         });
-      }
+      });
+    } else {
+      /*
+       * Load the transactions list
+       */
+      account.loadTransactions().then((_) {
+        store.dispatch({
+          "type": StateActions.AddAccount,
+          "account": account,
+        });
+      });
     }
-  });
+  }
 
   return store;
 }

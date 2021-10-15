@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:solana_wallet/components/network_selector.dart';
 import '../state/store.dart';
 
 /*
@@ -16,6 +17,7 @@ class WatchAddress extends StatefulWidget {
 class WatchAddressState extends State<WatchAddress> {
   StateWrapper store;
   late String address;
+  late String networkURL;
 
   WatchAddressState(this.store);
 
@@ -33,22 +35,34 @@ class WatchAddressState extends State<WatchAddress> {
                 child: Expanded(
                   child: Padding(
                     padding: EdgeInsets.all(15),
-                    child: TextFormField(
-                      validator: (String? value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Empty address';
-                        } else if (value.length < 43 || value.length > 50) {
-                          return 'Address length is not correct';
-                        } else {
-                          return null;
-                        }
-                      },
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your address',
-                      ),
-                      onChanged: (String value) async {
-                        address = value;
-                      },
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Empty address';
+                            } else if (value.length < 43 || value.length > 50) {
+                              return 'Address length is not correct';
+                            } else {
+                              return null;
+                            }
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Enter your address',
+                          ),
+                          onChanged: (String value) async {
+                            address = value;
+                          },
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20, bottom: 5),
+                          child: NetworkSelector(
+                            (String url) {
+                              networkURL = url;
+                            },
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ),
