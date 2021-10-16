@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:solana/solana.dart' show Wallet;
+import 'package:solana_wallet/dialogs/send_transaction.dart';
+import 'package:solana_wallet/dialogs/transaction_info.dart';
 import 'package:solana_wallet/state/store.dart';
 import 'package:tuple/tuple.dart';
 import 'package:worker_manager/worker_manager.dart';
@@ -15,35 +17,36 @@ class UnsupportedTransactionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-          padding: EdgeInsets.all(15),
-          child: Row(
-            children: [
-              Icon(Icons.block_outlined),
-              Padding(
-                padding: EdgeInsets.only(left: 20),
-                child: Text('Unsupported transaction'),
-              )
-            ],
-          )),
+        padding: EdgeInsets.all(15),
+        child: Row(
+          children: [
+            Icon(Icons.block_outlined),
+            Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text('Unsupported transaction'),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
 
 class TransactionCard extends StatelessWidget {
-  final bool toMe;
-  final String from;
-  final String to;
-  final double ammount;
+  final Transaction transaction;
 
-  const TransactionCard(this.toMe, this.from, this.to, this.ammount);
+  const TransactionCard(this.transaction);
 
   @override
   Widget build(BuildContext context) {
-    String shortAddress = this.from.substring(0, 5);
+    String shortAddress = this.transaction.origin.substring(0, 5);
+    bool toMe = transaction.receivedOrNot;
     return Card(
       child: InkWell(
         splashColor: Theme.of(context).hoverColor,
-        onTap: () {},
+        onTap: () {
+          transactionInfo(context, transaction);
+        },
         child: Padding(
           padding: EdgeInsets.all(15),
           child: Row(
@@ -54,7 +57,7 @@ class TransactionCard extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text(
-                    '${toMe ? '+' : '-'}${ammount.toString()} SOL from $shortAddress...'),
+                    '${toMe ? '+' : '-'}${transaction.ammount.toString()} SOL from $shortAddress...'),
               ),
             ],
           ),
@@ -213,7 +216,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
                     if (account != null) {
                       WalletAccount walletAccount = account as WalletAccount;
 
-                      sendTransactionDialog(context, walletAccount);
+                      sendTransactionDialog(store, context, walletAccount);
                     }
                   },
                 )
@@ -235,12 +238,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
                 physics: BouncingScrollPhysics(),
                 children: transactions.map((tx) {
                   if (tx != null) {
-                    return new TransactionCard(
-                      tx.receivedOrNot,
-                      tx.destination,
-                      tx.origin,
-                      tx.ammount,
-                    );
+                    return new TransactionCard(tx);
                   } else {
                     return UnsupportedTransactionCard();
                   }
@@ -251,250 +249,5 @@ class HomeTabBodyState extends State<HomeTabBody> {
         ],
       ),
     );
-  }
-
-  static String? transactionAddressValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Empty address';
-    }
-    if (value.length < 43 || value.length > 50) {
-      return 'Address length is not correct';
-    } else {
-      return null;
-    }
-  }
-
-  static String? transactionAmmountValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Empty ammount';
-    }
-    if (double.parse(value) <= 0) {
-      return 'You must send at least 0.000000001 SOL';
-    } else {
-      return null;
-    }
-  }
-
-  Future<void> sendTransactionDialog(
-    context,
-    WalletAccount walletAccount,
-  ) async {
-    String destination = "";
-    double sendAmmount = 0;
-
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Send SOL'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Form(
-                  autovalidateMode: AutovalidateMode.always,
-                  child: TextFormField(
-                    validator: transactionAddressValidator,
-                    decoration: InputDecoration(
-                      hintText: walletAccount.address,
-                    ),
-                    onChanged: (String value) async {
-                      destination = value;
-                    },
-                  ),
-                ),
-                Form(
-                  autovalidateMode: AutovalidateMode.always,
-                  child: TextFormField(
-                    validator: transactionAmmountValidator,
-                    decoration: InputDecoration(
-                      hintText: 'Ammount of SOLs',
-                    ),
-                    onChanged: (String value) async {
-                      sendAmmount = double.parse(value);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Send'),
-              onPressed: () async {
-                bool addressIsOk =
-                    transactionAddressValidator(destination) == null;
-                bool balanceIsOk =
-                    transactionAmmountValidator("$sendAmmount") == null;
-
-                // Only let send if the address and the ammount is OK
-                if (addressIsOk && balanceIsOk) {
-                  // 1 SOL = 1000000000 lamports
-                  int lamports = (sendAmmount * 1000000000).toInt();
-                  // Make the transfer
-                  Wallet wallet = walletAccount.wallet;
-
-                  // Close the dialog
-                  Navigator.of(dialogContext).pop();
-
-                  // Show some feedback
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          'Sending $sendAmmount SOL to ${destination.substring(0, 5)}...'),
-                    ),
-                  );
-
-                  Executor()
-                      .execute(
-                          arg1: wallet,
-                          arg2: destination,
-                          arg3: lamports,
-                          fun3: makeTransaction)
-                      .then(
-                    (res) async {
-                      if (res) {
-                        store.refreshAccount(accountName);
-                        await transactionHasBeenSentDialog(
-                          context,
-                          destination,
-                          sendAmmount,
-                        );
-                      } else {
-                        await transactionErroredDialog(
-                          context,
-                          destination,
-                          sendAmmount,
-                        );
-                      }
-                    },
-                  );
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> transactionHasBeenSentDialog(
-      context, String destination, double ammount) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Transaction sent'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(15),
-                      child: Icon(
-                        Icons.task_alt_outlined,
-                        color: Colors.green,
-                        size: 35,
-                      ),
-                    ),
-                    Text("Successfully sent $ammount SOL to"),
-                    Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text(
-                        "$destination",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Dismiss'),
-              onPressed: () async {
-                // Close the dialog
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> transactionErroredDialog(
-      context, String destination, double ammount) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Transaction error'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(15),
-                      child: Icon(
-                        Icons.error_outline_outlined,
-                        color: Colors.red,
-                        size: 35,
-                      ),
-                    ),
-                    Text("Could not sent $ammount SOL to"),
-                    Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text(
-                        "$destination",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Dismiss'),
-              onPressed: () async {
-                // Close the dialog
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  static Future<bool> makeTransaction(
-    Wallet wallet,
-    String destination,
-    int lamports,
-  ) async {
-    try {
-      await wallet.transfer(
-        destination: destination,
-        lamports: lamports,
-      );
-
-      return true;
-    } catch (e) {
-      return false;
-    }
   }
 }

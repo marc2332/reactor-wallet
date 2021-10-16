@@ -39,44 +39,50 @@ class NetworkSelectorState extends State<NetworkSelector> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        DropdownButton<String>(
-          value: selectedOption,
-          iconSize: 24,
-          elevation: 16,
-          isDense: true,
-          onChanged: (String? newValue) {
-            setState(() {
-              selectedOption = newValue!;
-              if (selectedOption != 'Custom') {
-                onSelected(urlOptions[selectedOption]);
-              }
-            });
-          },
-          items: options.map<DropdownMenuItem<String>>(
-            (String option) {
-              return DropdownMenuItem<String>(
-                value: option,
-                child: Text(option),
-              );
+        Padding(
+          padding: EdgeInsets.only(top: 15),
+          child: DropdownButton<String>(
+            value: selectedOption,
+            iconSize: 24,
+            elevation: 16,
+            isDense: true,
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedOption = newValue!;
+                if (selectedOption != 'Custom') {
+                  onSelected(urlOptions[selectedOption]);
+                }
+              });
             },
-          ).toList(),
+            items: options.map<DropdownMenuItem<String>>(
+              (String option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  child: Text(option),
+                );
+              },
+            ).toList(),
+          ),
         ),
         if (selectedOption == 'Custom') ...[
-          TextFormField(
-            validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return 'Empty URL';
-              } else {
-                return null;
-              }
-            },
-            decoration: const InputDecoration(
-              hintText: 'Enter a custom netwok URL',
+          Padding(
+            padding: EdgeInsets.only(top: 15),
+            child: TextFormField(
+              validator: (String? value) {
+                if (value == null || value.isEmpty) {
+                  return 'Empty URL';
+                } else {
+                  return null;
+                }
+              },
+              decoration: const InputDecoration(
+                hintText: 'Enter a custom netwok URL',
+              ),
+              onChanged: (String value) async {
+                customNetworkURL = value;
+                onSelected(customNetworkURL);
+              },
             ),
-            onChanged: (String value) async {
-              customNetworkURL = value;
-              onSelected(customNetworkURL);
-            },
           ),
         ]
       ],
