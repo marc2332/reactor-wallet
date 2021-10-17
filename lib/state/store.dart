@@ -88,7 +88,7 @@ class BaseAccount {
               bool receivedOrNot = transfer['destination'] == address;
               double ammount = transfer['lamports'] / 1000000000;
               return new Transaction(
-                  address, transfer['source'], ammount, receivedOrNot);
+                  transfer['source'], transfer['destination'], ammount, receivedOrNot);
             default:
               // Unsupported transaction type
               return null;

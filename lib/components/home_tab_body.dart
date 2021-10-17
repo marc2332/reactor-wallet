@@ -57,7 +57,7 @@ class TransactionCard extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text(
-                    '${toMe ? '+' : '-'}${transaction.ammount.toString()} SOL from $shortAddress...'),
+                    '${toMe ? '+' : '-'}${transaction.ammount.toString()} SOL ${toMe ? 'from' : 'to'} $shortAddress...'),
               ),
             ],
           ),
