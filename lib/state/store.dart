@@ -87,8 +87,8 @@ class BaseAccount {
               dynamic transfer = parsed['info'].toJson();
               bool receivedOrNot = transfer['destination'] == address;
               double ammount = transfer['lamports'] / 1000000000;
-              return new Transaction(
-                  transfer['source'], transfer['destination'], ammount, receivedOrNot);
+              return new Transaction(transfer['source'],
+                  transfer['destination'], ammount, receivedOrNot);
             default:
               // Unsupported transaction type
               return null;
@@ -309,7 +309,17 @@ class StateWrapper extends Store<AppState> {
       : super(reducer, initialState: initialState, middleware: middleware);
 
   Future<void> refreshAccounts() async {
-    // Refresh balances
+    for (var accountEntry in state.accounts.entries.toList()) {
+      Account account = accountEntry.value;
+      if (account != null) {
+        // Refresh the account transactions
+        await account.loadTransactions();
+        // Refresh the account balance
+        await account.refreshBalance();
+      }
+    }
+
+    // Refresh all balances value
     await state.loadSolValue();
 
     // Dispatch the change
