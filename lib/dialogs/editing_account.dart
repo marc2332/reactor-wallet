@@ -10,7 +10,7 @@ void applyAccount(StateWrapper store, Account account, String accountName) {
   store.dispatch({"type": StateActions.AddAccount, "account": account});
 }
 
-Future<void> editAccountDialog(context, store, account) async {
+Future<void> editAccountDialog(BuildContext context,StateWrapper store,Account account) async {
   String accountName = account.name;
 
   return showDialog<void>(
