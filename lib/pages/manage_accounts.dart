@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:solana_wallet/dialogs/editing_account.dart';
 import 'package:solana_wallet/dialogs/account_info.dart';
 import 'package:solana_wallet/dialogs/remove_account.dart';
+import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/store.dart';
 
 class ManageAccountsPage extends StatefulWidget {
@@ -49,7 +50,7 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
                     trailing: IconButton(
                       icon: Icon(Icons.mode_edit_outline_outlined),
                       onPressed: () {
-                        editAccountDialog(store, context, account);
+                        editAccountDialog(context, store, account);
                       },
                     ),
                     enableFeedback: true,

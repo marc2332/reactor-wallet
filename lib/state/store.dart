@@ -1,108 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:solana/solana.dart'
-    show
-        Ed25519HDKeyPair,
-        ParsedInstruction,
-        ParsedMessage,
-        RPCClient,
-        TransactionResponse,
-        Wallet;
+import 'package:flutter/services.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as Http;
-import 'package:bip39/bip39.dart' as bip39;
-import 'package:solana/src/rpc_client/rpc_client.dart';
-import 'package:worker_manager/worker_manager.dart';
 
-abstract class Account {
-  final AccountType accountType;
-  late String name;
-  final String url;
-
-  late double balance = 0;
-  late double usdtBalance = 0;
-  late String address;
-  late double solValue = 0;
-  late List<Transaction?> transactions = [];
-
-  Account(this.accountType, this.name, this.url);
-
-  Future<void> refreshBalance();
-  Map<String, dynamic> toJson();
-  Future<void> loadTransactions();
-}
-
-class Transaction {
-  final String origin;
-  final String destination;
-  final double ammount;
-  final bool receivedOrNot;
-
-  Transaction(this.origin, this.destination, this.ammount, this.receivedOrNot);
-}
-
-class BaseAccount {
-  final AccountType accountType = AccountType.Wallet;
-  final String url;
-  late String name;
-
-  late RPCClient client;
-  late String address;
-
-  late double balance = 0;
-  late double usdtBalance = 0;
-  late double solValue = 0;
-  late List<Transaction?> transactions = [];
-
-  BaseAccount(this.balance, this.name, this.url);
-
-  /*
-   * Refresh the account balance
-   */
-  Future<void> refreshBalance() async {
-    int balance = await client.getBalance(address);
-    this.balance = balance.toDouble() / 1000000000;
-    this.usdtBalance = this.balance * solValue;
-  }
-
-  /*
-   * Load the Address's transactions into the account
-   */
-  Future<void> loadTransactions() async {
-    final response = await client.getTransactionsList(address);
-    List<TransactionResponse> responseTransactions = response.toList();
-
-    transactions = responseTransactions.map((tx) {
-      ParsedMessage? message = tx.transaction.message;
-
-      if (message != null) {
-        ParsedInstruction instruction = message.instructions[0];
-        dynamic res = instruction.toJson();
-        if (res['program'] == 'system') {
-          dynamic parsed = res['parsed'].toJson();
-          switch (parsed['type']) {
-            case 'transfer':
-              dynamic transfer = parsed['info'].toJson();
-              bool receivedOrNot = transfer['destination'] == address;
-              double ammount = transfer['lamports'] / 1000000000;
-              return new Transaction(transfer['source'],
-                  transfer['destination'], ammount, receivedOrNot);
-            default:
-              // Unsupported transaction type
-              return null;
-          }
-        } else {
-          // Unsupported program
-          return null;
-        }
-      } else {
-        return null;
-      }
-    }).toList();
-  }
-}
+import 'base_account.dart';
+import 'client_account.dart';
+import 'wallet_account.dart';
 
 /*
  * Types of accounts
@@ -112,104 +18,158 @@ enum AccountType {
   Client,
 }
 
-class WalletAccount extends BaseAccount implements Account {
-  final AccountType accountType = AccountType.Wallet;
+const system_program_id = "11111111111111111111111111111111";
+const token_program_id = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 
-  late Wallet wallet;
-  final String mnemonic;
+/*
+ * Token Tracker
+ */
+class Tracker {
+  String name;
+  String programMint;
+  double usdValue = 0;
 
-  WalletAccount(double balance, name, url, this.mnemonic)
-      : super(balance, name, url) {
-    client = RPCClient(url);
+  Tracker(this.name, this.programMint);
+}
+
+class TokenInfo {
+  late String name = "Unknown";
+  late String logoUrl = "";
+
+  TokenInfo();
+  TokenInfo.withInfo(this.name, this.logoUrl);
+}
+
+/*
+ * Centralized token trackers list
+ */
+class TokenTrackers {
+  // List of Token trackers
+  late Map<String, Tracker> trackers = {
+    system_program_id: new Tracker('solana', system_program_id),
+    //"11111111111111111111111111111111": new Tracker('solana', '11111111111111111111111111111111'),
+  };
+
+  late Map tokensList;
+
+  Future<void> loadTokenList() async {
+    var tokensFile = await rootBundle.loadString('assets/tokens_list.json');
+    Map tokensList = json.decode(tokensFile);
+    this.tokensList = tokensList;
   }
 
-  /*
-   * Constructor in case the address is already known
-   */
-  WalletAccount.with_address(
-      double balance, String address, name, url, this.mnemonic)
-      : super(balance, name, url) {
-    this.address = address;
-    client = RPCClient(url);
+  double getTokenValue(String programMint) {
+    Tracker? token = trackers[programMint];
+    if (token != null) {
+      return token.usdValue;
+    } else {
+      return 0;
+    }
   }
 
-  /*
-   * Create the keys pair in Isolate to prevent blocking the main thread
-   */
-  static Future<Ed25519HDKeyPair> createKeyPair(String mnemonic) async {
-    final Ed25519HDKeyPair keyPair =
-        await Ed25519HDKeyPair.fromMnemonic(mnemonic);
-    return keyPair;
+  Tracker? getTracker(String programMint) {
+    return trackers[programMint];
   }
 
-  /*
-   * Load the keys pair into the WalletAccount
-   */
-  Future<void> loadKeyPair() async {
-    final Ed25519HDKeyPair keyPair =
-        await Executor().execute(arg1: mnemonic, fun1: createKeyPair);
-    final Wallet wallet = new Wallet(signer: keyPair, rpcClient: client);
-    this.wallet = wallet;
-    this.address = wallet.address;
+  void setTokenValue(String programMint, double usdValue) {
+    Tracker? token = trackers[programMint];
+    if (token != null) {
+      token.usdValue = usdValue;
+    }
   }
 
-  /*
-   * Create a new WalletAccount with a random mnemonic
-   */
-  static Future<WalletAccount> generate(String name, String url) async {
-    final String randomMnemonic = bip39.generateMnemonic();
-
-    WalletAccount account = new WalletAccount(0, name, url, randomMnemonic);
-    await account.loadKeyPair();
-    await account.refreshBalance();
-    return account;
+  TokenInfo getTokenInfo(String programId) {
+    for (final token in tokensList["tokens"]) {
+      if (token['address'] == programId) {
+        return new TokenInfo.withInfo(token["name"], token["logoURI"]);
+      }
+    }
+    // If not info about the token is found then an "Unknown" token is returned
+    return new TokenInfo();
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      "name": name,
-      "address": address,
-      "balance": balance,
-      "url": url,
-      "mnemonic": mnemonic,
-      "accountType": accountType.toString()
-    };
+  Tracker? addTrackerByProgramMint(String programMint) {
+    // Add tracker if doesn't exist yet
+    if (!trackers.containsKey(programMint)) {
+      TokenInfo tokenInfo = getTokenInfo(programMint);
+
+      trackers[programMint] = new Tracker(tokenInfo.name, programMint);
+
+      return trackers[programMint];
+    }
   }
 }
 
 /*
- * Simple Address Client to watch over an specific address
+ * Fetch the USD value of a token using the Binance API 
  */
-class ClientAccount extends BaseAccount implements Account {
-  final AccountType accountType = AccountType.Client;
+Future<double> getTokenUsdValue(String token) async {
+  try {
+    Map<String, String> headers = new Map();
+    headers['Accept'] = 'application/json';
+    headers['Access-Control-Allow-Origin'] = '*';
 
-  ClientAccount(address, double balance, name, url)
-      : super(balance, name, url) {
-    this.address = address;
-    this.client = RPCClient(this.url);
-  }
+    Http.Response response = await Http.get(
+      Uri.http(
+        'api.coingecko.com',
+        '/api/v3/simple/price',
+        {
+          'ids': token,
+          'vs_currencies': 'USD',
+        },
+      ),
+      headers: headers,
+    );
 
-  Map<String, dynamic> toJson() {
-    return {
-      "name": name,
-      "address": address,
-      "balance": balance,
-      "url": url,
-      "accountType": accountType.toString()
-    };
+    final body = json.decode(response.body);
+
+    double val = body[token]['usd'];
+    return val;
+  } catch (err) {
+    return 0;
   }
 }
 
 class AppState {
   late Map<String, Account> accounts = Map();
   late double solValue = 0;
+  final TokenTrackers valuesTracker;
 
-  AppState(this.accounts);
+  AppState(this.accounts, this.valuesTracker);
+
+  Future<void> loadUSDValues() async {
+    for (final tracker in valuesTracker.trackers.values) {
+      double usdValue = await getTokenUsdValue(tracker.name.toLowerCase());
+      valuesTracker.setTokenValue(tracker.programMint, usdValue);
+    }
+
+    for (final account in accounts.values) {
+      await account.refreshBalance();
+    }
+  }
+
+  /*
+  * Generate an available random name for the new Account
+  */
+  String generateAccountName() {
+    int accountN = 0;
+    while (accounts.containsKey("Account $accountN")) {
+      accountN++;
+    }
+    return "Account $accountN";
+  }
+
+  void addAccount(Account account) {
+    account.valuesTracker = valuesTracker;
+    accounts[account.name] = account;
+  }
 
   static AppState? fromJson(dynamic data) {
     if (data == null) {
       return null;
     }
+
+    TokenTrackers valuesTracker = new TokenTrackers();
 
     try {
       Map<String, dynamic> accounts = data["accounts"];
@@ -223,31 +183,27 @@ class AppState {
                 : AccountType.Wallet;
 
         if (accountType == AccountType.Client) {
-          ClientAccount clientAccount = ClientAccount(
-            account["address"],
-            account["balance"],
-            accountName,
-            account["url"],
-          );
+          ClientAccount clientAccount = ClientAccount(account["address"],
+              account["balance"], accountName, account["url"], valuesTracker);
           return MapEntry(accountName, clientAccount);
         } else {
           WalletAccount walletAccount = new WalletAccount.with_address(
-            account["balance"],
-            account["address"],
-            accountName,
-            account["url"],
-            account["mnemonic"],
-          );
+              account["balance"],
+              account["address"],
+              accountName,
+              account["url"],
+              account["mnemonic"],
+              valuesTracker);
           return MapEntry(accountName, walletAccount);
         }
       });
 
-      return AppState(mappedAccounts);
+      return AppState(mappedAccounts, valuesTracker);
     } catch (err) {
       /*
        * Restart the settings if there was any error
        */
-      return AppState(Map());
+      return AppState(Map(), valuesTracker);
     }
   }
 
@@ -259,46 +215,6 @@ class AppState {
       'accounts': savedAccounts,
     };
   }
-
-  Future<void> loadSolValue() async {
-    Map<String, String> headers = new Map();
-    headers['Accept'] = 'application/json';
-    headers['Access-Control-Allow-Origin'] = '*';
-
-    Http.Response response = await Http.get(
-      Uri.http(
-        'api.coingecko.com',
-        '/api/v3/simple/price',
-        {
-          'ids': 'solana',
-          'vs_currencies': 'USD',
-        },
-      ),
-      headers: headers,
-    );
-
-    final body = json.decode(response.body);
-
-    solValue = body['solana']['usd'].toDouble();
-
-    for (final account in accounts.values) {
-      account.solValue = solValue;
-      await account.refreshBalance();
-    }
-  }
-
-  String generateAccountName() {
-    int accountN = 0;
-    while (accounts.containsKey("Account $accountN")) {
-      accountN++;
-    }
-    return "Account $accountN";
-  }
-
-  void addAccount(Account account) {
-    account.solValue = solValue;
-    accounts[account.name] = account;
-  }
 }
 
 /*
@@ -309,18 +225,17 @@ class StateWrapper extends Store<AppState> {
       : super(reducer, initialState: initialState, middleware: middleware);
 
   Future<void> refreshAccounts() async {
-    for (var accountEntry in state.accounts.entries.toList()) {
-      Account account = accountEntry.value;
-      if (account != null) {
-        // Refresh the account transactions
-        await account.loadTransactions();
-        // Refresh the account balance
-        await account.refreshBalance();
-      }
-    }
-
     // Refresh all balances value
-    await state.loadSolValue();
+    await state.loadUSDValues();
+
+    for (final account in state.accounts.values) {
+      // Refresh the account transactions
+      await account.loadTransactions();
+      // Refresh the tokens list
+      await account.loadTokens();
+      // Refresh the account balance
+      await account.refreshBalance();
+    }
 
     // Dispatch the change
     dispatch({"type": StateActions.SolValueRefreshed});
@@ -332,13 +247,13 @@ class StateWrapper extends Store<AppState> {
   Future<void> createWallet(String accountName, String url) async {
     // Create the account
     WalletAccount walletAccount =
-        await WalletAccount.generate(accountName, url);
+        await WalletAccount.generate(accountName, url, state.valuesTracker);
 
     // Add the account
     state.addAccount(walletAccount);
 
     // Refresh the balances
-    await state.loadSolValue();
+    await state.loadUSDValues();
 
     dispatch({"type": StateActions.SolValueRefreshed});
   }
@@ -349,20 +264,22 @@ class StateWrapper extends Store<AppState> {
   Future<void> importWallet(String mnemonic, String url) async {
     // Create the account
     WalletAccount walletAccount = new WalletAccount(
-      0,
-      state.generateAccountName(),
-      url,
-      mnemonic,
-    );
+        0, state.generateAccountName(), url, mnemonic, state.valuesTracker);
 
     // Create key pair
     await walletAccount.loadKeyPair();
+
+    // Load account transactions
+    await walletAccount.loadTransactions();
+
+    // Load account tokens
+    await walletAccount.loadTokens();
 
     // Add the account
     state.addAccount(walletAccount);
 
     // Refresh the balances
-    await state.loadSolValue();
+    await state.loadUSDValues();
 
     // Dispatch the change
     dispatch({"type": StateActions.SolValueRefreshed});
@@ -372,17 +289,25 @@ class StateWrapper extends Store<AppState> {
    * Create an address watcher
    */
   Future<void> createWatcher(String address) async {
-    ClientAccount account = new ClientAccount(address, 0,
-        state.generateAccountName(), "https://api.mainnet-beta.solana.com");
+    ClientAccount account = new ClientAccount(
+      address,
+      0,
+      state.generateAccountName(),
+      "https://api.mainnet-beta.solana.com",
+      state.valuesTracker,
+    );
 
     // Load account transactions
     await account.loadTransactions();
+
+    // Load account tokens
+    await account.loadTokens();
 
     // Add the account
     state.addAccount(account);
 
     // Refresh the balances
-    await state.loadSolValue();
+    await state.loadUSDValues();
 
     dispatch({"type": StateActions.SolValueRefreshed});
   }
@@ -453,7 +378,9 @@ Future<StateWrapper> createStore() async {
   // Try to load the previous app state
   AppState? initialState = await persistor.load();
 
-  AppState state = initialState ?? AppState(Map());
+  AppState state = initialState ?? AppState(Map(), new TokenTrackers());
+
+  await state.valuesTracker.loadTokenList();
 
   final StateWrapper store = StateWrapper(
     stateReducer,
@@ -461,14 +388,15 @@ Future<StateWrapper> createStore() async {
     [persistor.createMiddleware()],
   );
 
-  // Fetch the current solana value
-  store.refreshAccounts();
+  int accountsWithTokensLoaded = 0;
+  await state.loadUSDValues();
+
   for (Account account in state.accounts.values) {
     // Fetch every saved account's balance
     if (account.accountType == AccountType.Wallet) {
       account = account as WalletAccount;
       /*
-       * Load the key's pair and the transactions list
+       * Load the key's pair if it's a Wallet account
        */
       account.loadKeyPair().then((_) {
         store.dispatch({
@@ -476,23 +404,33 @@ Future<StateWrapper> createStore() async {
           "account": account,
         });
       });
-      account.loadTransactions().then((_) {
-        store.dispatch({
-          "type": StateActions.AddAccount,
-          "account": account,
-        });
-      });
-    } else {
-      /*
-       * Load the transactions list
-       */
-      account.loadTransactions().then((_) {
-        store.dispatch({
-          "type": StateActions.AddAccount,
-          "account": account,
-        });
-      });
     }
+
+    /*
+       * Load the transactions list and the tokens list
+       */
+    account.loadTransactions().then((_) {
+      store.dispatch({
+        "type": StateActions.AddAccount,
+        "account": account,
+      });
+    });
+
+    account.loadTokens().then((_) async {
+      accountsWithTokensLoaded++;
+
+      if (accountsWithTokensLoaded == state.accounts.length) {
+        await state.loadUSDValues();
+        store.dispatch({
+          "type": StateActions.SolValueRefreshed,
+        });
+      } else {
+        store.dispatch({
+          "type": StateActions.AddAccount,
+          "account": account,
+        });
+      }
+    });
   }
 
   return store;

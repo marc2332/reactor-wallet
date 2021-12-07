@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/store.dart';
 
 Future<void> removeAccountDialog(

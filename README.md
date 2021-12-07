@@ -4,6 +4,7 @@ A mobile wallet for Solana made in flutter
 
 Features:
 - Watch over any address
+- Display SPL Tokens
 - Import wallets with it's seedphrase (devnet only for now)
 - Create new wallets (devnet only for now)
 
@@ -20,6 +21,7 @@ TODO / Ideas:
 - [ ] Ability to easily share an address (QR?)
 - [ ] Have some UI tweaking options, like themes.
 - [ ] Unit tests
+- [x] Display owned tokens
 - [ ] Ability to display NFTs owned by a wallet 
 - [ ] Upload to https://itsallwidgets.com/
 - [ ] Small note when making transactions

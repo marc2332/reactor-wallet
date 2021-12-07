@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:solana_wallet/components/home_tab_body.dart';
+import 'package:solana_wallet/state/base_account.dart';
 import '../state/store.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,7 +20,7 @@ class AccountSubPage extends StatelessWidget {
       length: accounts.length,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Solana wallet"),
+          title: const Text("Wallets"),
           actions: <Widget>[
             IconButton(
               icon: Icon(
@@ -32,7 +33,7 @@ class AccountSubPage extends StatelessWidget {
             )
           ],
           bottom: new PreferredSize(
-            preferredSize: new Size(200.0, 60.0),
+            preferredSize: new Size(200.0, 50.0),
             child: TabBar(
               physics: BouncingScrollPhysics(),
               isScrollable: true,
@@ -75,7 +76,10 @@ class AccountSubPage extends StatelessWidget {
                 },
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
-                  child: HomeTabBody(account: account, store: store),
+                  child: HomeTabBody(
+                    account: account,
+                    store: store,
+                  ),
                 ),
               ),
             );
@@ -136,8 +140,9 @@ class SettingsSubPageState extends State<SettingsSubPage> {
           ),
           Card(
             child: ListTile(
-                title: const Text('Made by Marc Espín'),
-                trailing: Icon(Icons.info_outline)),
+              title: const Text('Made by Marc Espín'),
+              trailing: Icon(Icons.info_outline),
+            ),
           )
         ],
       ),

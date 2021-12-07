@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/store.dart';
 
 /*
@@ -10,7 +11,8 @@ void applyAccount(StateWrapper store, Account account, String accountName) {
   store.dispatch({"type": StateActions.AddAccount, "account": account});
 }
 
-Future<void> editAccountDialog(BuildContext context,StateWrapper store,Account account) async {
+Future<void> editAccountDialog(
+    BuildContext context, StateWrapper store, Account account) async {
   String accountName = account.name;
 
   return showDialog<void>(

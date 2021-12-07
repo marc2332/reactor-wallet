@@ -3,6 +3,7 @@ import 'package:solana/solana.dart';
 import 'package:solana_wallet/dialogs/transaction_errored.dart';
 import 'package:solana_wallet/dialogs/transaction_sent.dart';
 import 'package:solana_wallet/state/store.dart';
+import 'package:solana_wallet/state/wallet_account.dart';
 import 'package:worker_manager/worker_manager.dart';
 
 String? transactionAddressValidator(String? value) {

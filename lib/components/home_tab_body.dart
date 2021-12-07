@@ -1,16 +1,21 @@
-import 'dart:async';
-
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:solana/solana.dart' show Wallet;
 import 'package:solana_wallet/dialogs/send_transaction.dart';
 import 'package:solana_wallet/dialogs/transaction_info.dart';
+import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/store.dart';
+import 'package:solana_wallet/state/wallet_account.dart';
 import 'package:tuple/tuple.dart';
-import 'package:worker_manager/worker_manager.dart';
+
+String balanceShorter(String balance) {
+  if (balance.length >= 6) {
+    balance = balance.substring(0, 6);
+  }
+  return balance;
+}
 
 class UnsupportedTransactionCard extends StatelessWidget {
   @override
@@ -63,6 +68,178 @@ class TransactionCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class WrapperImage extends StatelessWidget {
+  final String url;
+
+  WrapperImage(this.url);
+
+  @override
+  Widget build(BuildContext context) {
+    RegExp isImage = RegExp(r'[\/.](jpg|jpeg|png)', caseSensitive: true);
+    if (isImage.hasMatch(url)) {
+      return Image.network(
+        url,
+        height: 40,
+        width: 40,
+      );
+    } else {
+      return Container(
+          width: 40, child: const Icon(Icons.no_accounts_outlined));
+    }
+  }
+}
+
+class TokenCard extends StatelessWidget {
+  final Token token;
+
+  const TokenCard(this.token);
+
+  @override
+  Widget build(BuildContext context) {
+    return StoreConnector<AppState, TokenInfo>(converter: ((store) {
+      TokenInfo tokenInfo = store.state.valuesTracker.getTokenInfo(token.mint);
+      return tokenInfo;
+    }), builder: (context, tokenInfo) {
+      String usdBalance = balanceShorter(token.usdBalance);
+      String tokenBalance = balanceShorter(token.balance.toString());
+      return Card(
+        child: InkWell(
+          splashColor: Theme.of(context).hoverColor,
+          onTap: () {},
+          child: Padding(
+            padding: EdgeInsets.all(15),
+            child: Row(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                  child: WrapperImage(tokenInfo.logoUrl),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tokenInfo.name,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(tokenBalance),
+                  ],
+                ),
+                Expanded(child: SizedBox()),
+                Container(
+                  child: Text('$usdBalance\$'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
+}
+
+class BodyTabs extends StatefulWidget {
+  final String accountName;
+
+  BodyTabs(this.accountName);
+
+  @override
+  BodyTabsState createState() => BodyTabsState(this.accountName);
+}
+
+class BodyTabsState extends State<BodyTabs>
+    with SingleTickerProviderStateMixin {
+  final accountName;
+  late TabController tabsController;
+
+  BodyTabsState(this.accountName);
+
+  @override
+  void initState() {
+    super.initState();
+    tabsController = new TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    tabsController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        TabBar(
+          controller: tabsController,
+          indicatorColor: Theme.of(context).indicatorColor,
+          labelColor: Theme.of(context).indicatorColor,
+          unselectedLabelColor: Colors.black54,
+          isScrollable: true,
+          tabs: <Widget>[
+            Tab(
+              text: "Tokens",
+            ),
+            Tab(
+              text: "Transactions",
+            )
+          ],
+        ),
+        Container(
+          height: 300,
+          child: TabBarView(
+            controller: tabsController,
+            children: <Widget>[
+              StoreConnector<AppState, List<Token>>(converter: ((store) {
+                Account? account = store.state.accounts[accountName];
+                if (account != null) {
+                  return account.tokens;
+                } else {
+                  return [];
+                }
+              }), builder: (context, tokens) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: ListView(
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    children: tokens.map((token) {
+                      return new TokenCard(token);
+                    }).toList(),
+                  ),
+                );
+              }),
+              StoreConnector<AppState, List<Transaction?>>(converter: ((store) {
+                Account? account = store.state.accounts[accountName];
+                if (account != null) {
+                  return account.transactions;
+                } else {
+                  return [];
+                }
+              }), builder: (context, transactions) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: ListView(
+                    shrinkWrap: true,
+                    physics: BouncingScrollPhysics(),
+                    children: transactions.map((tx) {
+                      if (tx != null) {
+                        return new TransactionCard(tx);
+                      } else {
+                        return UnsupportedTransactionCard();
+                      }
+                    }).toList(),
+                  ),
+                );
+              })
+            ],
+          ),
+        )
+      ],
     );
   }
 }
@@ -124,7 +301,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.only(bottom: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -146,7 +323,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
                     solBalance,
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
-                        fontSize: 50,
+                        fontSize: 40,
                       ),
                     ),
                   );
@@ -158,18 +335,14 @@ class HomeTabBodyState extends State<HomeTabBody> {
           StoreConnector<AppState, Tuple2<bool, String>>(converter: ((store) {
             Account? account = store.state.accounts[accountName];
             if (account != null) {
-              String usdBalance = account.usdtBalance.toString();
-              // Cut some numbers to make it easier to read
-              if (usdBalance.length >= 6) {
-                usdBalance = usdBalance.substring(0, 6);
-              }
+              String usdBalance = balanceShorter(account.usdBalance.toString());
               /*
                * If the SOL balance is 0.0 the USD equivalent will always be 0.0 too, so,
                * in order to prevent an infinite loading animation, it makes sure that the SOL balance is at least > 0.0, 
                * if not, it will just display 0.0
                */
               bool shouldRenderSpinner =
-                  account.balance > 0.0 && account.usdtBalance == 0.0;
+                  account.balance > 0.0 && account.usdBalance == 0.0;
               return Tuple2(shouldRenderSpinner, usdBalance);
             } else {
               return Tuple2(false, "");
@@ -204,48 +377,30 @@ class HomeTabBodyState extends State<HomeTabBody> {
               );
             }
           }),
-          Padding(
-            padding: EdgeInsets.all(30),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  child: const Text("Send"),
-                  onPressed: () {
-                    Account? account = store.state.accounts[accountName];
-                    if (account != null) {
-                      WalletAccount walletAccount = account as WalletAccount;
+          if (accountType == AccountType.Wallet) ...[
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    child: const Text("Send"),
+                    onPressed: () {
+                      Account? account = store.state.accounts[accountName];
+                      if (account != null) {
+                        WalletAccount walletAccount = account as WalletAccount;
 
-                      sendTransactionDialog(store, context, walletAccount);
-                    }
-                  },
-                )
-              ],
-            ),
-          ),
-          StoreConnector<AppState, List<Transaction?>>(converter: ((store) {
-            Account? account = store.state.accounts[accountName];
-            if (account != null) {
-              return account.transactions;
-            } else {
-              return [];
-            }
-          }), builder: (context, transactions) {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: ListView(
-                shrinkWrap: true,
-                physics: BouncingScrollPhysics(),
-                children: transactions.map((tx) {
-                  if (tx != null) {
-                    return new TransactionCard(tx);
-                  } else {
-                    return UnsupportedTransactionCard();
-                  }
-                }).toList(),
+                        sendTransactionDialog(store, context, walletAccount);
+                      }
+                    },
+                  )
+                ],
               ),
-            );
-          })
+            )
+          ] else ...[
+            SizedBox(height: 15)
+          ],
+          BodyTabs(accountName)
         ],
       ),
     );

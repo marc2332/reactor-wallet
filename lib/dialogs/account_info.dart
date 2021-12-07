@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/store.dart';
+import 'package:solana_wallet/state/wallet_account.dart';
 
 Future<void> accountInfoDialog(context, Account account) async {
   String shortAddress = account.address.substring(0, 13);
