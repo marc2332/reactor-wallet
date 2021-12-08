@@ -31,9 +31,10 @@ TODO / Ideas:
 WIP.
 
 ### Support this project
-You can support this project by donating any ammount you want to this **Solana** address: 
+You can support this project by donating any ammount you want to these addresses;
 
-`u5GzDDXyzhB9zA8vSHuEow5mQJ6Tk3kC4Bn2T9dp6nX3U`
+Solana: `u5GzDDXyzhB9zA8vSHuEow5mQJ6Tk3kC4Bn2T9dp6nX3U`
+Bitcoin: `1HCBeYD564Y3AjQ3Ci6Fp2zosfZvevJuu6`
 
 ### Building
 
