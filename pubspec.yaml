@@ -23,6 +23,7 @@ dependencies:
   bip39: ^1.0.6
   worker_manager: ^4.2.3
   url_launcher: ^6.0.12
+  cached_network_image: ^3.2.0
 
 dev_dependencies:
   flutter_test:

@@ -181,7 +181,7 @@ class AppState {
         if (accountType == AccountType.Client) {
           ClientAccount clientAccount =
               ClientAccount(account["address"], account["balance"], accountName, account["url"], valuesTracker);
-          //clientAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
+          // clientAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
           return MapEntry(accountName, clientAccount);
         } else {
           WalletAccount walletAccount = new WalletAccount.with_address(
@@ -337,7 +337,6 @@ AppState stateReducer(AppState state, dynamic action) {
 
     case StateActions.AddAccount:
       Account account = action['account'];
-
       // Add the account to the settings
       state.addAccount(account);
       break;
@@ -345,7 +344,6 @@ AppState stateReducer(AppState state, dynamic action) {
     case StateActions.RemoveAccount:
       // Remove the account from the settings
       state.accounts.remove(action["name"]);
-
       break;
 
     case StateActions.SolValueRefreshed:

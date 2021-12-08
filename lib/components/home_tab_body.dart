@@ -9,6 +9,7 @@ import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/store.dart';
 import 'package:solana_wallet/state/wallet_account.dart';
 import 'package:tuple/tuple.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 String balanceShorter(String balance) {
   if (balance.length >= 6) {
@@ -79,13 +80,14 @@ class WrapperImage extends StatelessWidget {
   Widget build(BuildContext context) {
     RegExp isImage = RegExp(r'[\/.](jpg|jpeg|png)', caseSensitive: true);
     if (isImage.hasMatch(url)) {
-      return Image.network(
-        url,
-        height: 40,
-        width: 40,
+      return CachedNetworkImage(
+        imageUrl: url,
+        height: 30,
+        width: 30,
+        errorWidget: (context, url, error) => const Icon(Icons.no_accounts_outlined),
       );
     } else {
-      return Container(width: 40, child: const Icon(Icons.no_accounts_outlined));
+      return Container(width: 30, height: 30, child: const Icon(Icons.no_accounts_outlined));
     }
   }
 }
@@ -200,12 +202,13 @@ class BodyTabsState extends State<BodyTabs> with SingleTickerProviderStateMixin 
               }), builder: (context, tokens) {
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: ListView(
+                  child: ListView.builder(
+                    itemCount: tokens.length,
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
-                    children: tokens.map((token) {
-                      return new TokenCard(token);
-                    }).toList(),
+                    itemBuilder: (context, index) {
+                      return TokenCard(tokens[index]);
+                    },
                   ),
                 );
               }),
@@ -219,16 +222,18 @@ class BodyTabsState extends State<BodyTabs> with SingleTickerProviderStateMixin 
               }), builder: (context, transactions) {
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: ListView(
+                  child: ListView.builder(
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
-                    children: transactions.map((tx) {
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      final Transaction tx = transactions[index];
                       if (tx.origin != "Unknown") {
-                        return new TransactionCard(tx);
+                        return TransactionCard(tx);
                       } else {
                         return UnsupportedTransactionCard();
                       }
-                    }).toList(),
+                    },
                   ),
                 );
               })
