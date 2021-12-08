@@ -56,9 +56,7 @@ class TransactionCard extends StatelessWidget {
           padding: EdgeInsets.all(15),
           child: Row(
             children: [
-              toMe
-                  ? Icon(Icons.call_received_outlined)
-                  : Icon(Icons.call_made_outlined),
+              toMe ? Icon(Icons.call_received_outlined) : Icon(Icons.call_made_outlined),
               Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text(
@@ -87,8 +85,7 @@ class WrapperImage extends StatelessWidget {
         width: 40,
       );
     } else {
-      return Container(
-          width: 40, child: const Icon(Icons.no_accounts_outlined));
+      return Container(width: 40, child: const Icon(Icons.no_accounts_outlined));
     }
   }
 }
@@ -150,8 +147,7 @@ class BodyTabs extends StatefulWidget {
   BodyTabsState createState() => BodyTabsState(this.accountName);
 }
 
-class BodyTabsState extends State<BodyTabs>
-    with SingleTickerProviderStateMixin {
+class BodyTabsState extends State<BodyTabs> with SingleTickerProviderStateMixin {
   final accountName;
   late TabController tabsController;
 
@@ -245,8 +241,7 @@ class BodyTabsState extends State<BodyTabs>
 }
 
 class HomeTabBody extends StatefulWidget {
-  HomeTabBody({Key? key, required this.account, required this.store})
-      : super(key: key);
+  HomeTabBody({Key? key, required this.account, required this.store}) : super(key: key);
 
   final StateWrapper store;
   final Account account;
@@ -341,8 +336,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
                * in order to prevent an infinite loading animation, it makes sure that the SOL balance is at least > 0.0, 
                * if not, it will just display 0.0
                */
-              bool shouldRenderSpinner =
-                  account.balance > 0.0 && account.usdBalance == 0.0;
+              bool shouldRenderSpinner = account.balance > 0.0 && account.usdBalance == 0.0;
               return Tuple2(shouldRenderSpinner, usdBalance);
             } else {
               return Tuple2(false, "");

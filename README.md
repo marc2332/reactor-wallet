@@ -39,4 +39,9 @@ You can support this project by donating any ammount you want to this **Solana**
 flutter build apk --tree-shake-icons --split-per-abi
 ```
 
+#### Format
+```
+dart format . --line-length 120
+```
+
 MIT License

@@ -173,27 +173,19 @@ class AppState {
     try {
       Map<String, dynamic> accounts = data["accounts"];
 
-      Map<String, Account> mappedAccounts =
-          accounts.map((accountName, account) {
+      Map<String, Account> mappedAccounts = accounts.map((accountName, account) {
         // Convert enum from string to enum
         AccountType accountType =
-            account["accountType"] == AccountType.Client.toString()
-                ? AccountType.Client
-                : AccountType.Wallet;
+            account["accountType"] == AccountType.Client.toString() ? AccountType.Client : AccountType.Wallet;
 
         if (accountType == AccountType.Client) {
-          ClientAccount clientAccount = ClientAccount(account["address"],
-              account["balance"], accountName, account["url"], valuesTracker);
+          ClientAccount clientAccount =
+              ClientAccount(account["address"], account["balance"], accountName, account["url"], valuesTracker);
           //clientAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
           return MapEntry(accountName, clientAccount);
         } else {
           WalletAccount walletAccount = new WalletAccount.with_address(
-              account["balance"],
-              account["address"],
-              accountName,
-              account["url"],
-              account["mnemonic"],
-              valuesTracker);
+              account["balance"], account["address"], accountName, account["url"], account["mnemonic"], valuesTracker);
           // walletAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
           return MapEntry(accountName, walletAccount);
         }
@@ -210,8 +202,7 @@ class AppState {
   }
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> savedAccounts =
-        accounts.map((name, account) => MapEntry(name, account.toJson()));
+    Map<String, dynamic> savedAccounts = accounts.map((name, account) => MapEntry(name, account.toJson()));
 
     return {
       'accounts': savedAccounts,
@@ -246,8 +237,7 @@ class StateWrapper extends Store<AppState> {
    */
   Future<void> createWallet(String accountName, String url) async {
     // Create the account
-    WalletAccount walletAccount =
-        await WalletAccount.generate(accountName, url, state.valuesTracker);
+    WalletAccount walletAccount = await WalletAccount.generate(accountName, url, state.valuesTracker);
 
     // Add the account
     state.addAccount(walletAccount);
@@ -263,8 +253,7 @@ class StateWrapper extends Store<AppState> {
    */
   Future<void> importWallet(String mnemonic, String url) async {
     // Create the account
-    WalletAccount walletAccount = new WalletAccount(
-        0, state.generateAccountName(), url, mnemonic, state.valuesTracker);
+    WalletAccount walletAccount = new WalletAccount(0, state.generateAccountName(), url, mnemonic, state.valuesTracker);
 
     // Create key pair
     await walletAccount.loadKeyPair();
@@ -343,8 +332,7 @@ AppState stateReducer(AppState state, dynamic action) {
     case StateActions.SetBalance:
       final accountName = action['name'];
       final accountBalance = action['balance'];
-      state.accounts
-          .update(accountName, (account) => account.balance = accountBalance);
+      state.accounts.update(accountName, (account) => account.balance = accountBalance);
       break;
 
     case StateActions.AddAccount:

@@ -83,8 +83,7 @@ class CreateWalletState extends State<CreateWallet> {
   }
 
   void createWallet() async {
-    if (accountName.length > 0 &&
-        !store.state.accounts.containsKey(accountName)) {
+    if (accountName.length > 0 && !store.state.accounts.containsKey(accountName)) {
       store.createWallet(accountName, networkURL).then((_) {
         // Go to Home page
         Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);

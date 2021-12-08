@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-Future<void> transactionErroredDialog(
-    context, String destination, double ammount) async {
+Future<void> transactionErroredDialog(context, String destination, double ammount) async {
   return showDialog<void>(
     context: context,
     builder: (BuildContext dialogContext) {

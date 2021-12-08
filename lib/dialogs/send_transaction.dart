@@ -99,10 +99,8 @@ Future<void> sendTransactionDialog(
           TextButton(
             child: const Text('Send'),
             onPressed: () async {
-              bool addressIsOk =
-                  transactionAddressValidator(destination) == null;
-              bool balanceIsOk =
-                  transactionAmmountValidator("$sendAmmount") == null;
+              bool addressIsOk = transactionAddressValidator(destination) == null;
+              bool balanceIsOk = transactionAmmountValidator("$sendAmmount") == null;
 
               // Only let send if the address and the ammount is OK
               if (addressIsOk && balanceIsOk) {
@@ -117,18 +115,11 @@ Future<void> sendTransactionDialog(
                 // Show some feedback
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(
-                        'Sending $sendAmmount SOL to ${destination.substring(0, 5)}...'),
+                    content: Text('Sending $sendAmmount SOL to ${destination.substring(0, 5)}...'),
                   ),
                 );
 
-                Executor()
-                    .execute(
-                        arg1: wallet,
-                        arg2: destination,
-                        arg3: lamports,
-                        fun3: makeTransaction)
-                    .then(
+                Executor().execute(arg1: wallet, arg2: destination, arg3: lamports, fun3: makeTransaction).then(
                   (res) async {
                     if (res) {
                       store.refreshAccount(accountName);

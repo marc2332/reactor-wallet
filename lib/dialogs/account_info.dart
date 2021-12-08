@@ -8,8 +8,7 @@ import 'package:solana_wallet/state/wallet_account.dart';
 Future<void> accountInfoDialog(context, Account account) async {
   String shortAddress = account.address.substring(0, 13);
   String network = account.url;
-  String accountType =
-      account.accountType == AccountType.Client ? 'Client' : 'Wallet';
+  String accountType = account.accountType == AccountType.Client ? 'Client' : 'Wallet';
 
   return showDialog<void>(
     context: context,

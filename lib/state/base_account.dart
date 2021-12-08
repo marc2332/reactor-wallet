@@ -33,8 +33,7 @@ class BaseAccount {
   Future<void> refreshBalance() async {
     int balance = await client.getBalance(address);
     this.balance = balance.toDouble() / 1000000000;
-    this.usdBalance =
-        this.balance * valuesTracker.getTokenValue(system_program_id);
+    this.usdBalance = this.balance * valuesTracker.getTokenValue(system_program_id);
 
     for (final token in tokens) {
       updateUsdFromTokenValue(token);
@@ -55,14 +54,12 @@ class BaseAccount {
   }
 
   // ignore: avoid_init_to_null
-  Future<void> loadTokens(
-      {Function(Tracker tracker)? onLoadEveryToken = null}) async {
+  Future<void> loadTokens({Function(Tracker tracker)? onLoadEveryToken = null}) async {
     this.tokens = [];
     Completer completer = new Completer();
 
     // Fetch all the tokens (spl-program mints) owned by the specified address
-    Iterable<AssociatedTokenAccount> tokenAccounts =
-        await client.getTokenAccountsByOwner(
+    Iterable<AssociatedTokenAccount> tokenAccounts = await client.getTokenAccountsByOwner(
       owner: address,
       programId: token_program_id,
     );
@@ -73,10 +70,8 @@ class BaseAccount {
       if (data != null) {
         data.when(
           splToken: (parsed) async {
-            double decimals =
-                double.parse("1" + "0" * (parsed.info.tokenAmount.decimals));
-            double balance =
-                double.parse(parsed.info.tokenAmount.amount) / decimals;
+            double decimals = double.parse("1" + "0" * (parsed.info.tokenAmount.decimals));
+            double balance = double.parse(parsed.info.tokenAmount.amount) / decimals;
             String tokenMint = parsed.info.mint;
 
             // Start tracking the token
@@ -85,8 +80,7 @@ class BaseAccount {
             Token newToken = new Token(balance, tokenMint);
 
             if (tracker != null && onLoadEveryToken != null) {
-              double usdValue =
-                  await getTokenUsdValue(tracker.name.toLowerCase());
+              double usdValue = await getTokenUsdValue(tracker.name.toLowerCase());
               valuesTracker.setTokenValue(tracker.programMint, usdValue);
               onLoadEveryToken(tracker);
 
@@ -132,8 +126,9 @@ class BaseAccount {
               dynamic transfer = parsed['info'].toJson();
               bool receivedOrNot = transfer['destination'] == address;
               double ammount = transfer['lamports'] / 1000000000;
-              this.transactions.add(new Transaction(transfer['source'],
-                  transfer['destination'], ammount, receivedOrNot));
+              this
+                  .transactions
+                  .add(new Transaction(transfer['source'], transfer['destination'], ammount, receivedOrNot));
               break;
             default:
               // Unsupported transaction type
@@ -181,17 +176,11 @@ class Transaction {
   Transaction(this.origin, this.destination, this.ammount, this.receivedOrNot);
 
   Map<String, dynamic> toJson() {
-    return {
-      "origin": origin,
-      "destination": destination,
-      "ammount": ammount,
-      "receivedOrNot": receivedOrNot
-    };
+    return {"origin": origin, "destination": destination, "ammount": ammount, "receivedOrNot": receivedOrNot};
   }
 
   static Transaction fromJson(dynamic tx) {
-    return new Transaction(
-        tx["origin"], tx["destination"], tx["ammount"], tx["receivedOrNot"]);
+    return new Transaction(tx["origin"], tx["destination"], tx["ammount"], tx["receivedOrNot"]);
   }
 }
 

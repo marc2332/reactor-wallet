@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/store.dart';
 
-Future<void> removeAccountDialog(
-    StateWrapper store, BuildContext context, Account account) async {
+Future<void> removeAccountDialog(StateWrapper store, BuildContext context, Account account) async {
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {

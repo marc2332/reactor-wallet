@@ -49,13 +49,11 @@ class App extends StatelessWidget {
           '/home': (context) => HomePage(
                 store: this.store,
               ),
-          '/account_selection': (context) =>
-              AccountSelectionPage(store: this.store),
+          '/account_selection': (context) => AccountSelectionPage(store: this.store),
           '/watch_address': (context) => WatchAddress(store: this.store),
           '/create_wallet': (context) => CreateWallet(store: this.store),
           '/import_wallet': (context) => ImportWallet(store: this.store),
-          '/manage_accounts': (context) =>
-              ManageAccountsPage(store: this.store),
+          '/manage_accounts': (context) => ManageAccountsPage(store: this.store),
         },
       ),
     );

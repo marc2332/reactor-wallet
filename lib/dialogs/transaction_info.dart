@@ -26,8 +26,7 @@ Future<void> transactionInfo(
                 subtitle: Text('${transaction.ammount} SOL'),
               ),
               ListTile(
-                title:
-                    toMe ? const Text('Received from') : const Text('Sent to'),
+                title: toMe ? const Text('Received from') : const Text('Sent to'),
                 subtitle: Text('$involvedAddressShort...'),
                 trailing: IconButton(
                   icon: Icon(Icons.copy_all_outlined),

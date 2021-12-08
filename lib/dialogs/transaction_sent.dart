@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-Future<void> transactionHasBeenSentDialog(
-    context, String destination, double ammount) async {
+Future<void> transactionHasBeenSentDialog(context, String destination, double ammount) async {
   return showDialog<void>(
     context: context,
     builder: (BuildContext dialogContext) {

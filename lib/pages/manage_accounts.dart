@@ -54,8 +54,7 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
                       },
                     ),
                     enableFeedback: true,
-                    title: Text(
-                        '${account.name} (${account.address.toString().substring(0, 5)}...)'),
+                    title: Text('${account.name} (${account.address.toString().substring(0, 5)}...)'),
                     leading: IconButton(
                       icon: Icon(Icons.remove_circle_outline),
                       onPressed: () {

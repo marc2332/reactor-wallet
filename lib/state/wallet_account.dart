@@ -12,16 +12,14 @@ class WalletAccount extends BaseAccount implements Account {
   late Wallet wallet;
   final String mnemonic;
 
-  WalletAccount(double balance, name, url, this.mnemonic, valuesTracker)
-      : super(balance, name, url, valuesTracker) {
+  WalletAccount(double balance, name, url, this.mnemonic, valuesTracker) : super(balance, name, url, valuesTracker) {
     client = RPCClient(url);
   }
 
   /*
    * Constructor in case the address is already known
    */
-  WalletAccount.with_address(
-      double balance, String address, name, url, this.mnemonic, valuesTracker)
+  WalletAccount.with_address(double balance, String address, name, url, this.mnemonic, valuesTracker)
       : super(balance, name, url, valuesTracker) {
     this.address = address;
     client = RPCClient(url);
@@ -31,8 +29,7 @@ class WalletAccount extends BaseAccount implements Account {
    * Create the keys pair in Isolate to prevent blocking the main thread
    */
   static Future<Ed25519HDKeyPair> createKeyPair(String mnemonic) async {
-    final Ed25519HDKeyPair keyPair =
-        await Ed25519HDKeyPair.fromMnemonic(mnemonic);
+    final Ed25519HDKeyPair keyPair = await Ed25519HDKeyPair.fromMnemonic(mnemonic);
     return keyPair;
   }
 
@@ -40,8 +37,7 @@ class WalletAccount extends BaseAccount implements Account {
    * Load the keys pair into the WalletAccount
    */
   Future<void> loadKeyPair() async {
-    final Ed25519HDKeyPair keyPair =
-        await Executor().execute(arg1: mnemonic, fun1: createKeyPair);
+    final Ed25519HDKeyPair keyPair = await Executor().execute(arg1: mnemonic, fun1: createKeyPair);
     final Wallet wallet = new Wallet(signer: keyPair, rpcClient: client);
     this.wallet = wallet;
     this.address = wallet.address;
@@ -50,12 +46,10 @@ class WalletAccount extends BaseAccount implements Account {
   /*
    * Create a new WalletAccount with a random mnemonic
    */
-  static Future<WalletAccount> generate(
-      String name, String url, valuesTracker) async {
+  static Future<WalletAccount> generate(String name, String url, valuesTracker) async {
     final String randomMnemonic = bip39.generateMnemonic();
 
-    WalletAccount account =
-        new WalletAccount(0, name, url, randomMnemonic, valuesTracker);
+    WalletAccount account = new WalletAccount(0, name, url, randomMnemonic, valuesTracker);
     await account.loadKeyPair();
     await account.refreshBalance();
     return account;
