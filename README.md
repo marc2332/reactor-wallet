@@ -13,9 +13,9 @@ TODO / Ideas:
 - [ ] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses
-- [x] Ability to make transactions
+- [x] Ability to make SOL transactions
 - [x] Ability to refresh the current SOL value by pulling down
-- [ ] Option to use another currency besides dollar as equivalent value
+- [ ] Option to use another currency besides USD as equivalent currency
 - [x] Display latest transactions
 - [ ] Better project organization
 - [ ] Ability to easily share an address (QR?)
@@ -24,7 +24,9 @@ TODO / Ideas:
 - [x] Display owned tokens
 - [ ] Ability to display NFTs owned by a wallet 
 - [ ] Upload to https://itsallwidgets.com/
-- [ ] Small note when making transactions
+- [ ] Ability to add a small note when making transactions
+- [ ] Ability to make transactions with SPL Tokens
+- [ ] Better UX (specially when creating accounts)
 
 WIP.
 
