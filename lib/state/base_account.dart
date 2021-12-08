@@ -22,7 +22,7 @@ class BaseAccount {
   late double balance = 0;
   late double usdBalance = 0;
   late TokenTrackers valuesTracker;
-  late List<Transaction?> transactions = [];
+  late List<Transaction> transactions = [];
   late List<Token> tokens = [];
 
   BaseAccount(this.balance, this.name, this.url, this.valuesTracker);
@@ -37,20 +37,26 @@ class BaseAccount {
         this.balance * valuesTracker.getTokenValue(system_program_id);
 
     for (final token in tokens) {
-      try {
-        Tracker? tracker = valuesTracker.getTracker(token.mint);
-        if (tracker != null) {
-          double tokenUsdBalance = (token.balance * tracker.usdValue);
-          token.usdBalance = tokenUsdBalance.toString();
-          this.usdBalance += tokenUsdBalance;
-        }
-      } catch (err) {
-        print(err);
-      }
+      updateUsdFromTokenValue(token);
     }
   }
 
-  Future<void> loadTokens() async {
+  void updateUsdFromTokenValue(Token token) {
+    try {
+      Tracker? tracker = valuesTracker.getTracker(token.mint);
+      if (tracker != null) {
+        double tokenUsdBalance = (token.balance * tracker.usdValue);
+        token.usdBalance = tokenUsdBalance.toString();
+        this.usdBalance += tokenUsdBalance;
+      }
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  // ignore: avoid_init_to_null
+  Future<void> loadTokens(
+      {Function(Tracker tracker)? onLoadEveryToken = null}) async {
     this.tokens = [];
     Completer completer = new Completer();
 
@@ -74,9 +80,22 @@ class BaseAccount {
             String tokenMint = parsed.info.mint;
 
             // Start tracking the token
-            valuesTracker.addTrackerByProgramMint(tokenMint);
+            Tracker? tracker = valuesTracker.addTrackerByProgramMint(tokenMint);
+
+            Token newToken = new Token(balance, tokenMint);
+
+            if (tracker != null && onLoadEveryToken != null) {
+              double usdValue =
+                  await getTokenUsdValue(tracker.name.toLowerCase());
+              valuesTracker.setTokenValue(tracker.programMint, usdValue);
+              onLoadEveryToken(tracker);
+
+              // Update the total USD value
+              updateUsdFromTokenValue(newToken);
+            }
+
             // Add the token to this account
-            tokens.add(new Token(balance, tokenMint));
+            tokens.add(newToken);
 
             completedTokenAccounts++;
 
@@ -100,11 +119,9 @@ class BaseAccount {
    */
   Future<void> loadTransactions() async {
     final response = await client.getTransactionsList(address);
-    List<TransactionResponse> responseTransactions = response.toList();
 
-    transactions = responseTransactions.map((tx) {
+    response.forEach((tx) {
       ParsedMessage? message = tx.transaction.message;
-
       if (message != null) {
         ParsedInstruction instruction = message.instructions[0];
         dynamic res = instruction.toJson();
@@ -115,20 +132,21 @@ class BaseAccount {
               dynamic transfer = parsed['info'].toJson();
               bool receivedOrNot = transfer['destination'] == address;
               double ammount = transfer['lamports'] / 1000000000;
-              return new Transaction(transfer['source'],
-                  transfer['destination'], ammount, receivedOrNot);
+              this.transactions.add(new Transaction(transfer['source'],
+                  transfer['destination'], ammount, receivedOrNot));
+              break;
             default:
               // Unsupported transaction type
-              return null;
+              this.transactions.add(new UnsupportedTransaction());
           }
         } else {
           // Unsupported program
-          return null;
+          this.transactions.add(new UnsupportedTransaction());
         }
       } else {
-        return null;
+        return;
       }
-    }).toList();
+    });
   }
 }
 
@@ -141,15 +159,17 @@ abstract class Account {
   late double usdBalance = 0;
   late String address;
   late TokenTrackers valuesTracker;
-  late List<Transaction?> transactions = [];
+  late List<Transaction> transactions = [];
   late List<Token> tokens = [];
 
   Account(this.accountType, this.name, this.url);
 
+  void updateUsdFromTokenValue(Token token);
   Future<void> refreshBalance();
   Map<String, dynamic> toJson();
   Future<void> loadTransactions();
-  Future<void> loadTokens();
+  // ignore: avoid_init_to_null
+  Future<void> loadTokens({Function(Tracker tracker)? onLoadEveryToken = null});
 }
 
 class Transaction {
@@ -159,4 +179,22 @@ class Transaction {
   final bool receivedOrNot;
 
   Transaction(this.origin, this.destination, this.ammount, this.receivedOrNot);
+
+  Map<String, dynamic> toJson() {
+    return {
+      "origin": origin,
+      "destination": destination,
+      "ammount": ammount,
+      "receivedOrNot": receivedOrNot
+    };
+  }
+
+  static Transaction fromJson(dynamic tx) {
+    return new Transaction(
+        tx["origin"], tx["destination"], tx["ammount"], tx["receivedOrNot"]);
+  }
+}
+
+class UnsupportedTransaction extends Transaction {
+  UnsupportedTransaction() : super("Unknown", "Unknown", 0.0, false);
 }

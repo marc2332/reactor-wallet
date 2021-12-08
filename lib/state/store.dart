@@ -47,7 +47,6 @@ class TokenTrackers {
   // List of Token trackers
   late Map<String, Tracker> trackers = {
     system_program_id: new Tracker('solana', system_program_id),
-    //"11111111111111111111111111111111": new Tracker('solana', '11111111111111111111111111111111'),
   };
 
   late Map tokensList;
@@ -185,6 +184,7 @@ class AppState {
         if (accountType == AccountType.Client) {
           ClientAccount clientAccount = ClientAccount(account["address"],
               account["balance"], accountName, account["url"], valuesTracker);
+          //clientAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
           return MapEntry(accountName, clientAccount);
         } else {
           WalletAccount walletAccount = new WalletAccount.with_address(
@@ -194,12 +194,14 @@ class AppState {
               account["url"],
               account["mnemonic"],
               valuesTracker);
+          // walletAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
           return MapEntry(accountName, walletAccount);
         }
       });
 
       return AppState(mappedAccounts, valuesTracker);
     } catch (err) {
+      print(err);
       /*
        * Restart the settings if there was any error
        */
@@ -225,17 +227,15 @@ class StateWrapper extends Store<AppState> {
       : super(reducer, initialState: initialState, middleware: middleware);
 
   Future<void> refreshAccounts() async {
-    // Refresh all balances value
-    await state.loadUSDValues();
-
     for (final account in state.accounts.values) {
       // Refresh the account transactions
       await account.loadTransactions();
       // Refresh the tokens list
       await account.loadTokens();
-      // Refresh the account balance
-      await account.refreshBalance();
     }
+
+    // Refresh all balances value
+    await state.loadUSDValues();
 
     // Dispatch the change
     dispatch({"type": StateActions.SolValueRefreshed});
@@ -288,12 +288,12 @@ class StateWrapper extends Store<AppState> {
   /*
    * Create an address watcher
    */
-  Future<void> createWatcher(String address) async {
+  Future<void> createWatcher(String address, String url) async {
     ClientAccount account = new ClientAccount(
       address,
       0,
       state.generateAccountName(),
-      "https://api.mainnet-beta.solana.com",
+      url,
       state.valuesTracker,
     );
 
@@ -388,7 +388,6 @@ Future<StateWrapper> createStore() async {
     [persistor.createMiddleware()],
   );
 
-  int accountsWithTokensLoaded = 0;
   await state.loadUSDValues();
 
   for (Account account in state.accounts.values) {
@@ -407,8 +406,8 @@ Future<StateWrapper> createStore() async {
     }
 
     /*
-       * Load the transactions list and the tokens list
-       */
+     * Load the transactions list and the tokens list
+     */
     account.loadTransactions().then((_) {
       store.dispatch({
         "type": StateActions.AddAccount,
@@ -416,20 +415,15 @@ Future<StateWrapper> createStore() async {
       });
     });
 
-    account.loadTokens().then((_) async {
-      accountsWithTokensLoaded++;
-
-      if (accountsWithTokensLoaded == state.accounts.length) {
-        await state.loadUSDValues();
-        store.dispatch({
-          "type": StateActions.SolValueRefreshed,
-        });
-      } else {
-        store.dispatch({
-          "type": StateActions.AddAccount,
-          "account": account,
-        });
-      }
+    account.loadTokens(onLoadEveryToken: (tracker) {
+      store.dispatch({
+        "type": StateActions.SolValueRefreshed,
+      });
+    }).then((_) async {
+      store.dispatch({
+        "type": StateActions.AddAccount,
+        "account": account,
+      });
     });
   }
 

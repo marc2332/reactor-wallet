@@ -85,7 +85,7 @@ class WatchAddressState extends State<WatchAddress> {
 
   void addAccount() async {
     // Create the account
-    store.createWatcher(address).then((_) {
+    store.createWatcher(address, networkURL).then((_) {
       // Go to Home page
       Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
     });

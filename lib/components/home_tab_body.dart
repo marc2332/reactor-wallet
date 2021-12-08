@@ -213,7 +213,7 @@ class BodyTabsState extends State<BodyTabs>
                   ),
                 );
               }),
-              StoreConnector<AppState, List<Transaction?>>(converter: ((store) {
+              StoreConnector<AppState, List<Transaction>>(converter: ((store) {
                 Account? account = store.state.accounts[accountName];
                 if (account != null) {
                   return account.transactions;
@@ -227,7 +227,7 @@ class BodyTabsState extends State<BodyTabs>
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
                     children: transactions.map((tx) {
-                      if (tx != null) {
+                      if (tx.origin != "Unknown") {
                         return new TransactionCard(tx);
                       } else {
                         return UnsupportedTransactionCard();
@@ -277,7 +277,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
       accountTypeText = "Wallet";
     }
     return Padding(
-      padding: EdgeInsets.only(top: 20.0),
+      padding: EdgeInsets.only(top: 5.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,

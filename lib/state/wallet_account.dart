@@ -68,7 +68,8 @@ class WalletAccount extends BaseAccount implements Account {
       "balance": balance,
       "url": url,
       "mnemonic": mnemonic,
-      "accountType": accountType.toString()
+      "accountType": accountType.toString(),
+      "transactions": transactions.map((tx) => tx.toJson())
     };
   }
 }

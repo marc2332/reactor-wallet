@@ -21,7 +21,8 @@ class ClientAccount extends BaseAccount implements Account {
       "address": address,
       "balance": balance,
       "url": url,
-      "accountType": accountType.toString()
+      "accountType": accountType.toString(),
+      "transactions": transactions.map((tx) => tx.toJson()).toList()
     };
   }
 }
