@@ -184,7 +184,7 @@ class AppState {
           // clientAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
           return MapEntry(accountName, clientAccount);
         } else {
-          WalletAccount walletAccount = new WalletAccount.with_address(
+          WalletAccount walletAccount = new WalletAccount.withAddress(
               account["balance"], account["address"], accountName, account["url"], account["mnemonic"], valuesTracker);
           // walletAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
           return MapEntry(accountName, walletAccount);
@@ -236,6 +236,8 @@ class StateWrapper extends Store<AppState> {
    * Create a wallet instance
    */
   Future<void> createWallet(String accountName, String url) async {
+    print(state);
+    print(state.valuesTracker);
     // Create the account
     WalletAccount walletAccount = await WalletAccount.generate(accountName, url, state.valuesTracker);
 

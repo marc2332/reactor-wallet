@@ -7,7 +7,6 @@ import 'base_account.dart';
 
 class WalletAccount extends BaseAccount implements Account {
   final AccountType accountType = AccountType.Wallet;
-  late TokenTrackers valuesTracker;
 
   late Wallet wallet;
   final String mnemonic;
@@ -19,7 +18,7 @@ class WalletAccount extends BaseAccount implements Account {
   /*
    * Constructor in case the address is already known
    */
-  WalletAccount.with_address(double balance, String address, name, url, this.mnemonic, valuesTracker)
+  WalletAccount.withAddress(double balance, String address, name, url, this.mnemonic, valuesTracker)
       : super(balance, name, url, valuesTracker) {
     this.address = address;
     client = RPCClient(url);

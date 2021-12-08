@@ -1,14 +1,35 @@
 ## Solana Mobile Wallet
 
-A mobile wallet for Solana made in flutter
+A non-custodial Open Source Mobile wallet for Solana made in Flutter.
 
-Features:
-- Watch over any address
-- Display SPL Tokens
-- Import wallets with it's seedphrase (devnet only for now)
-- Create new wallets (devnet only for now)
+⚠ It's on **alpha**. WIP.
 
-TODO / Ideas:
+### 😎 Features
+- Watch over any address you want
+- Display SPL Tokens and transactions
+- Import and create multiple wallets
+- Show the USD equivalent of the address balance and all it's tokens combined
+
+
+![Example screenshot](screenshot.png)
+
+### 🎉 Support this project
+You can support this project by donating any ammount you want to these addresses;
+
+- Solana: `u5GzDDXyzhB9zA8vSHuEow5mQJ6Tk3kC4Bn2T9dp6nX3U`
+- Bitcoin: `1HCBeYD564Y3AjQ3Ci6Fp2zosfZvevJuu6`
+
+### 🏭 Building
+```
+flutter build apk --tree-shake-icons --split-per-abi
+```
+
+### 📝 Formatting
+```
+dart format . --line-length 120
+```
+
+### 🤔 To-do / Ideas
 - [ ] **A name for the app**
 - [ ] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
@@ -27,24 +48,5 @@ TODO / Ideas:
 - [ ] Ability to add a small note when making transactions
 - [ ] Ability to make transactions with SPL Tokens
 - [ ] Better UX (specially when creating accounts)
-
-WIP.
-
-### Support this project
-You can support this project by donating any ammount you want to these addresses;
-
-Solana: `u5GzDDXyzhB9zA8vSHuEow5mQJ6Tk3kC4Bn2T9dp6nX3U`
-Bitcoin: `1HCBeYD564Y3AjQ3Ci6Fp2zosfZvevJuu6`
-
-### Building
-
-```
-flutter build apk --tree-shake-icons --split-per-abi
-```
-
-#### Format
-```
-dart format . --line-length 120
-```
 
 MIT License
