@@ -5,6 +5,7 @@ import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as Http;
+import 'dart:async';
 
 import 'base_account.dart';
 import 'client_account.dart';
@@ -28,16 +29,18 @@ class Tracker {
   String name;
   String programMint;
   double usdValue = 0;
+  String symbol;
 
-  Tracker(this.name, this.programMint);
+  Tracker(this.name, this.programMint, this.symbol);
 }
 
 class TokenInfo {
   late String name = "Unknown";
   late String logoUrl = "";
+  late String symbol = "?";
 
   TokenInfo();
-  TokenInfo.withInfo(this.name, this.logoUrl);
+  TokenInfo.withInfo(this.name, this.logoUrl, this.symbol);
 }
 
 /*
@@ -46,7 +49,7 @@ class TokenInfo {
 class TokenTrackers {
   // List of Token trackers
   late Map<String, Tracker> trackers = {
-    system_program_id: new Tracker('solana', system_program_id),
+    system_program_id: new Tracker('solana', system_program_id, "SOL"),
   };
 
   late Map tokensList;
@@ -80,7 +83,7 @@ class TokenTrackers {
   TokenInfo getTokenInfo(String programId) {
     for (final token in tokensList["tokens"]) {
       if (token['address'] == programId) {
-        return new TokenInfo.withInfo(token["name"], token["logoURI"]);
+        return new TokenInfo.withInfo(token["name"], token["logoURI"], token["symbol"]);
       }
     }
     // If not info about the token is found then an "Unknown" token is returned
@@ -92,7 +95,7 @@ class TokenTrackers {
     if (!trackers.containsKey(programMint)) {
       TokenInfo tokenInfo = getTokenInfo(programMint);
 
-      trackers[programMint] = new Tracker(tokenInfo.name, programMint);
+      trackers[programMint] = new Tracker(tokenInfo.name, programMint, tokenInfo.symbol);
 
       return trackers[programMint];
     }
@@ -100,32 +103,35 @@ class TokenTrackers {
 }
 
 /*
- * Fetch the USD value of a token using the Binance API 
+ * Fetch the USD value of a token using the Coingecko API
  */
-Future<double> getTokenUsdValue(String token) async {
+Future<Map<String, double>> getTokenUsdValue(List<String> tokens) async {
   try {
     Map<String, String> headers = new Map();
     headers['Accept'] = 'application/json';
     headers['Access-Control-Allow-Origin'] = '*';
-
     Http.Response response = await Http.get(
       Uri.http(
         'api.coingecko.com',
         '/api/v3/simple/price',
         {
-          'ids': token,
+          'ids': tokens.join(','),
           'vs_currencies': 'USD',
         },
       ),
       headers: headers,
     );
 
-    final body = json.decode(response.body);
+    final body = json.decode(response.body) as Map;
+    Map<String, double> values = {};
+    for (final token in body.keys) {
+      values[token] = body[token]['usd'];
+    }
 
-    double val = body[token]['usd'];
-    return val;
+    return values;
   } catch (err) {
-    return 0;
+    print('$err');
+    return {tokens[0]: 0};
   }
 }
 
@@ -137,10 +143,15 @@ class AppState {
   AppState(this.accounts, this.valuesTracker);
 
   Future<void> loadUSDValues() async {
-    for (final tracker in valuesTracker.trackers.values) {
-      double usdValue = await getTokenUsdValue(tracker.name.toLowerCase());
-      valuesTracker.setTokenValue(tracker.programMint, usdValue);
-    }
+    List<String> tokenNames = valuesTracker.trackers.values.map((e) => e.name.toLowerCase()).toList();
+    Map<String, double> usdValues = await getTokenUsdValue(tokenNames);
+    valuesTracker.trackers.entries.forEach((entry) {
+      Tracker tracker = entry.value;
+      double? usdValue = usdValues[tracker.name.toLowerCase()];
+      if (usdValue != null) {
+        valuesTracker.setTokenValue(tracker.programMint, usdValue);
+      }
+    });
 
     for (final account in accounts.values) {
       await account.refreshBalance();
@@ -236,8 +247,6 @@ class StateWrapper extends Store<AppState> {
    * Create a wallet instance
    */
   Future<void> createWallet(String accountName, String url) async {
-    print(state);
-    print(state.valuesTracker);
     // Create the account
     WalletAccount walletAccount = await WalletAccount.generate(accountName, url, state.valuesTracker);
 
@@ -307,6 +316,7 @@ class StateWrapper extends Store<AppState> {
     Account? account = state.accounts[accountName];
 
     if (account != null) {
+      await account.loadTokens();
       await account.loadTransactions();
       await account.refreshBalance();
 
@@ -378,6 +388,8 @@ Future<StateWrapper> createStore() async {
 
   await state.loadUSDValues();
 
+  int accountWithLoadedTokens = 0;
+
   for (Account account in state.accounts.values) {
     // Fetch every saved account's balance
     if (account.accountType == AccountType.Wallet) {
@@ -403,11 +415,14 @@ Future<StateWrapper> createStore() async {
       });
     });
 
-    account.loadTokens(onLoadEveryToken: (tracker) {
-      store.dispatch({
-        "type": StateActions.SolValueRefreshed,
-      });
-    }).then((_) async {
+    account.loadTokens().then((_) async {
+      accountWithLoadedTokens++;
+
+      // When all accounts have loaded it's tokens then fetch it's price
+      if (accountWithLoadedTokens == state.accounts.length) {
+        await state.loadUSDValues();
+      }
+
       store.dispatch({
         "type": StateActions.AddAccount,
         "account": account,

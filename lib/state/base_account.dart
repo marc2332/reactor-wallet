@@ -6,9 +6,10 @@ import 'package:solana_wallet/state/store.dart';
 class Token {
   late double balance = 0;
   late String usdBalance = "0";
+  late String symbol;
   late String mint;
 
-  Token(this.balance, this.mint);
+  Token(this.balance, this.mint, this.symbol);
 }
 
 class BaseAccount {
@@ -54,7 +55,7 @@ class BaseAccount {
   }
 
   // ignore: avoid_init_to_null
-  Future<void> loadTokens({Function(Tracker tracker)? onLoadEveryToken = null}) async {
+  Future<void> loadTokens() async {
     this.tokens = [];
     Completer completer = new Completer();
 
@@ -76,20 +77,10 @@ class BaseAccount {
 
             // Start tracking the token
             Tracker? tracker = valuesTracker.addTrackerByProgramMint(tokenMint);
-
-            Token newToken = new Token(balance, tokenMint);
-
-            if (tracker != null && onLoadEveryToken != null) {
-              double usdValue = await getTokenUsdValue(tracker.name.toLowerCase());
-              valuesTracker.setTokenValue(tracker.programMint, usdValue);
-              onLoadEveryToken(tracker);
-
-              // Update the total USD value
-              updateUsdFromTokenValue(newToken);
-            }
+            String symbol = tracker != null ? tracker.symbol : valuesTracker.getTokenInfo(tokenMint).symbol;
 
             // Add the token to this account
-            tokens.add(newToken);
+            tokens.add(new Token(balance, tokenMint, symbol));
 
             completedTokenAccounts++;
 
@@ -164,7 +155,7 @@ abstract class Account {
   Map<String, dynamic> toJson();
   Future<void> loadTransactions();
   // ignore: avoid_init_to_null
-  Future<void> loadTokens({Function(Tracker tracker)? onLoadEveryToken = null});
+  Future<void> loadTokens();
 }
 
 class Transaction {
