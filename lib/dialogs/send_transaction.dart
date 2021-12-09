@@ -119,7 +119,9 @@ Future<void> sendTransactionDialog(
                   ),
                 );
 
-                Executor().execute(arg1: wallet, arg2: destination, arg3: lamports, fun3: makeTransaction).then(
+                Executor()
+                    .execute(arg1: wallet, arg2: destination, arg3: lamports, fun3: makeTransaction)
+                    .then(
                   (res) async {
                     if (res) {
                       store.refreshAccount(accountName);

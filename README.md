@@ -26,7 +26,7 @@ flutter build apk --tree-shake-icons --split-per-abi
 
 ### 📝 Formatting
 ```
-dart format . --line-length 120
+dart format . --line-length 100
 ```
 
 ### 🤔 To-do / Ideas

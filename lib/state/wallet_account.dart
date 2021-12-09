@@ -11,7 +11,8 @@ class WalletAccount extends BaseAccount implements Account {
   late Wallet wallet;
   final String mnemonic;
 
-  WalletAccount(double balance, name, url, this.mnemonic, valuesTracker) : super(balance, name, url, valuesTracker) {
+  WalletAccount(double balance, name, url, this.mnemonic, valuesTracker)
+      : super(balance, name, url, valuesTracker) {
     client = RPCClient(url);
   }
 

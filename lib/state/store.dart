@@ -143,8 +143,10 @@ class AppState {
   AppState(this.accounts, this.valuesTracker);
 
   Future<void> loadUSDValues() async {
-    List<String> tokenNames =
-        valuesTracker.trackers.values.where((e) => e.name != "Unknown").map((e) => e.name.toLowerCase()).toList();
+    List<String> tokenNames = valuesTracker.trackers.values
+        .where((e) => e.name != "Unknown")
+        .map((e) => e.name.toLowerCase())
+        .toList();
     Map<String, double> usdValues = await getTokenUsdValue(tokenNames);
     valuesTracker.trackers.entries.forEach((entry) {
       Tracker tracker = entry.value;
@@ -187,8 +189,9 @@ class AppState {
 
       Map<String, Account> mappedAccounts = accounts.map((accountName, account) {
         // Convert enum from string to enum
-        AccountType accountType =
-            account["accountType"] == AccountType.Client.toString() ? AccountType.Client : AccountType.Wallet;
+        AccountType accountType = account["accountType"] == AccountType.Client.toString()
+            ? AccountType.Client
+            : AccountType.Wallet;
 
         if (accountType == AccountType.Client) {
           ClientAccount clientAccount = ClientAccount(
@@ -223,7 +226,8 @@ class AppState {
   }
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> savedAccounts = accounts.map((name, account) => MapEntry(name, account.toJson()));
+    Map<String, dynamic> savedAccounts =
+        accounts.map((name, account) => MapEntry(name, account.toJson()));
 
     return {
       'accounts': savedAccounts,
@@ -258,7 +262,8 @@ class StateWrapper extends Store<AppState> {
    */
   Future<void> createWallet(String accountName, String url) async {
     // Create the account
-    WalletAccount walletAccount = await WalletAccount.generate(accountName, url, state.valuesTracker);
+    WalletAccount walletAccount =
+        await WalletAccount.generate(accountName, url, state.valuesTracker);
 
     // Add the account
     state.addAccount(walletAccount);
@@ -274,7 +279,8 @@ class StateWrapper extends Store<AppState> {
    */
   Future<void> importWallet(String mnemonic, String url) async {
     // Create the account
-    WalletAccount walletAccount = new WalletAccount(0, state.generateAccountName(), url, mnemonic, state.valuesTracker);
+    WalletAccount walletAccount =
+        new WalletAccount(0, state.generateAccountName(), url, mnemonic, state.valuesTracker);
 
     // Create key pair
     await walletAccount.loadKeyPair();

@@ -81,7 +81,8 @@ class BaseAccount {
 
             // Start tracking the token
             Tracker? tracker = valuesTracker.addTrackerByProgramMint(tokenMint);
-            String symbol = tracker != null ? tracker.symbol : valuesTracker.getTokenInfo(tokenMint).symbol;
+            String symbol =
+                tracker != null ? tracker.symbol : valuesTracker.getTokenInfo(tokenMint).symbol;
 
             // Add the token to this account
             tokens.add(new Token(balance, tokenMint, symbol));
@@ -126,9 +127,8 @@ class BaseAccount {
               dynamic transfer = parsed['info'].toJson();
               bool receivedOrNot = transfer['destination'] == address;
               double ammount = transfer['lamports'] / 1000000000;
-              this
-                  .transactions
-                  .add(new Transaction(transfer['source'], transfer['destination'], ammount, receivedOrNot));
+              this.transactions.add(new Transaction(
+                  transfer['source'], transfer['destination'], ammount, receivedOrNot));
               break;
             default:
               // Unsupported transaction type
@@ -179,7 +179,12 @@ class Transaction {
   Transaction(this.origin, this.destination, this.ammount, this.receivedOrNot);
 
   Map<String, dynamic> toJson() {
-    return {"origin": origin, "destination": destination, "ammount": ammount, "receivedOrNot": receivedOrNot};
+    return {
+      "origin": origin,
+      "destination": destination,
+      "ammount": ammount,
+      "receivedOrNot": receivedOrNot
+    };
   }
 
   static Transaction fromJson(dynamic tx) {

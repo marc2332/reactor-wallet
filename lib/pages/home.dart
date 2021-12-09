@@ -40,7 +40,8 @@ class AccountSubPage extends StatelessWidget {
               tabs: accounts.map(
                 (account) {
                   bool isWallet = account.accountType == AccountType.Wallet;
-                  IconData icon = isWallet ? Icons.account_balance_wallet_outlined : Icons.person_pin_outlined;
+                  IconData icon =
+                      isWallet ? Icons.account_balance_wallet_outlined : Icons.person_pin_outlined;
 
                   return Tab(
                     child: Row(
