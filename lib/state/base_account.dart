@@ -101,9 +101,9 @@ class BaseAccount {
     }
 
     // Complete the completer if the account has no tokens
-    if(tokenAccounts.length == 0) {
+    if (tokenAccounts.length == 0) {
       completer.complete();
-    }    
+    }
 
     return completer.future;
   }

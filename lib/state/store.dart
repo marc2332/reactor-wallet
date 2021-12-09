@@ -143,7 +143,8 @@ class AppState {
   AppState(this.accounts, this.valuesTracker);
 
   Future<void> loadUSDValues() async {
-    List<String> tokenNames = valuesTracker.trackers.values.map((e) => e.name.toLowerCase()).toList();
+    List<String> tokenNames =
+        valuesTracker.trackers.values.where((e) => e.name != "Unknown").map((e) => e.name.toLowerCase()).toList();
     Map<String, double> usdValues = await getTokenUsdValue(tokenNames);
     valuesTracker.trackers.entries.forEach((entry) {
       Tracker tracker = entry.value;
@@ -190,14 +191,23 @@ class AppState {
             account["accountType"] == AccountType.Client.toString() ? AccountType.Client : AccountType.Wallet;
 
         if (accountType == AccountType.Client) {
-          ClientAccount clientAccount =
-              ClientAccount(account["address"], account["balance"], accountName, account["url"], valuesTracker);
-          // clientAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
+          ClientAccount clientAccount = ClientAccount(
+            account["address"],
+            account["balance"],
+            accountName,
+            account["url"],
+            valuesTracker,
+          );
           return MapEntry(accountName, clientAccount);
         } else {
           WalletAccount walletAccount = new WalletAccount.withAddress(
-              account["balance"], account["address"], accountName, account["url"], account["mnemonic"], valuesTracker);
-          // walletAccount.transactions = account["transactions"].map<Transaction>((tx) => Transaction.fromJson(tx)).toList();
+            account["balance"],
+            account["address"],
+            accountName,
+            account["url"],
+            account["mnemonic"],
+            valuesTracker,
+          );
           return MapEntry(accountName, walletAccount);
         }
       });
