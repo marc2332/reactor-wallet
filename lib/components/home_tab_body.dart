@@ -45,8 +45,8 @@ class TransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String shortAddress = this.transaction.origin.substring(0, 5);
     bool toMe = transaction.receivedOrNot;
+    String shortAddress =  toMe ? transaction.origin.substring(0, 5) : transaction.destination.substring(0, 5) ;
     return Card(
       child: InkWell(
         splashColor: Theme.of(context).hoverColor,
