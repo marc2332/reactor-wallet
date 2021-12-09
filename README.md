@@ -16,7 +16,7 @@ A non-custodial Open Source Mobile wallet for Solana made in Flutter.
 ### 🎉 Support this project
 You can support this project by donating any amount you want to these addresses;
 
-- Solana: `u5GzDDXyzhB9zA8vSHuEow5mQJ6Tk3kC4Bn2T9dp6nX3U`
+- Solana: `5GzDDXyzhB9zA8vSHuEow5mQJ6Tk3kC4Bn2T9dp6nX3U`
 - Bitcoin: `1HCBeYD564Y3AjQ3Ci6Fp2zosfZvevJuu6`
 
 ### 🏭 Building
