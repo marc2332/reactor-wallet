@@ -41,6 +41,9 @@ class BaseAccount {
     }
   }
 
+  /*
+   * Sum a token value into the account's global USD balance
+   */
   void updateUsdFromTokenValue(Token token) {
     try {
       Tracker? tracker = valuesTracker.getTracker(token.mint);
@@ -54,12 +57,13 @@ class BaseAccount {
     }
   }
 
-  // ignore: avoid_init_to_null
+  /*
+    * Loads all the tokens (spl-program mints) owned by this account
+   */
   Future<void> loadTokens() async {
     this.tokens = [];
     Completer completer = new Completer();
 
-    // Fetch all the tokens (spl-program mints) owned by the specified address
     Iterable<AssociatedTokenAccount> tokenAccounts = await client.getTokenAccountsByOwner(
       owner: address,
       programId: token_program_id,
@@ -95,6 +99,11 @@ class BaseAccount {
         );
       }
     }
+
+    // Complete the completer if the account has no tokens
+    if(tokenAccounts.length == 0) {
+      completer.complete();
+    }    
 
     return completer.future;
   }
@@ -136,6 +145,9 @@ class BaseAccount {
   }
 }
 
+/*
+ * WalletAccount and ClientAccount implement this
+ */
 abstract class Account {
   final AccountType accountType;
   late String name;
@@ -152,10 +164,10 @@ abstract class Account {
 
   void updateUsdFromTokenValue(Token token);
   Future<void> refreshBalance();
-  Map<String, dynamic> toJson();
   Future<void> loadTransactions();
-  // ignore: avoid_init_to_null
   Future<void> loadTokens();
+
+  Map<String, dynamic> toJson();
 }
 
 class Transaction {

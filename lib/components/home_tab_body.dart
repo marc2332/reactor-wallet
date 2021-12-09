@@ -309,12 +309,7 @@ class HomeTabBodyState extends State<HomeTabBody> {
                 StoreConnector<AppState, String>(converter: ((store) {
                   Account? account = store.state.accounts[accountName];
                   if (account != null) {
-                    String solBalance = account.balance.toString();
-                    // Cut some numbers to make it easier to read
-                    if (solBalance.length >= 5) {
-                      solBalance = solBalance.substring(0, 5);
-                    }
-                    return solBalance;
+                    return balanceShorter(account.balance.toString());
                   } else {
                     return "0";
                   }
