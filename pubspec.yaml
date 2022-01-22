@@ -24,6 +24,7 @@ dependencies:
   worker_manager: ^4.2.3
   url_launcher: ^6.0.12
   cached_network_image: ^3.2.0
+  encrypt: ^5.0.1
 
 dev_dependencies:
   flutter_test:

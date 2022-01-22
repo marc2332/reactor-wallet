@@ -203,14 +203,7 @@ class AppState {
           );
           return MapEntry(accountName, clientAccount);
         } else {
-          WalletAccount walletAccount = new WalletAccount.withAddress(
-            account["balance"],
-            account["address"],
-            accountName,
-            account["url"],
-            account["mnemonic"],
-            valuesTracker,
-          );
+          WalletAccount walletAccount = WalletAccount.fromJson(accountName, account, valuesTracker);
           return MapEntry(accountName, walletAccount);
         }
       });

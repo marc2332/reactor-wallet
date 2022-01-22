@@ -2,8 +2,13 @@ import 'package:solana/solana.dart' show Ed25519HDKeyPair, RPCClient, Wallet;
 import 'package:solana_wallet/state/store.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:bip39/bip39.dart' as bip39;
-
 import 'base_account.dart';
+import 'package:encrypt/encrypt.dart';
+
+// Master key to encrypt and decrypt mnemonics, aka passphrases
+final secureKey = Key.fromUtf8(
+    String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"));
+final iv = IV.fromLength(16);
 
 class WalletAccount extends BaseAccount implements Account {
   final AccountType accountType = AccountType.Wallet;
@@ -55,15 +60,31 @@ class WalletAccount extends BaseAccount implements Account {
     return account;
   }
 
+  static WalletAccount fromJson(
+      String accountName, Map<String, dynamic> account, TokenTrackers valuesTracker) {
+    final encrypter = Encrypter(AES(secureKey));
+
+    return new WalletAccount.withAddress(
+      account["balance"],
+      account["address"],
+      accountName,
+      account["url"],
+      encrypter.decrypt(Encrypted.fromBase64(account["mnemonic"]), iv: iv),
+      valuesTracker,
+    );
+  }
+
   Map<String, dynamic> toJson() {
+    final encrypter = Encrypter(AES(secureKey));
+
     return {
       "name": name,
       "address": address,
       "balance": balance,
       "url": url,
-      "mnemonic": mnemonic,
+      "mnemonic": encrypter.encrypt(mnemonic, iv: iv).base64,
       "accountType": accountType.toString(),
-      "transactions": transactions.map((tx) => tx.toJson())
+      "transactions": transactions.map((tx) => tx.toJson()).toList()
     };
   }
 }

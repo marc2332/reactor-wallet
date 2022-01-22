@@ -21,8 +21,10 @@ You can support this project by donating any amount you want to these addresses;
 
 ### 🏭 Building
 ```
-flutter build apk --tree-shake-icons --split-per-abi
+flutter build apk --tree-shake-icons --split-per-abi --dart-define secureKey=<32CharactersLengthSecretKey>
 ```
+
+Note: `secureKey` is used to internally encrypt and decrypt the wallets's passphrases when using the app.
 
 ### 📝 Formatting
 ```
@@ -31,7 +33,7 @@ dart format . --line-length 100
 
 ### 🤔 To-do / Ideas
 - [ ] **A name for the app**
-- [ ] Seedphrases encryption
+- [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses
 - [x] Ability to make SOL transactions
