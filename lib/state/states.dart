@@ -68,7 +68,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
 
     await tokensTracker.loadTokenList();
 
-    await loadUSDValues();
+    loadUSDValues();
 
     int accountWithLoadedTokens = 0;
 

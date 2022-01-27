@@ -29,16 +29,9 @@ String? transactionAmmountValidator(String? value) {
   }
 }
 
-Future<bool> makeTransaction(
-  Wallet wallet,
-  String destination,
-  int lamports,
-) async {
+Future<bool> makeTransaction(WalletAccount account, String destination, int supply) async {
   try {
-    await wallet.transfer(
-      destination: destination,
-      lamports: lamports,
-    );
+    account.sendLamportsTo(destination, supply);
 
     return true;
   } catch (e) {
@@ -107,8 +100,6 @@ Future<void> sendTransactionDialog(
                 if (addressIsOk && balanceIsOk) {
                   // 1 SOL = 1000000000 lamports
                   int lamports = (sendAmmount * 1000000000).toInt();
-                  // Make the transfer
-                  Wallet wallet = walletAccount.wallet;
 
                   // Close the dialog
                   Navigator.of(dialogContext).pop();
@@ -123,18 +114,25 @@ Future<void> sendTransactionDialog(
 
                   Executor()
                       .execute(
-                          arg1: wallet, arg2: destination, arg3: lamports, fun3: makeTransaction)
+                          arg1: walletAccount,
+                          arg2: destination,
+                          arg3: lamports,
+                          fun3: makeTransaction)
                       .then(
                     (res) async {
                       if (res) {
                         final accountsProv = ref.read(accountsProvider.notifier);
-                        accountsProv.refreshAccount(accountName);
+
+                        // Display the "Transaction went OK" dialog
                         await transactionHasBeenSentDialog(
                           context,
                           destination,
                           sendAmmount,
                         );
+
+                        accountsProv.refreshAccount(accountName);
                       } else {
+                        // Display the "Transaction went wrong" dialog
                         await transactionErroredDialog(
                           context,
                           destination,

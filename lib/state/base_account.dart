@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:solana/solana.dart';
+
 import 'package:solana_wallet/state/tracker.dart';
 
 class Token {
@@ -17,7 +18,7 @@ class BaseAccount {
   final String url;
   late String name;
 
-  late RPCClient client;
+  late RpcClient client;
   late String address;
 
   late double balance = 0;
@@ -66,44 +67,54 @@ class BaseAccount {
     this.tokens = [];
     Completer completer = new Completer();
 
-    Iterable<AssociatedTokenAccount> tokenAccounts = await client.getTokenAccountsByOwner(
-      owner: address,
-      programId: token_program_id,
+    // Get all the tokens owned by the account
+    final tokenAccounts = await client.getTokenAccountsByOwner(
+      address,
+      TokenAccountsFilter.byProgramId(TokenProgram.programId),
+      encoding: Encoding.jsonParsed,
     );
 
     int completedTokenAccounts = 0;
+
     for (final tokenAccount in tokenAccounts) {
-      var data = tokenAccount.account.data;
+      ParsedAccountData? data = tokenAccount.account.data as ParsedAccountData?;
+
       if (data != null) {
         data.when(
-          splToken: (parsed) async {
-            double decimals = double.parse("1" + "0" * (parsed.info.tokenAmount.decimals));
-            double balance = double.parse(parsed.info.tokenAmount.amount) / decimals;
-            String tokenMint = parsed.info.mint;
+          splToken: (data) async {
+            data.when(
+                account: (mintData, type, accountType) {
+                  String tokenMint = mintData.mint;
+                  String? uiBalance = mintData.tokenAmount.uiAmountString;
+                  double balance = double.parse(uiBalance != null ? uiBalance : "0");
 
-            // Start tracking the token
-            Tracker? tracker = tokensTracker.addTrackerByProgramMint(tokenMint);
-            String symbol =
-                tracker != null ? tracker.symbol : tokensTracker.getTokenInfo(tokenMint).symbol;
+                  // Start tracking the token
+                  Tracker? tracker = tokensTracker.addTrackerByProgramMint(tokenMint);
 
-            // Add the token to this account
-            tokens.add(new Token(balance, tokenMint, symbol));
+                  // Get the token's symbol
+                  String symbol = tracker != null
+                      ? tracker.symbol
+                      : tokensTracker.getTokenInfo(tokenMint).symbol;
 
-            completedTokenAccounts++;
+                  // Add the token to this account
+                  tokens.add(new Token(balance, tokenMint, symbol));
 
-            if (completedTokenAccounts == tokenAccounts.length) {
-              completer.complete();
-            }
+                  completedTokenAccounts++;
+
+                  if (completedTokenAccounts == tokenAccounts.length) {
+                    completer.complete();
+                  }
+                },
+                mint: (_, __, ___) {},
+                unknown: (_) {});
           },
-          empty: () {},
-          fromBytes: (List<int> bytes) {},
-          fromString: (String string) {},
-          generic: (Map<String, dynamic> data) {},
+          unsupported: (_) {},
+          stake: (_) {},
         );
       }
     }
 
-    // Complete the completer if the account has no tokens
+    // fallback: Complete the completer if the account has no tokens
     if (tokenAccounts.length == 0) {
       completer.complete();
     }
@@ -115,34 +126,65 @@ class BaseAccount {
    * Load the Address's transactions into the account
    */
   Future<void> loadTransactions() async {
+    this.transactions = [];
+
     final response = await client.getTransactionsList(address);
 
     response.forEach((tx) {
-      ParsedMessage? message = tx.transaction.message;
-      if (message != null) {
-        ParsedInstruction instruction = message.instructions[0];
-        dynamic res = instruction.toJson();
-        if (res['program'] == 'system') {
-          dynamic parsed = res['parsed'].toJson();
-          switch (parsed['type']) {
-            case 'transfer':
-              dynamic transfer = parsed['info'].toJson();
-              bool receivedOrNot = transfer['destination'] == address;
-              double ammount = transfer['lamports'] / 1000000000;
-              this.transactions.add(new Transaction(
-                  transfer['source'], transfer['destination'], ammount, receivedOrNot));
-              break;
-            default:
-              // Unsupported transaction type
+      final message = tx.transaction.message;
+
+      message.instructions.forEach((instruction) {
+        if (instruction is ParsedInstruction) {
+          ParsedInstruction parsedInstruction = instruction as ParsedInstruction;
+
+          parsedInstruction.map(
+            system: (data) {
+              data.parsed.map(
+                transfer: (data) {
+                  ParsedSystemTransferInformation transfer = data.info;
+                  bool receivedOrNot = transfer.destination == address;
+                  double ammount = transfer.lamports / 1000000000;
+                  this.transactions.add(
+                        new Transaction(
+                          transfer.source,
+                          transfer.destination,
+                          ammount,
+                          receivedOrNot,
+                        ),
+                      );
+                },
+                transferChecked: (_) {},
+                unsupported: (_) {
+                  this.transactions.add(new UnsupportedTransaction());
+                },
+              );
+            },
+            splToken: (data) {
+              data.parsed.map(
+                transfer: (data) {
+                  SplTokenTransferInfo transfer = data.info;
+                  bool receivedOrNot = transfer.destination == address;
+                  double ammount = double.parse(transfer.amount);
+                  this.transactions.add(
+                        new Transaction(
+                          transfer.source,
+                          transfer.destination,
+                          ammount,
+                          receivedOrNot,
+                        ),
+                      );
+                },
+                transferChecked: (_) {},
+                generic: (_) {},
+              );
+            },
+            memo: (_) {},
+            unsupported: (_) {
               this.transactions.add(new UnsupportedTransaction());
-          }
-        } else {
-          // Unsupported program
-          this.transactions.add(new UnsupportedTransaction());
+            },
+          );
         }
-      } else {
-        return;
-      }
+      });
     });
   }
 }

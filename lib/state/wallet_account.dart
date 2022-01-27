@@ -1,4 +1,5 @@
-import 'package:solana/solana.dart' show Ed25519HDKeyPair, RPCClient, Wallet;
+import 'package:solana/solana.dart'
+    show Ed25519HDKeyPair, RPCClient, RpcClient, SignedTx, SystemProgram, Wallet;
 import 'package:solana_wallet/state/tracker.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:bip39/bip39.dart' as bip39;
@@ -18,7 +19,7 @@ class WalletAccount extends BaseAccount implements Account {
 
   WalletAccount(double balance, name, url, this.mnemonic, tokensTracker)
       : super(balance, name, url, tokensTracker) {
-    client = RPCClient(url);
+    client = RpcClient(url);
   }
 
   /*
@@ -27,7 +28,28 @@ class WalletAccount extends BaseAccount implements Account {
   WalletAccount.withAddress(double balance, String address, name, url, this.mnemonic, tokensTracker)
       : super(balance, name, url, tokensTracker) {
     this.address = address;
-    client = RPCClient(url);
+    client = RpcClient(url);
+  }
+
+  /*
+   *
+   */
+
+  void sendLamportsTo(String destinationAddress, int supply) async {
+    final recentBlockhash = await client.getRecentBlockhash();
+
+    final message = SystemProgram.transfer(
+      source: address,
+      destination: destinationAddress,
+      lamports: supply,
+    );
+
+    final SignedTx signedTx = await wallet.signMessage(
+      message: message,
+      recentBlockhash: recentBlockhash.blockhash,
+    );
+
+    await client.sendTransaction(signedTx.encode());
   }
 
   /*
@@ -43,8 +65,7 @@ class WalletAccount extends BaseAccount implements Account {
    */
   Future<void> loadKeyPair() async {
     final Ed25519HDKeyPair keyPair = await Executor().execute(arg1: mnemonic, fun1: createKeyPair);
-    final Wallet wallet = new Wallet(signer: keyPair, rpcClient: client);
-    this.wallet = wallet;
+    this.wallet = keyPair;
     this.address = wallet.address;
   }
 

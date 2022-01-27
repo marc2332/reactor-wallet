@@ -1,4 +1,4 @@
-import 'package:solana/solana.dart' show RPCClient;
+import 'package:solana/solana.dart' show RPCClient, RpcClient;
 import 'package:solana_wallet/state/tracker.dart';
 
 import 'base_account.dart';
@@ -12,7 +12,7 @@ class ClientAccount extends BaseAccount implements Account {
   ClientAccount(address, double balance, name, url, TokenTrackers tokensTracker)
       : super(balance, name, url, tokensTracker) {
     this.address = address;
-    this.client = RPCClient(this.url);
+    this.client = RpcClient(this.url);
   }
 
   Map<String, dynamic> toJson() {
