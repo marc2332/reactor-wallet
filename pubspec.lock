@@ -113,13 +113,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.3"
   ed25519_hd_key:
     dependency: transitive
     description:
@@ -181,13 +174,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.0"
-  flutter_redux:
+  flutter_hooks:
     dependency: "direct main"
     description:
-      name: flutter_redux
+      name: flutter_hooks
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.2"
+    version: "0.18.2"
+  flutter_riverpod:
+    dependency: transitive
+    description:
+      name: flutter_riverpod
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0-dev.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -219,6 +219,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.0"
+  hive:
+    dependency: "direct main"
+    description:
+      name: hive
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5"
+  hive_flutter:
+    dependency: "direct main"
+    description:
+      name: hive_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
+  hooks_riverpod:
+    dependency: "direct main"
+    description:
+      name: hooks_riverpod
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0-dev.0"
   http:
     dependency: transitive
     description:
@@ -352,34 +373,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.3"
-  quiver:
+  riverpod:
     dependency: transitive
     description:
-      name: quiver
+      name: riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.1"
-  redux:
-    dependency: "direct main"
-    description:
-      name: redux
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "5.0.0"
-  redux_persist:
-    dependency: "direct main"
-    description:
-      name: redux_persist
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.9.0"
-  redux_persist_flutter:
-    dependency: "direct main"
-    description:
-      name: redux_persist_flutter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.9.0"
+    version: "2.0.0-dev.0"
   rxdart:
     dependency: transitive
     description:
@@ -387,48 +387,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.27.3"
-  shared_preferences:
-    dependency: transitive
-    description:
-      name: shared_preferences
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.8"
-  shared_preferences_linux:
-    dependency: transitive
-    description:
-      name: shared_preferences_linux
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.2"
-  shared_preferences_macos:
-    dependency: transitive
-    description:
-      name: shared_preferences_macos
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.2"
-  shared_preferences_platform_interface:
-    dependency: transitive
-    description:
-      name: shared_preferences_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
-  shared_preferences_web:
-    dependency: transitive
-    description:
-      name: shared_preferences_web
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.2"
-  shared_preferences_windows:
-    dependency: transitive
-    description:
-      name: shared_preferences_windows
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.2"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -471,6 +429,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0"
+  state_notifier:
+    dependency: transitive
+    description:
+      name: state_notifier
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.7.2+1"
   stream_channel:
     dependency: transitive
     description:
@@ -506,13 +471,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.3"
-  tuple:
-    dependency: "direct main"
-    description:
-      name: tuple
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
   typed_data:
     dependency: transitive
     description:

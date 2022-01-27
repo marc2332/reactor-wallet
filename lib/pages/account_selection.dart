@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import '../state/store.dart';
 
 /*
  * Account Selection Page
  */
 class AccountSelectionPage extends StatelessWidget {
-  AccountSelectionPage({Key? key, required this.store}) : super(key: key);
-
-  final StateWrapper store;
+  AccountSelectionPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/components/network_selector.dart';
-import '../state/store.dart';
+import 'package:solana_wallet/state/states.dart';
 
 /*
  * Getting Started Page
  */
-class WatchAddress extends StatefulWidget {
-  WatchAddress({Key? key, required this.store}) : super(key: key);
-
-  final StateWrapper store;
+class WatchAddress extends ConsumerStatefulWidget {
+  WatchAddress({Key? key}) : super(key: key);
 
   @override
-  WatchAddressState createState() => WatchAddressState(this.store);
+  WatchAddressState createState() => WatchAddressState();
 }
 
-class WatchAddressState extends State<WatchAddress> {
-  StateWrapper store;
+class WatchAddressState extends ConsumerState<WatchAddress> {
   late String address;
   late String networkURL;
 
-  WatchAddressState(this.store);
+  WatchAddressState();
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +82,10 @@ class WatchAddressState extends State<WatchAddress> {
   }
 
   void addAccount() async {
+    final accountsProv = ref.read(accountsProvider.notifier);
+
     // Create the account
-    store.createWatcher(address, networkURL).then((_) {
+    accountsProv.createWatcher(address, networkURL).then((_) {
       // Go to Home page
       Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
     });

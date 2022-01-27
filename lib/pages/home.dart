@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/components/home_tab_body.dart';
-import 'package:solana_wallet/state/base_account.dart';
-import '../state/store.dart';
+import 'package:solana_wallet/state/states.dart';
+import '../state/tracker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /*
  * Accounts sub page
  */
-class AccountSubPage extends StatelessWidget {
-  final StateWrapper store;
-  final List<Account> accounts;
-
-  AccountSubPage(this.store, this.accounts);
-
+class AccountSubPage extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final accounts = ref.watch(accountsProvider).values.toList();
+
     return DefaultTabController(
       length: accounts.length,
       child: Scaffold(
@@ -65,19 +62,19 @@ class AccountSubPage extends StatelessWidget {
             return RefreshIndicator(
               onRefresh: () async {
                 // Refresh all account's balances when pulling
-                await store.refreshAccounts();
+                final accountsProv = ref.read(accountsProvider.notifier);
+                await accountsProv.refreshAccounts();
               },
               child: NotificationListener<OverscrollIndicatorNotification>(
                 onNotification: (OverscrollIndicatorNotification overscroll) {
                   // This disables the Material scroll effect when overscrolling
-                  overscroll.disallowGlow();
+                  overscroll.disallowIndicator();
                   return true;
                 },
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   child: HomeTabBody(
                     account: account,
-                    store: store,
                   ),
                 ),
               ),
@@ -92,19 +89,15 @@ class AccountSubPage extends StatelessWidget {
 /*
  * Settings sub page
  */
-class SettingsSubPage extends StatefulWidget {
-  final StateWrapper store;
-
-  SettingsSubPage(this.store);
+class SettingsSubPage extends ConsumerStatefulWidget {
+  SettingsSubPage();
 
   @override
-  State<StatefulWidget> createState() => SettingsSubPageState(this.store);
+  SettingsSubPageState createState() => SettingsSubPageState();
 }
 
-class SettingsSubPageState extends State<SettingsSubPage> {
-  final StateWrapper store;
-
-  SettingsSubPageState(this.store);
+class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
+  SettingsSubPageState();
 
   @override
   Widget build(BuildContext context) {
@@ -166,66 +159,55 @@ class SettingsSubPageState extends State<SettingsSubPage> {
 /*
  * Home Page
  */
-class HomePage extends StatefulWidget {
-  HomePage({Key? key, required this.store}) : super(key: key);
-
-  final StateWrapper store;
+class HomePage extends ConsumerStatefulWidget {
+  HomePage({Key? key}) : super(key: key);
 
   @override
-  HomePageState createState() => HomePageState(this.store);
+  HomePageState createState() => HomePageState();
 }
 
-class HomePageState extends State<HomePage> {
-  final StateWrapper store;
-
-  HomePageState(this.store);
-
+class HomePageState extends ConsumerState<HomePage> {
   int currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, List<Account>>(converter: (store) {
-      Map<String, Account> accounts = store.state.accounts;
-      return accounts.entries.map((entry) => entry.value).toList();
-    }, builder: (context, accounts) {
-      Widget page;
+    Widget page;
 
-      switch (currentPage) {
-        // Settings sub page
-        case 1:
-          page = SettingsSubPage(store);
-          break;
+    switch (currentPage) {
+      // Settings sub page
+      case 1:
+        page = SettingsSubPage();
+        break;
 
-        // Wallet sub page
-        default:
-          page = AccountSubPage(store, accounts);
-      }
+      // Wallet sub page
+      default:
+        page = AccountSubPage();
+    }
 
-      return Scaffold(
-        body: page,
-        bottomNavigationBar: BottomNavigationBar(
-          onTap: (int page) {
-            setState(() {
-              currentPage = page;
-            });
-          },
-          elevation: 0,
-          currentIndex: currentPage,
-          showUnselectedLabels: false,
-          items: [
-            BottomNavigationBarItem(
-              activeIcon: Icon(Icons.account_balance_wallet),
-              icon: Icon(Icons.account_balance_wallet_outlined),
-              label: 'Accounts',
-            ),
-            BottomNavigationBarItem(
-              activeIcon: Icon(Icons.settings),
-              icon: Icon(Icons.settings_outlined),
-              label: 'Settings',
-            ),
-          ],
-        ),
-      );
-    });
+    return Scaffold(
+      body: page,
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: (int page) {
+          setState(() {
+            currentPage = page;
+          });
+        },
+        elevation: 0,
+        currentIndex: currentPage,
+        showUnselectedLabels: false,
+        items: [
+          BottomNavigationBarItem(
+            activeIcon: Icon(Icons.account_balance_wallet),
+            icon: Icon(Icons.account_balance_wallet_outlined),
+            label: 'Accounts',
+          ),
+          BottomNavigationBarItem(
+            activeIcon: Icon(Icons.settings),
+            icon: Icon(Icons.settings_outlined),
+            label: 'Settings',
+          ),
+        ],
+      ),
+    );
   }
 }

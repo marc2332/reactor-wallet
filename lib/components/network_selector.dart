@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const options = [
@@ -9,7 +8,7 @@ const options = [
 ];
 
 const urlOptions = {
-  'Mainnet-beta (default)': 'https://api.mainnet-beta.solana.com',
+  'Mainnet-beta (default)': 'https://solana-api.projectserum.com',
   'Devnet': 'https://api.devnet.solana.com',
   'Testnet': 'https://api.testnet.solana.com',
   'Custom': '',

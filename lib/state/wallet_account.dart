@@ -1,5 +1,5 @@
 import 'package:solana/solana.dart' show Ed25519HDKeyPair, RPCClient, Wallet;
-import 'package:solana_wallet/state/store.dart';
+import 'package:solana_wallet/state/tracker.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'base_account.dart';
@@ -16,16 +16,16 @@ class WalletAccount extends BaseAccount implements Account {
   late Wallet wallet;
   final String mnemonic;
 
-  WalletAccount(double balance, name, url, this.mnemonic, valuesTracker)
-      : super(balance, name, url, valuesTracker) {
+  WalletAccount(double balance, name, url, this.mnemonic, tokensTracker)
+      : super(balance, name, url, tokensTracker) {
     client = RPCClient(url);
   }
 
   /*
    * Constructor in case the address is already known
    */
-  WalletAccount.withAddress(double balance, String address, name, url, this.mnemonic, valuesTracker)
-      : super(balance, name, url, valuesTracker) {
+  WalletAccount.withAddress(double balance, String address, name, url, this.mnemonic, tokensTracker)
+      : super(balance, name, url, tokensTracker) {
     this.address = address;
     client = RPCClient(url);
   }
@@ -51,27 +51,19 @@ class WalletAccount extends BaseAccount implements Account {
   /*
    * Create a new WalletAccount with a random mnemonic
    */
-  static Future<WalletAccount> generate(String name, String url, valuesTracker) async {
+  static Future<WalletAccount> generate(String name, String url, tokensTracker) async {
     final String randomMnemonic = bip39.generateMnemonic();
 
-    WalletAccount account = new WalletAccount(0, name, url, randomMnemonic, valuesTracker);
+    WalletAccount account = new WalletAccount(0, name, url, randomMnemonic, tokensTracker);
     await account.loadKeyPair();
     await account.refreshBalance();
     return account;
   }
 
-  static WalletAccount fromJson(
-      String accountName, Map<String, dynamic> account, TokenTrackers valuesTracker) {
+  static String decryptMnemonic(String mnemonic) {
     final encrypter = Encrypter(AES(secureKey));
 
-    return new WalletAccount.withAddress(
-      account["balance"],
-      account["address"],
-      accountName,
-      account["url"],
-      encrypter.decrypt(Encrypted.fromBase64(account["mnemonic"]), iv: iv),
-      valuesTracker,
-    );
+    return encrypter.decrypt(Encrypted.fromBase64(mnemonic), iv: iv);
   }
 
   Map<String, dynamic> toJson() {

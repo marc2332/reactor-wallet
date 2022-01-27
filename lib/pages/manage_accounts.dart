@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/dialogs/editing_account.dart';
 import 'package:solana_wallet/dialogs/account_info.dart';
 import 'package:solana_wallet/dialogs/remove_account.dart';
 import 'package:solana_wallet/state/base_account.dart';
-import 'package:solana_wallet/state/store.dart';
+import 'package:solana_wallet/state/states.dart';
 
 class ManageAccountsPage extends StatefulWidget {
-  final StateWrapper store;
-
-  ManageAccountsPage({Key? key, required this.store}) : super(key: key);
+  ManageAccountsPage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => ManageAccountsPageState(this.store);
+  State<StatefulWidget> createState() => ManageAccountsPageState();
 }
 
 class ManageAccountsPageState extends State<ManageAccountsPage> {
-  final StateWrapper store;
-
-  ManageAccountsPageState(this.store);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,12 +28,10 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
-        child: StoreConnector<AppState, List<Account>>(
-          converter: (store) {
-            Map<String, Account> accounts = store.state.accounts;
-            return accounts.entries.map((entry) => entry.value).toList();
-          },
-          builder: (context, accounts) {
+        child: Consumer(
+          builder: (context, ref, child) {
+            final accounts = ref.watch(accountsProvider).values.toList();
+
             return ListView(
               shrinkWrap: true,
               physics: BouncingScrollPhysics(),
@@ -50,7 +42,7 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
                     trailing: IconButton(
                       icon: Icon(Icons.mode_edit_outline_outlined),
                       onPressed: () {
-                        editAccountDialog(context, store, account);
+                        editAccountDialog(context, account);
                       },
                     ),
                     enableFeedback: true,
@@ -59,7 +51,7 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
                     leading: IconButton(
                       icon: Icon(Icons.remove_circle_outline),
                       onPressed: () {
-                        removeAccountDialog(store, context, account);
+                        removeAccountDialog(context, account);
                       },
                     ),
                     onTap: () {

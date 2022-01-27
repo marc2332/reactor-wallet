@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:solana/solana.dart';
-import 'package:solana_wallet/state/store.dart';
+import 'package:solana_wallet/state/tracker.dart';
 
 class Token {
   late double balance = 0;
@@ -22,19 +22,21 @@ class BaseAccount {
 
   late double balance = 0;
   late double usdBalance = 0;
-  late TokenTrackers valuesTracker;
+  late TokenTrackers tokensTracker;
   late List<Transaction> transactions = [];
   late List<Token> tokens = [];
 
-  BaseAccount(this.balance, this.name, this.url, this.valuesTracker);
+  BaseAccount(this.balance, this.name, this.url, this.tokensTracker);
 
   /*
    * Refresh the account balance
    */
   Future<void> refreshBalance() async {
     int balance = await client.getBalance(address);
+
     this.balance = balance.toDouble() / 1000000000;
-    this.usdBalance = this.balance * valuesTracker.getTokenValue(system_program_id);
+
+    this.usdBalance = this.balance * tokensTracker.getTokenValue(system_program_id);
 
     for (final token in tokens) {
       updateUsdFromTokenValue(token);
@@ -46,7 +48,7 @@ class BaseAccount {
    */
   void updateUsdFromTokenValue(Token token) {
     try {
-      Tracker? tracker = valuesTracker.getTracker(token.mint);
+      Tracker? tracker = tokensTracker.getTracker(token.mint);
       if (tracker != null) {
         double tokenUsdBalance = (token.balance * tracker.usdValue);
         token.usdBalance = tokenUsdBalance.toString();
@@ -80,9 +82,9 @@ class BaseAccount {
             String tokenMint = parsed.info.mint;
 
             // Start tracking the token
-            Tracker? tracker = valuesTracker.addTrackerByProgramMint(tokenMint);
+            Tracker? tracker = tokensTracker.addTrackerByProgramMint(tokenMint);
             String symbol =
-                tracker != null ? tracker.symbol : valuesTracker.getTokenInfo(tokenMint).symbol;
+                tracker != null ? tracker.symbol : tokensTracker.getTokenInfo(tokenMint).symbol;
 
             // Add the token to this account
             tokens.add(new Token(balance, tokenMint, symbol));
@@ -156,7 +158,7 @@ abstract class Account {
   late double balance = 0;
   late double usdBalance = 0;
   late String address;
-  late TokenTrackers valuesTracker;
+  late TokenTrackers tokensTracker;
   late List<Transaction> transactions = [];
   late List<Token> tokens = [];
 

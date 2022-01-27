@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/components/network_selector.dart';
-import '../state/store.dart';
+import 'package:solana_wallet/state/states.dart';
 
 /*
  * Getting Started Page
  */
-class CreateWallet extends StatefulWidget {
-  CreateWallet({Key? key, required this.store}) : super(key: key);
-
-  final StateWrapper store;
+class CreateWallet extends ConsumerStatefulWidget {
+  CreateWallet({Key? key}) : super(key: key);
 
   @override
-  CreateWalletState createState() => CreateWalletState(this.store);
+  CreateWalletState createState() => CreateWalletState();
 }
 
-class CreateWalletState extends State<CreateWallet> {
-  StateWrapper store;
+class CreateWalletState extends ConsumerState<CreateWallet> {
   late String address;
   late String accountName;
   late String networkURL;
 
-  CreateWalletState(this.store);
+  CreateWalletState();
 
   @override
   Widget build(BuildContext context) {
@@ -83,8 +81,10 @@ class CreateWalletState extends State<CreateWallet> {
   }
 
   void createWallet() async {
-    if (accountName.length > 0 && !store.state.accounts.containsKey(accountName)) {
-      store.createWallet(accountName, networkURL).then((_) {
+    final accountsProv = ref.read(accountsProvider.notifier);
+
+    if (accountName.length > 0 && !accountsProv.state.containsKey(accountName)) {
+      accountsProv.createWallet(accountName, networkURL).then((_) {
         // Go to Home page
         Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
       });

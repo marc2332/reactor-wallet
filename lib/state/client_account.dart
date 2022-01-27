@@ -1,5 +1,5 @@
 import 'package:solana/solana.dart' show RPCClient;
-import 'package:solana_wallet/state/store.dart';
+import 'package:solana_wallet/state/tracker.dart';
 
 import 'base_account.dart';
 
@@ -9,8 +9,8 @@ import 'base_account.dart';
 class ClientAccount extends BaseAccount implements Account {
   final AccountType accountType = AccountType.Client;
 
-  ClientAccount(address, double balance, name, url, TokenTrackers valuesTracker)
-      : super(balance, name, url, valuesTracker) {
+  ClientAccount(address, double balance, name, url, TokenTrackers tokensTracker)
+      : super(balance, name, url, tokensTracker) {
     this.address = address;
     this.client = RPCClient(this.url);
   }
@@ -24,5 +24,9 @@ class ClientAccount extends BaseAccount implements Account {
       "accountType": accountType.toString(),
       "transactions": transactions.map((tx) => tx.toJson()).toList()
     };
+  }
+
+  static ClientAccount from(ClientAccount from) {
+    return new ClientAccount(from.address, from.balance, from.name, from.url, from.tokensTracker);
   }
 }
