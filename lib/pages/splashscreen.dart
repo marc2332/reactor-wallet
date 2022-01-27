@@ -26,7 +26,7 @@ class SplashScreen extends ConsumerWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("Opening your accounts 😄"),
+              Text('Opening your accounts 😄'),
               Padding(
                 padding: EdgeInsets.only(top: 30),
                 child: Container(
@@ -34,7 +34,7 @@ class SplashScreen extends ConsumerWidget {
                   height: 35,
                   child: CircularProgressIndicator(
                     strokeWidth: 3.0,
-                    semanticsLabel: 'Loading SOL USD equivalent value',
+                    semanticsLabel: 'Loading the accounts',
                   ),
                 ),
               )
