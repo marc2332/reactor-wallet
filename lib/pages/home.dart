@@ -1,65 +1,107 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/components/home_tab_body.dart';
+import 'package:solana_wallet/state/base_account.dart';
+import 'package:solana_wallet/state/client_account.dart';
 import 'package:solana_wallet/state/states.dart';
+import 'package:solana_wallet/state/wallet_account.dart';
 import '../state/tracker.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:shimmer/shimmer.dart';
+
+class AccountSubPage extends StatefulWidget {
+  const AccountSubPage({Key? key}) : super(key: key);
+  @override
+  State<AccountSubPage> createState() => AccountSubPageState();
+}
 
 /*
  * Accounts sub page
  */
-class AccountSubPage extends ConsumerWidget {
+class AccountSubPageState extends State<AccountSubPage> with TickerProviderStateMixin {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final accounts = ref.watch(accountsProvider).values.toList();
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, ref, _) {
+        final tokensTracker = ref.read(tokensTrackerProvider);
+        final accounts = ref.watch(accountsProvider).values.toList();
 
-    return DefaultTabController(
-      length: accounts.length,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Wallets"),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                Icons.manage_accounts_outlined,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, "/manage_accounts");
-              },
-            )
-          ],
-          bottom: new PreferredSize(
-            preferredSize: new Size(200.0, 50.0),
-            child: TabBar(
-              physics: BouncingScrollPhysics(),
-              isScrollable: true,
-              tabs: accounts.map(
-                (account) {
-                  bool isWallet = account.accountType == AccountType.Wallet;
-                  IconData icon =
-                      isWallet ? Icons.account_balance_wallet_outlined : Icons.person_pin_outlined;
+        final isAppLoaded = ref.watch(appLoaded);
 
-                  return Tab(
-                    child: Row(
-                      children: [
-                        Icon(icon),
-                        Padding(
-                          padding: EdgeInsets.only(left: 5),
-                          child: Text(account.name),
-                        ),
-                      ],
+        List<Widget> accountTabs = [];
+        List<Widget> accountBodies = [];
+
+        if (isAppLoaded) {
+          accountTabs = accounts.map(
+            (account) {
+              bool isWallet = account.accountType == AccountType.Wallet;
+              IconData icon =
+                  isWallet ? Icons.account_balance_wallet_outlined : Icons.person_pin_outlined;
+
+              return Tab(
+                child: Row(
+                  children: [
+                    Icon(icon),
+                    Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: Text(account.name),
                     ),
-                  );
-                },
-              ).toList(),
+                  ],
+                ),
+              );
+            },
+          ).toList();
+        } else {
+          accountTabs = [
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Tab(
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: Container(
+                        width: 100,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(150, 0, 0, 0),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-        body: TabBarView(
-          physics: BouncingScrollPhysics(),
-          children: accounts.map((account) {
+          ];
+        }
+
+        if (isAppLoaded) {
+          accountBodies = accounts.map((account) {
             return RefreshIndicator(
+              onRefresh: () async {
+                // Refresh all account's balances when pulling
+                final accountsProv = ref.read(accountsProvider.notifier);
+                await accountsProv.refreshAccounts();
+              },
+              child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: HomeTabBody(
+                  account: account,
+                ),
+              ),
+            );
+          }).toList();
+        } else {
+          final sampleAccount = ClientAccount("_____", 0, "_____", "_____", tokensTracker);
+
+          sampleAccount.isLoaded = false;
+
+          accountBodies = [
+            RefreshIndicator(
               onRefresh: () async {
                 // Refresh all account's balances when pulling
                 final accountsProv = ref.read(accountsProvider.notifier);
@@ -74,14 +116,46 @@ class AccountSubPage extends ConsumerWidget {
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   child: HomeTabBody(
-                    account: account,
+                    account: sampleAccount,
                   ),
                 ),
               ),
-            );
-          }).toList(),
-        ),
-      ),
+            )
+          ];
+        }
+
+        return DefaultTabController(
+          length: accountBodies.length,
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text("Accounts"),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(
+                    Icons.manage_accounts_outlined,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/manage_accounts");
+                  },
+                )
+              ],
+              bottom: new PreferredSize(
+                preferredSize: new Size(200.0, 50.0),
+                child: TabBar(
+                  physics: BouncingScrollPhysics(),
+                  isScrollable: true,
+                  tabs: accountTabs,
+                ),
+              ),
+            ),
+            body: TabBarView(
+              physics: BouncingScrollPhysics(),
+              children: accountBodies,
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -5,7 +5,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/pages/create_wallet.dart';
 import 'package:solana_wallet/pages/import_wallet.dart';
 import 'package:solana_wallet/pages/manage_accounts.dart';
-import 'package:solana_wallet/pages/splashscreen.dart';
 import 'package:solana_wallet/pages/watch_address.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'pages/home.dart';
@@ -32,10 +31,9 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/splashscreen',
+      initialRoute: '/home',
       routes: {
         '/home': (_) => HomePage(),
-        '/splashscreen': (_) => SplashScreen(),
         '/account_selection': (_) => AccountSelectionPage(),
         '/watch_address': (_) => WatchAddress(),
         '/create_wallet': (_) => CreateWallet(),

@@ -13,10 +13,15 @@ class Token {
   Token(this.balance, this.mint, this.symbol);
 }
 
+enum AccountItem {
+  Tokens,
+}
+
 class BaseAccount {
   final AccountType accountType = AccountType.Wallet;
   final String url;
   late String name;
+  late bool isLoaded = true;
 
   late RpcClient client;
   late String address;
@@ -27,7 +32,13 @@ class BaseAccount {
   late List<Transaction> transactions = [];
   late List<Token> tokens = [];
 
+  final itemsLoaded = Map<AccountItem, bool>();
+
   BaseAccount(this.balance, this.name, this.url, this.tokensTracker);
+
+  bool isItemLoaded(AccountItem item) {
+    return itemsLoaded[item] != null;
+  }
 
   /*
    * Refresh the account balance
@@ -103,6 +114,7 @@ class BaseAccount {
 
                   if (completedTokenAccounts == tokenAccounts.length) {
                     completer.complete();
+                    itemsLoaded[AccountItem.Tokens] = true;
                   }
                 },
                 mint: (_, __, ___) {},
@@ -117,6 +129,7 @@ class BaseAccount {
     // fallback: Complete the completer if the account has no tokens
     if (tokenAccounts.length == 0) {
       completer.complete();
+      itemsLoaded[AccountItem.Tokens] = true;
     }
 
     return completer.future;
@@ -196,6 +209,7 @@ abstract class Account {
   final AccountType accountType;
   late String name;
   final String url;
+  late bool isLoaded = true;
 
   late double balance = 0;
   late double usdBalance = 0;
@@ -206,6 +220,7 @@ abstract class Account {
 
   Account(this.accountType, this.name, this.url);
 
+  bool isItemLoaded(AccountItem item);
   void updateUsdFromTokenValue(Token token);
   Future<void> refreshBalance();
   Future<void> loadTransactions();

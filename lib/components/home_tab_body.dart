@@ -2,6 +2,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:solana_wallet/dialogs/send_transaction.dart';
 import 'package:solana_wallet/dialogs/transaction_info.dart';
 import 'package:solana_wallet/state/base_account.dart';
@@ -140,6 +141,84 @@ class TokenCard extends ConsumerWidget {
   }
 }
 
+class TokenCardWithShimmer extends StatelessWidget {
+  const TokenCardWithShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        splashColor: Theme.of(context).hoverColor,
+        onTap: () {},
+        child: Padding(
+          padding: EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                child: Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    width: 35,
+                    height: 35,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(150, 0, 0, 0),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 65,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(150, 0, 0, 0),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(150, 0, 0, 0),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(child: SizedBox()),
+              Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(150, 0, 0, 0),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class BodyTabs extends StatefulWidget {
   final Account account;
 
@@ -151,82 +230,96 @@ class BodyTabs extends StatefulWidget {
 
 class BodyTabsState extends State<BodyTabs> with SingleTickerProviderStateMixin {
   final Account account;
-  late TabController tabsController;
 
   BodyTabsState(this.account);
 
   @override
-  void initState() {
-    super.initState();
-    tabsController = new TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    tabsController.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        TabBar(
-          controller: tabsController,
-          indicatorColor: Theme.of(context).indicatorColor,
-          labelColor: Theme.of(context).indicatorColor,
-          unselectedLabelColor: Colors.black54,
-          isScrollable: true,
-          tabs: <Widget>[
-            Tab(
-              text: "Tokens",
-            ),
-            Tab(
-              text: "Transactions",
-            )
-          ],
-        ),
-        Container(
-          height: 300,
-          child: TabBarView(
-            controller: tabsController,
-            children: <Widget>[
-              Consumer(builder: (context, ref, w) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: ListView.builder(
-                    itemCount: account.tokens.length,
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return TokenCard(account.tokens[index]);
-                    },
-                  ),
-                );
-              }),
-              Consumer(builder: (context, ref, child) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    physics: BouncingScrollPhysics(),
-                    itemCount: account.transactions.length,
-                    itemBuilder: (context, index) {
-                      final Transaction tx = account.transactions[index];
-                      if (tx.origin != "Unknown") {
-                        return TransactionCard(tx);
-                      } else {
-                        return UnsupportedTransactionCard();
-                      }
-                    },
-                  ),
-                );
-              })
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          TabBar(
+            indicatorColor: Theme.of(context).indicatorColor,
+            labelColor: Theme.of(context).indicatorColor,
+            unselectedLabelColor: Colors.black54,
+            isScrollable: true,
+            tabs: <Widget>[
+              Tab(
+                text: "Tokens",
+              ),
+              Tab(
+                text: "Transactions",
+              )
             ],
           ),
-        )
-      ],
+          Padding(
+              padding: EdgeInsets.only(left: 20, right: 20, top: 10),
+              child: Container(
+                height: 320,
+                child: TabBarView(
+                  children: <Widget>[
+                    Consumer(builder: (context, ref, _) {
+                      int accountTokenQuantity = account.tokens.length;
+
+                      if (account.isItemLoaded(AccountItem.Tokens)) {
+                        if (accountTokenQuantity == 0) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 20),
+                                    child: const Text("This address doesn't own any token"),
+                                  )
+                                ],
+                              )
+                            ],
+                          );
+                        } else {
+                          return ListView.builder(
+                            itemCount: account.tokens.length,
+                            shrinkWrap: true,
+                            physics: BouncingScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              return TokenCard(account.tokens[index]);
+                            },
+                          );
+                        }
+                      } else {
+                        return ListView.builder(
+                          itemCount: 5,
+                          shrinkWrap: true,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return TokenCardWithShimmer();
+                          },
+                        );
+                      }
+                    }),
+                    Consumer(builder: (context, ref, _) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: BouncingScrollPhysics(),
+                        itemCount: account.transactions.length,
+                        itemBuilder: (context, index) {
+                          final Transaction tx = account.transactions[index];
+                          if (tx.origin != "Unknown") {
+                            return TransactionCard(tx);
+                          } else {
+                            return UnsupportedTransactionCard();
+                          }
+                        },
+                      );
+                    })
+                  ],
+                ),
+              )),
+        ],
+      ),
     );
   }
 }
@@ -255,7 +348,7 @@ class HomeTabBodyState extends ConsumerState<HomeTabBody> {
      * in order to prevent an infinite loading animation, it makes sure that the SOL balance is at least > 0.0, 
      * if not, it will just display 0.0
      */
-    bool shouldRenderSpinner = account.balance > 0.0 && account.usdBalance == 0.0;
+    bool loadedUsdBalance = !(account.balance > 0.0 && account.usdBalance == 0.0);
 
     // Convert the account's type to String
     String accountTypeText = "";
@@ -284,38 +377,57 @@ class HomeTabBodyState extends ConsumerState<HomeTabBody> {
                 );
               });
             },
-            child: Text(
-              '$accountTypeText (${account.address.substring(0, 5)}...)',
-              style: TextStyle(color: Colors.black),
-            ),
+            child: account.isLoaded
+                ? Text(
+                    '$accountTypeText (${account.address.substring(0, 5)}...)',
+                    style: TextStyle(color: Colors.black),
+                  )
+                : Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 80,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(150, 0, 0, 0),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  solBalance,
-                  style: GoogleFonts.poppins(
-                    textStyle: TextStyle(
-                      fontSize: 40,
+                if (account.isLoaded) ...[
+                  Text(
+                    solBalance,
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        fontSize: 40,
+                      ),
                     ),
                   ),
-                ),
-                const Text(' SOL'),
+                  const Text(' SOL'),
+                ] else ...[
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 90,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(150, 0, 0, 0),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
-          if (shouldRenderSpinner) ...[
-            Container(
-              width: 35,
-              height: 35,
-              child: CircularProgressIndicator(
-                strokeWidth: 3.0,
-                semanticsLabel: 'Loading SOL USD equivalent value',
-              ),
-            )
-          ] else ...[
+          if (account.isLoaded && loadedUsdBalance) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -329,6 +441,19 @@ class HomeTabBodyState extends ConsumerState<HomeTabBody> {
                   ),
                 )
               ],
+            )
+          ] else ...[
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                width: 70,
+                height: 35,
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(150, 0, 0, 0),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
             )
           ],
           if (account.accountType == AccountType.Wallet) ...[
