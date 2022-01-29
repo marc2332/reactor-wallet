@@ -47,7 +47,9 @@ void removeAccount(WidgetRef ref, BuildContext context, Account account) {
 
   accountsProv.removeAccount(account);
 
-  if (accountsProv.state.length == 0) {
-    Navigator.pushReplacementNamed(context, "/account_selection");
+  if (accountsProv.state.isEmpty) {
+    ref.read(selectedAccountProvider.notifier).state = null;
+  } else {
+    ref.read(selectedAccountProvider.notifier).state = accountsProv.state.values.first;
   }
 }

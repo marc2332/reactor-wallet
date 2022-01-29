@@ -5,8 +5,12 @@ import 'package:solana_wallet/state/client_account.dart';
 import 'package:solana_wallet/state/tracker.dart';
 import 'package:solana_wallet/state/wallet_account.dart';
 
-final appLoaded = StateProvider<bool>((_) {
+final appLoadedProvider = StateProvider<bool>((_) {
   return false;
+});
+
+final selectedAccountProvider = StateProvider<Account?>((_) {
+  return null;
 });
 
 final tokensTrackerProvider = Provider<TokenTrackers>((_) {
@@ -64,7 +68,11 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
 
     state = accountsMap;
 
-    ref.read(appLoaded.notifier).state = true;
+    if (state.values.isNotEmpty) {
+      ref.read(selectedAccountProvider.notifier).state = state.values.first;
+    }
+
+    ref.read(appLoadedProvider.notifier).state = true;
 
     await tokensTracker.loadTokenList();
 
@@ -165,7 +173,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   /*
    * Import a wallet
    */
-  Future<void> importWallet(String mnemonic, String url) async {
+  Future<WalletAccount> importWallet(String mnemonic, String url) async {
     // Create the account
     WalletAccount walletAccount =
         new WalletAccount(0, generateAccountName(), url, mnemonic, tokensTracker);
@@ -189,6 +197,8 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
     accountsBox.put(walletAccount.name, walletAccount.toJson());
 
     refreshAllState();
+
+    return walletAccount;
   }
 
   /*
@@ -205,7 +215,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   /*
    * Create an address watcher
    */
-  Future<void> createWatcher(String address, String url) async {
+  Future<ClientAccount> createWatcher(String address, String url) async {
     ClientAccount account = new ClientAccount(
       address,
       0,
@@ -230,6 +240,8 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
     accountsBox.put(account.name, account.toJson());
 
     refreshAllState();
+
+    return account;
   }
 
   Future<void> refreshAccount(String accountName) async {

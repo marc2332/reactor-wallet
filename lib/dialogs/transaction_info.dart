@@ -21,7 +21,7 @@ Future<void> transactionInfo(
             children: <Widget>[
               ListTile(
                 title: const Text('Ammount'),
-                subtitle: Text('${transaction.ammount} SOL'),
+                subtitle: Text('${transaction.ammount.toStringAsFixed(9)} SOL'),
               ),
               ListTile(
                 title: toMe ? const Text('Received from') : const Text('Sent to'),

@@ -80,7 +80,8 @@ class ImportWalletState extends ConsumerState<ImportWallet> {
     final accountsProv = ref.read(accountsProvider.notifier);
 
     // Create the account
-    accountsProv.importWallet(mnemonic, networkURL).then((_) {
+    accountsProv.importWallet(mnemonic, networkURL).then((account) {
+      ref.read(selectedAccountProvider.notifier).state = account;
       Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
     });
   }

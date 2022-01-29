@@ -148,15 +148,14 @@ class BaseAccount {
 
       message.instructions.forEach((instruction) {
         if (instruction is ParsedInstruction) {
-          ParsedInstruction parsedInstruction = instruction as ParsedInstruction;
-
-          parsedInstruction.map(
+          instruction.map(
             system: (data) {
               data.parsed.map(
                 transfer: (data) {
                   ParsedSystemTransferInformation transfer = data.info;
                   bool receivedOrNot = transfer.destination == address;
-                  double ammount = transfer.lamports / 1000000000;
+                  double ammount = transfer.lamports.toDouble() / 1000000000;
+
                   this.transactions.add(
                         new Transaction(
                           transfer.source,

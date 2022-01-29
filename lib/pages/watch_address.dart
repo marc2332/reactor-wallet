@@ -85,8 +85,8 @@ class WatchAddressState extends ConsumerState<WatchAddress> {
     final accountsProv = ref.read(accountsProvider.notifier);
 
     // Create the account
-    accountsProv.createWatcher(address, networkURL).then((_) {
-      // Go to Home page
+    accountsProv.createWatcher(address, networkURL).then((account) {
+      ref.read(selectedAccountProvider.notifier).state = account;
       Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
     });
   }

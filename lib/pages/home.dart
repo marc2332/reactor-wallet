@@ -1,161 +1,130 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:solana_wallet/components/home_tab_body.dart';
+import 'package:solana_wallet/components/account_home.dart';
+import 'package:solana_wallet/components/accounts_transaction.dart';
+import 'package:solana_wallet/dialogs/send_transaction.dart';
 import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/client_account.dart';
 import 'package:solana_wallet/state/states.dart';
 import 'package:solana_wallet/state/wallet_account.dart';
-import '../state/tracker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shimmer/shimmer.dart';
-
-class AccountSubPage extends StatefulWidget {
-  const AccountSubPage({Key? key}) : super(key: key);
-  @override
-  State<AccountSubPage> createState() => AccountSubPageState();
-}
 
 /*
  * Accounts sub page
  */
-class AccountSubPageState extends State<AccountSubPage> with TickerProviderStateMixin {
+class AccountSubPage extends ConsumerWidget {
+  final String route;
+
+  AccountSubPage(this.route);
+
   @override
-  Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, _) {
-        final tokensTracker = ref.read(tokensTrackerProvider);
-        final accounts = ref.watch(accountsProvider).values.toList();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tokensTracker = ref.read(tokensTrackerProvider);
+    final accounts = ref.watch(accountsProvider).values.toList();
 
-        final isAppLoaded = ref.watch(appLoaded);
+    final selectedAccount = ref.watch(selectedAccountProvider);
+    final isAppLoaded = ref.watch(appLoadedProvider);
 
-        List<Widget> accountTabs = [];
-        List<Widget> accountBodies = [];
+    Widget? accountBody;
+    Widget? accountHeader;
 
-        if (isAppLoaded) {
-          accountTabs = accounts.map(
-            (account) {
-              bool isWallet = account.accountType == AccountType.Wallet;
-              IconData icon =
-                  isWallet ? Icons.account_balance_wallet_outlined : Icons.person_pin_outlined;
+    if (isAppLoaded && selectedAccount == null) {
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        Navigator.pushReplacementNamed(context, "/account_selection");
+      });
+    }
 
-              return Tab(
-                child: Row(
-                  children: [
-                    Icon(icon),
-                    Padding(
-                      padding: EdgeInsets.only(left: 5),
-                      child: Text(account.name),
-                    ),
-                  ],
+    if (selectedAccount != null) {
+      accountHeader = InkWell(
+        borderRadius: BorderRadius.circular(5),
+        onTap: () {},
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: DropdownButton<Account>(
+            value: selectedAccount,
+            icon: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: const Icon(Icons.arrow_downward, color: Colors.white),
+            ),
+            style: const TextStyle(color: Colors.white),
+            underline: Container(),
+            onChanged: (Account? account) {
+              if (account != null) {
+                ref.read(selectedAccountProvider.notifier).state = account;
+              }
+            },
+            items: accounts.map<DropdownMenuItem<Account>>((Account account) {
+              return DropdownMenuItem<Account>(
+                value: account,
+                child: Text(
+                  account.name,
+                  style: const TextStyle(color: Colors.black),
                 ),
               );
+            }).toList(),
+            selectedItemBuilder: (BuildContext context) {
+              return accounts.map<DropdownMenuItem<Account>>((Account account) {
+                return DropdownMenuItem<Account>(
+                  value: account,
+                  child: Text(
+                    account.name,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                );
+              }).toList();
             },
-          ).toList();
-        } else {
-          accountTabs = [
-            Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: Tab(
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 5),
-                      child: Container(
-                        width: 100,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(150, 0, 0, 0),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ];
-        }
-
-        if (isAppLoaded) {
-          accountBodies = accounts.map((account) {
-            return RefreshIndicator(
-              onRefresh: () async {
-                // Refresh all account's balances when pulling
-                final accountsProv = ref.read(accountsProvider.notifier);
-                await accountsProv.refreshAccounts();
-              },
-              child: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                child: HomeTabBody(
-                  account: account,
-                ),
-              ),
-            );
-          }).toList();
-        } else {
-          final sampleAccount = ClientAccount("_____", 0, "_____", "_____", tokensTracker);
-
-          sampleAccount.isLoaded = false;
-
-          accountBodies = [
-            RefreshIndicator(
-              onRefresh: () async {
-                // Refresh all account's balances when pulling
-                final accountsProv = ref.read(accountsProvider.notifier);
-                await accountsProv.refreshAccounts();
-              },
-              child: NotificationListener<OverscrollIndicatorNotification>(
-                onNotification: (OverscrollIndicatorNotification overscroll) {
-                  // This disables the Material scroll effect when overscrolling
-                  overscroll.disallowIndicator();
-                  return true;
-                },
-                child: SingleChildScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
-                  child: HomeTabBody(
-                    account: sampleAccount,
-                  ),
-                ),
-              ),
-            )
-          ];
-        }
-
-        return DefaultTabController(
-          length: accountBodies.length,
-          child: Scaffold(
-            appBar: AppBar(
-              title: const Text("Accounts"),
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(
-                    Icons.manage_accounts_outlined,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/manage_accounts");
-                  },
-                )
-              ],
-              bottom: new PreferredSize(
-                preferredSize: new Size(200.0, 50.0),
-                child: TabBar(
-                  physics: BouncingScrollPhysics(),
-                  isScrollable: true,
-                  tabs: accountTabs,
-                ),
-              ),
-            ),
-            body: TabBarView(
-              physics: BouncingScrollPhysics(),
-              children: accountBodies,
-            ),
           ),
+        ),
+      );
+    } else {
+      accountHeader = Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Container(
+          width: 75,
+          height: 30,
+          decoration: BoxDecoration(
+            color: Color.fromARGB(150, 0, 0, 0),
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+      );
+    }
+
+    if (selectedAccount != null) {
+      if (route == "/home") {
+        accountBody = AccountHome(
+          key: Key(selectedAccount.name),
+          account: selectedAccount,
         );
-      },
+      } else {
+        accountBody = AccountTransactions(
+          key: Key(selectedAccount.name),
+          account: selectedAccount,
+        );
+      }
+    } else {
+      final sampleAccount = ClientAccount("_____", 0, "_____", "_____", tokensTracker);
+
+      sampleAccount.isLoaded = false;
+
+      accountBody = AccountHome(
+        account: sampleAccount,
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: accountHeader),
+      floatingActionButton: selectedAccount is WalletAccount
+          ? FloatingActionButton(
+              onPressed: () {
+                sendTransactionDialog(context, selectedAccount);
+              },
+              child: const Icon(Icons.payment),
+            )
+          : null,
+      body: accountBody,
     );
   }
 }
@@ -164,7 +133,7 @@ class AccountSubPageState extends State<AccountSubPage> with TickerProviderState
  * Settings sub page
  */
 class SettingsSubPage extends ConsumerStatefulWidget {
-  SettingsSubPage();
+  SettingsSubPage({Key? key}) : super(key: key);
 
   @override
   SettingsSubPageState createState() => SettingsSubPageState();
@@ -249,13 +218,18 @@ class HomePageState extends ConsumerState<HomePage> {
 
     switch (currentPage) {
       // Settings sub page
-      case 1:
+      case 2:
         page = SettingsSubPage();
         break;
 
-      // Wallet sub page
+      // Settings sub page
+      case 1:
+        page = AccountSubPage("/transactions");
+        break;
+
+      // Account sub page
       default:
-        page = AccountSubPage();
+        page = AccountSubPage("/home");
     }
 
     return Scaffold(
@@ -273,7 +247,12 @@ class HomePageState extends ConsumerState<HomePage> {
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.account_balance_wallet),
             icon: Icon(Icons.account_balance_wallet_outlined),
-            label: 'Accounts',
+            label: 'Account',
+          ),
+          BottomNavigationBarItem(
+            activeIcon: Icon(Icons.timeline),
+            icon: Icon(Icons.timeline),
+            label: 'Transactions',
           ),
           BottomNavigationBarItem(
             activeIcon: Icon(Icons.settings),

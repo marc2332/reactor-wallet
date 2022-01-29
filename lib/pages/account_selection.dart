@@ -15,7 +15,8 @@ class AccountSelectionPage extends StatelessWidget {
       body: Padding(
         padding: EdgeInsets.all(20),
         child: Center(
-          child: Column(
+          child: Flex(
+            direction: Axis.vertical,
             children: [
               Expanded(
                 flex: 1,
