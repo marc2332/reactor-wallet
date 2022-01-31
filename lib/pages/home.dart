@@ -6,6 +6,7 @@ import 'package:solana_wallet/dialogs/send_transaction.dart';
 import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/client_account.dart';
 import 'package:solana_wallet/state/states.dart';
+import 'package:solana_wallet/state/tracker.dart';
 import 'package:solana_wallet/state/wallet_account.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shimmer/shimmer.dart';
@@ -42,11 +43,9 @@ class AccountSubPage extends ConsumerWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 10),
           child: DropdownButton<Account>(
+            iconSize: 20,
             value: selectedAccount,
-            icon: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: const Icon(Icons.arrow_downward, color: Colors.white),
-            ),
+            icon: const Icon(Icons.arrow_downward, color: Colors.white),
             style: const TextStyle(color: Colors.white),
             underline: Container(),
             onChanged: (Account? account) {
@@ -55,23 +54,46 @@ class AccountSubPage extends ConsumerWidget {
               }
             },
             items: accounts.map<DropdownMenuItem<Account>>((Account account) {
+              IconData icon = account.accountType == AccountType.Wallet
+                  ? Icons.account_balance_wallet_outlined
+                  : Icons.person_pin_outlined;
               return DropdownMenuItem<Account>(
-                value: account,
-                child: Text(
-                  account.name,
-                  style: const TextStyle(color: Colors.black),
-                ),
-              );
+                  value: account,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(right: 15),
+                        child: Icon(icon, color: Colors.black),
+                      ),
+                      Text(
+                        account.name,
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                    ],
+                  ));
             }).toList(),
             selectedItemBuilder: (BuildContext context) {
               return accounts.map<DropdownMenuItem<Account>>((Account account) {
+                IconData icon = account.accountType == AccountType.Wallet
+                    ? Icons.account_balance_wallet_outlined
+                    : Icons.person_pin_outlined;
                 return DropdownMenuItem<Account>(
-                  value: account,
-                  child: Text(
-                    account.name,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                );
+                    value: account,
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(right: 15),
+                          child: Icon(icon),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(right: 10),
+                          child: Text(
+                            account.name,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ));
               }).toList();
             },
           ),
@@ -234,32 +256,35 @@ class HomePageState extends ConsumerState<HomePage> {
 
     return Scaffold(
       body: page,
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (int page) {
-          setState(() {
-            currentPage = page;
-          });
-        },
-        elevation: 0,
-        currentIndex: currentPage,
-        showUnselectedLabels: false,
-        items: [
-          BottomNavigationBarItem(
-            activeIcon: Icon(Icons.account_balance_wallet),
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            label: 'Account',
-          ),
-          BottomNavigationBarItem(
-            activeIcon: Icon(Icons.timeline),
-            icon: Icon(Icons.timeline),
-            label: 'Transactions',
-          ),
-          BottomNavigationBarItem(
-            activeIcon: Icon(Icons.settings),
-            icon: Icon(Icons.settings_outlined),
-            label: 'Settings',
-          ),
-        ],
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 30),
+        child: BottomNavigationBar(
+          onTap: (int page) {
+            setState(() {
+              currentPage = page;
+            });
+          },
+          elevation: 0,
+          currentIndex: currentPage,
+          showUnselectedLabels: false,
+          items: [
+            BottomNavigationBarItem(
+              activeIcon: Icon(Icons.account_balance_wallet),
+              icon: Icon(Icons.account_balance_wallet_outlined),
+              label: 'Account',
+            ),
+            BottomNavigationBarItem(
+              activeIcon: Icon(Icons.timeline),
+              icon: Icon(Icons.timeline),
+              label: 'Transactions',
+            ),
+            BottomNavigationBarItem(
+              activeIcon: Icon(Icons.settings),
+              icon: Icon(Icons.settings_outlined),
+              label: 'Settings',
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -13,9 +13,7 @@ class Token {
   Token(this.balance, this.mint, this.symbol);
 }
 
-enum AccountItem {
-  Tokens,
-}
+enum AccountItem { Tokens, USDBalance, SolBBalance }
 
 class BaseAccount {
   final AccountType accountType = AccountType.Wallet;
@@ -47,8 +45,11 @@ class BaseAccount {
     int balance = await client.getBalance(address);
 
     this.balance = balance.toDouble() / 1000000000;
+    itemsLoaded[AccountItem.SolBBalance] = true;
 
     this.usdBalance = this.balance * tokensTracker.getTokenValue(system_program_id);
+
+    itemsLoaded[AccountItem.USDBalance] = true;
 
     for (final token in tokens) {
       updateUsdFromTokenValue(token);

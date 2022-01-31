@@ -174,6 +174,15 @@ class TokenCardWithShimmer extends StatelessWidget {
   }
 }
 
+void orderTokensByUSDBalanace(List<Token> accountTokens) {
+  accountTokens.sort((prev, next) {
+    double prevBalanace = double.parse(prev.usdBalance);
+    double nextBalanace = double.parse(next.usdBalance);
+
+    return nextBalanace.compareTo(prevBalanace);
+  });
+}
+
 class AccountTokens extends StatelessWidget {
   final Account account;
 
@@ -182,7 +191,7 @@ class AccountTokens extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Container(
           decoration: BoxDecoration(
             border: Border.all(color: Theme.of(context).dividerColor),
@@ -190,6 +199,8 @@ class AccountTokens extends StatelessWidget {
           ),
           child: Consumer(builder: (context, ref, _) {
             int accountTokenQuantity = account.tokens.length;
+            List<Token> accountTokens = List.from(account.tokens);
+            orderTokensByUSDBalanace(accountTokens);
 
             if (account.isItemLoaded(AccountItem.Tokens)) {
               if (accountTokenQuantity == 0) {
@@ -212,13 +223,13 @@ class AccountTokens extends StatelessWidget {
                 );
               } else {
                 return ListView.builder(
-                  itemCount: account.tokens.length,
+                  itemCount: accountTokens.length,
                   shrinkWrap: true,
                   physics: BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
                   itemBuilder: (context, index) {
-                    return TokenCard(account.tokens[index]);
+                    return TokenCard(accountTokens[index]);
                   },
                 );
               }
@@ -256,13 +267,6 @@ class AccountHomeState extends ConsumerState<AccountHome> {
     String solBalance = balanceShorter(account.balance.toString());
     String usdBalance = account.usdBalance.toStringAsFixed(2);
 
-    /*
-     * If the SOL balance is 0.0 the USD equivalent will always be 0.0 too, so,
-     * in order to prevent an infinite loading animation, it makes sure that the SOL balance is at least > 0.0, 
-     * if not, it will just display 0.0
-     */
-    bool loadedUsdBalance = !(account.balance > 0.0 && account.usdBalance == 0.0);
-
     // Convert the account's type to String
     String accountTypeText = "";
     if (account.accountType == AccountType.Client) {
@@ -277,130 +281,128 @@ class AccountHomeState extends ConsumerState<AccountHome> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Expanded(
-            flex: 3,
-            child: Flex(
-              direction: Axis.vertical,
-              children: [
-                RefreshIndicator(
-                  key: Key(account.address),
-                  onRefresh: () async {
-                    // Refresh the account when pulling down
-                    final accountsProv = ref.read(accountsProvider.notifier);
-                    await accountsProv.refreshAccount(account.name);
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              RefreshIndicator(
+                key: Key(account.address),
+                onRefresh: () async {
+                  // Refresh the account when pulling down
+                  final accountsProv = ref.read(accountsProvider.notifier);
+                  await accountsProv.refreshAccount(account.name);
+                },
+                child: NotificationListener<OverscrollIndicatorNotification>(
+                  onNotification: (OverscrollIndicatorNotification overscroll) {
+                    overscroll.disallowIndicator();
+                    return true;
                   },
-                  child: NotificationListener<OverscrollIndicatorNotification>(
-                    onNotification: (OverscrollIndicatorNotification overscroll) {
-                      overscroll.disallowIndicator();
-                      return true;
-                    },
-                    child: SingleChildScrollView(
-                      physics: AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 10, top: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                if (account.isLoaded) ...[
-                                  Text(
-                                    solBalance,
-                                    style: GoogleFonts.poppins(
-                                      textStyle: TextStyle(
-                                        fontSize: 40,
-                                      ),
-                                    ),
-                                  ),
-                                  const Text(' SOL'),
-                                ] else ...[
-                                  Shimmer.fromColors(
-                                    baseColor: Colors.grey[300]!,
-                                    highlightColor: Colors.grey[100]!,
-                                    child: Container(
-                                      width: 90,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: Color.fromARGB(150, 0, 0, 0),
-                                        borderRadius: BorderRadius.circular(3),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                          if (account.isLoaded && loadedUsdBalance) ...[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10, top: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (account.isLoaded &&
+                                  account.isItemLoaded(AccountItem.SolBBalance)) ...[
                                 Text(
-                                  '$usdBalance\$',
-                                  style: GoogleFonts.lato(
+                                  solBalance,
+                                  style: GoogleFonts.poppins(
                                     textStyle: TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.w900,
+                                      fontSize: 40,
                                     ),
+                                  ),
+                                ),
+                                const Text(' SOL'),
+                              ] else ...[
+                                Shimmer.fromColors(
+                                  baseColor: Colors.grey[300]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: Container(
+                                    width: 90,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: Color.fromARGB(150, 0, 0, 0),
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        if (account.isLoaded && account.isItemLoaded(AccountItem.USDBalance)) ...[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '$usdBalance\$',
+                                style: GoogleFonts.lato(
+                                  textStyle: TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        ] else ...[
+                          Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              width: 70,
+                              height: 35,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(150, 0, 0, 0),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                          )
+                        ],
+                        Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: account.isLoaded
+                              ? OutlinedButton(
+                                  onPressed: () {
+                                    Clipboard.setData(
+                                      new ClipboardData(text: account.address),
+                                    ).then((_) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text("Address copied to clipboard"),
+                                        ),
+                                      );
+                                    });
+                                  },
+                                  child: Text(
+                                    '$accountTypeText (${account.address.substring(0, 5)}...)',
+                                    style: TextStyle(color: Colors.black),
                                   ),
                                 )
-                              ],
-                            )
-                          ] else ...[
-                            Shimmer.fromColors(
-                              baseColor: Colors.grey[300]!,
-                              highlightColor: Colors.grey[100]!,
-                              child: Container(
-                                width: 70,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                  color: Color.fromARGB(150, 0, 0, 0),
-                                  borderRadius: BorderRadius.circular(3),
-                                ),
-                              ),
-                            )
-                          ],
-                          Padding(
-                            padding: EdgeInsets.only(top: 10),
-                            child: account.isLoaded
-                                ? OutlinedButton(
-                                    onPressed: () {
-                                      Clipboard.setData(
-                                        new ClipboardData(text: account.address),
-                                      ).then((_) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text("Address copied to clipboard"),
-                                          ),
-                                        );
-                                      });
-                                    },
-                                    child: Text(
-                                      '$accountTypeText (${account.address.substring(0, 5)}...)',
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                  )
-                                : Shimmer.fromColors(
-                                    baseColor: Colors.grey[300]!,
-                                    highlightColor: Colors.grey[100]!,
-                                    child: Container(
-                                      width: 80,
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                        color: Color.fromARGB(150, 0, 0, 0),
-                                        borderRadius: BorderRadius.circular(3),
-                                      ),
+                              : Shimmer.fromColors(
+                                  baseColor: Colors.grey[300]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: Container(
+                                    width: 80,
+                                    height: 20,
+                                    decoration: BoxDecoration(
+                                      color: Color.fromARGB(150, 0, 0, 0),
+                                      borderRadius: BorderRadius.circular(3),
                                     ),
                                   ),
-                          ),
-                        ],
-                      ),
+                                ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Expanded(flex: 6, child: AccountTokens(account)),
+          Expanded(flex: 2, child: AccountTokens(account)),
         ],
       ),
     );
