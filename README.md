@@ -33,6 +33,7 @@ dart format . --line-length 100
 
 ### 🤔 To-do / Ideas
 - [ ] **A name for the app**
+- [ ] Integrate Solana Pay (https://solana-pay-docs.vercel.app/core/wallet-integration)
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses
@@ -42,7 +43,7 @@ dart format . --line-length 100
 - [x] Display latest transactions
 - [ ] Better project organization
 - [ ] Ability to easily share an address (QR?)
-- [ ] Have some UI tweaking options, like themes.
+- [x] Have some UI tweaking options, like themes.
 - [ ] Unit tests
 - [x] Display owned tokens
 - [ ] Ability to display NFTs owned by a wallet 
