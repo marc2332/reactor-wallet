@@ -9,6 +9,15 @@ final appLoadedProvider = StateProvider<bool>((_) {
   return false;
 });
 
+enum ThemeType {
+  Light,
+  Dark,
+}
+
+final settingsProvider = StateNotifierProvider<SettingsManager, Map<String, dynamic>>((ref) {
+  return SettingsManager(ref);
+});
+
 final selectedAccountProvider = StateProvider<Account?>((_) {
   return null;
 });
@@ -22,95 +31,133 @@ final accountsProvider = StateNotifierProvider<AccountsManager, Map<String, Acco
   return new AccountsManager(tokensTracker, ref);
 });
 
+class SettingsManager extends StateNotifier<Map<String, dynamic>> {
+  late Box<dynamic> settingsBox;
+  final StateNotifierProviderRef ref;
+
+  SettingsManager(this.ref) : super(new Map()) {
+    state["theme"] = ThemeType.Light.name;
+  }
+
+  void setTheme(ThemeType theme) {
+    settingsBox.put("theme", theme.name);
+    state["theme"] = theme.name;
+    state = Map.from(state);
+  }
+
+  ThemeType getTheme() {
+    return mapType(state["theme"]);
+  }
+
+  static ThemeType mapType(String type) {
+    switch (type) {
+      case "Dark":
+        return ThemeType.Dark;
+      default:
+        return ThemeType.Light;
+    }
+  }
+}
+
+Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
+  await Hive.initFlutter();
+
+  // Selected the configured theme
+  Box<dynamic> settingsBox = await Hive.openBox('settings');
+  SettingsManager settingsManager = ref.read(settingsProvider.notifier);
+  ThemeType selectedTheme =
+      SettingsManager.mapType(settingsBox.get("theme", defaultValue: "Light"));
+  settingsManager.settingsBox = settingsBox;
+  settingsManager.setTheme(selectedTheme);
+
+  // Load the accounts
+  Box<dynamic> accountsBox = await Hive.openBox('accounts');
+  AccountsManager manager = ref.read(accountsProvider.notifier);
+  manager.accountsBox = accountsBox;
+
+  Map<dynamic, dynamic> jsonAccounts = accountsBox.toMap();
+
+  Map<String, Account> accountsMap = jsonAccounts.map((accountName, account) {
+    AccountType accountType = account["accountType"] == AccountType.Client.toString()
+        ? AccountType.Client
+        : AccountType.Wallet;
+
+    if (accountType == AccountType.Client) {
+      ClientAccount clientAccount = ClientAccount(
+        account["address"],
+        account["balance"],
+        accountName,
+        account["url"],
+        tokensTracker,
+      );
+      return MapEntry(accountName, clientAccount);
+    } else {
+      WalletAccount walletAccount = WalletAccount.withAddress(
+        account["balance"],
+        account["address"],
+        accountName,
+        account["url"],
+        WalletAccount.decryptMnemonic(account["mnemonic"]),
+        tokensTracker,
+      );
+      return MapEntry(accountName, walletAccount);
+    }
+  });
+
+  ref.read(accountsProvider.notifier).state = accountsMap;
+  Map<String, Account> state = ref.read(accountsProvider.notifier).state;
+
+  if (state.values.isNotEmpty) {
+    ref.read(selectedAccountProvider.notifier).state = state.values.first;
+  }
+
+  ref.read(appLoadedProvider.notifier).state = true;
+
+  await tokensTracker.loadTokenList();
+
+  manager.loadUSDValues();
+
+  int accountWithLoadedTokens = 0;
+
+  for (Account account in state.values) {
+    // Fetch every saved account's balance
+    if (account.accountType == AccountType.Wallet) {
+      account = account as WalletAccount;
+      /*
+        * Load the key's pair if it's a Wallet account
+        */
+      account.loadKeyPair().then((_) {
+        manager.refreshAllState();
+      });
+    }
+
+    /*
+      * Load the transactions list and the tokens list
+      */
+    account.loadTransactions().then((_) {
+      manager.refreshAllState();
+    });
+
+    account.loadTokens().then((_) async {
+      accountWithLoadedTokens++;
+
+      // When all accounts have loaded it's tokens then fetch it's price
+      if (accountWithLoadedTokens == state.length) {
+        await manager.loadUSDValues();
+      }
+
+      manager.refreshAllState();
+    });
+  }
+}
+
 class AccountsManager extends StateNotifier<Map<String, Account>> {
   // Tokens trackers manager
   late TokenTrackers tokensTracker;
   late Box<dynamic> accountsBox;
   final StateNotifierProviderRef ref;
 
-  AccountsManager(this.tokensTracker, this.ref) : super(new Map()) {
-    loadAccounts();
-  }
-
-  Future<void> loadAccounts() async {
-    await Hive.initFlutter();
-
-    accountsBox = await Hive.openBox('accounts');
-
-    Map<dynamic, dynamic> jsonAccounts = accountsBox.toMap();
-
-    Map<String, Account> accountsMap = jsonAccounts.map((accountName, account) {
-      AccountType accountType = account["accountType"] == AccountType.Client.toString()
-          ? AccountType.Client
-          : AccountType.Wallet;
-
-      if (accountType == AccountType.Client) {
-        ClientAccount clientAccount = ClientAccount(
-          account["address"],
-          account["balance"],
-          accountName,
-          account["url"],
-          tokensTracker,
-        );
-        return MapEntry(accountName, clientAccount);
-      } else {
-        WalletAccount walletAccount = WalletAccount.withAddress(
-          account["balance"],
-          account["address"],
-          accountName,
-          account["url"],
-          WalletAccount.decryptMnemonic(account["mnemonic"]),
-          tokensTracker,
-        );
-        return MapEntry(accountName, walletAccount);
-      }
-    });
-
-    state = accountsMap;
-
-    if (state.values.isNotEmpty) {
-      ref.read(selectedAccountProvider.notifier).state = state.values.first;
-    }
-
-    ref.read(appLoadedProvider.notifier).state = true;
-
-    await tokensTracker.loadTokenList();
-
-    loadUSDValues();
-
-    int accountWithLoadedTokens = 0;
-
-    for (Account account in state.values) {
-      // Fetch every saved account's balance
-      if (account.accountType == AccountType.Wallet) {
-        account = account as WalletAccount;
-        /*
-        * Load the key's pair if it's a Wallet account
-        */
-        account.loadKeyPair().then((_) {
-          refreshAllState();
-        });
-      }
-
-      /*
-      * Load the transactions list and the tokens list
-      */
-      account.loadTransactions().then((_) {
-        refreshAllState();
-      });
-
-      account.loadTokens().then((_) async {
-        accountWithLoadedTokens++;
-
-        // When all accounts have loaded it's tokens then fetch it's price
-        if (accountWithLoadedTokens == state.length) {
-          await loadUSDValues();
-        }
-
-        refreshAllState();
-      });
-    }
-  }
+  AccountsManager(this.tokensTracker, this.ref) : super(new Map());
 
   Future<void> loadUSDValues() async {
     List<String> tokenNames = tokensTracker.trackers.values

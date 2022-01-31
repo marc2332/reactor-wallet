@@ -379,7 +379,7 @@ class AccountHomeState extends ConsumerState<AccountHome> {
                                   },
                                   child: Text(
                                     '$accountTypeText (${account.address.substring(0, 5)}...)',
-                                    style: TextStyle(color: Colors.black),
+                                    style: Theme.of(context).textTheme.button,
                                   ),
                                 )
                               : Shimmer.fromColors(

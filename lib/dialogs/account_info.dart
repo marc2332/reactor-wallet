@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/tracker.dart';
 import 'package:solana_wallet/state/wallet_account.dart';
+import 'package:solana_wallet/state/theme.dart';
 
 Future<void> accountInfoDialog(context, Account account) async {
   String shortAddress = account.address.substring(0, 13);
@@ -21,7 +22,7 @@ Future<void> accountInfoDialog(context, Account account) async {
                 title: Text('Address'),
                 subtitle: Text('$shortAddress...'),
                 trailing: IconButton(
-                  icon: Icon(Icons.copy_all_outlined),
+                  icon: Icon(Icons.copy_all_outlined, color: Theme.of(context).iconColor),
                   onPressed: () {
                     Clipboard.setData(
                       new ClipboardData(text: account.address),
@@ -50,7 +51,7 @@ Future<void> accountInfoDialog(context, Account account) async {
                   title: const Text('Seedphrase'),
                   subtitle: const Text('Hidden'),
                   trailing: IconButton(
-                    icon: Icon(Icons.copy_all_outlined),
+                    icon: Icon(Icons.copy_all_outlined, color: Theme.of(context).iconColor),
                     onPressed: () {
                       WalletAccount walletAccount = account as WalletAccount;
 

@@ -3,6 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/dialogs/transaction_info.dart';
 import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/states.dart';
+import 'package:solana_wallet/state/theme.dart';
 
 class UnsupportedTransactionCard extends StatelessWidget {
   @override
@@ -44,7 +45,10 @@ class TransactionCard extends StatelessWidget {
           padding: EdgeInsets.all(15),
           child: Row(
             children: [
-              toMe ? Icon(Icons.call_received_outlined) : Icon(Icons.call_made_outlined),
+              Icon(
+                toMe ? Icons.call_received_outlined : Icons.call_made_outlined,
+                color: Theme.of(context).iconColor,
+              ),
               Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text(

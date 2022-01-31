@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:solana_wallet/state/base_account.dart';
+import 'package:solana_wallet/state/theme.dart';
 
 Future<void> transactionInfo(
   BuildContext context,
@@ -27,7 +28,10 @@ Future<void> transactionInfo(
                 title: toMe ? const Text('Received from') : const Text('Sent to'),
                 subtitle: Text('$involvedAddressShort...'),
                 trailing: IconButton(
-                  icon: Icon(Icons.copy_all_outlined),
+                  icon: Icon(
+                    Icons.copy_all_outlined,
+                    color: Theme.of(context).iconColor,
+                  ),
                   onPressed: () {
                     Clipboard.setData(
                       new ClipboardData(text: involvedAddress),

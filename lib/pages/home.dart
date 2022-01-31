@@ -8,6 +8,7 @@ import 'package:solana_wallet/state/client_account.dart';
 import 'package:solana_wallet/state/states.dart';
 import 'package:solana_wallet/state/tracker.dart';
 import 'package:solana_wallet/state/wallet_account.dart';
+import 'package:solana_wallet/state/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -63,11 +64,11 @@ class AccountSubPage extends ConsumerWidget {
                     children: [
                       Padding(
                         padding: EdgeInsets.only(right: 15),
-                        child: Icon(icon, color: Colors.black),
+                        child: Icon(icon, color: Theme.of(context).iconColor),
                       ),
                       Text(
                         account.name,
-                        style: const TextStyle(color: Colors.black),
+                        style: Theme.of(context).textTheme.bodyText1,
                       ),
                     ],
                   ));
@@ -83,7 +84,7 @@ class AccountSubPage extends ConsumerWidget {
                       children: [
                         Padding(
                           padding: EdgeInsets.only(right: 15),
-                          child: Icon(icon),
+                          child: Icon(icon, color: Colors.white),
                         ),
                         Padding(
                           padding: EdgeInsets.only(right: 10),
@@ -143,7 +144,7 @@ class AccountSubPage extends ConsumerWidget {
               onPressed: () {
                 sendTransactionDialog(context, selectedAccount);
               },
-              child: const Icon(Icons.payment),
+              child: const Icon(Icons.payment, color: Colors.white),
             )
           : null,
       body: accountBody,
@@ -164,6 +165,14 @@ class SettingsSubPage extends ConsumerStatefulWidget {
 class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
   SettingsSubPageState();
 
+  void enableDarkTheme(bool value) {
+    if (value) {
+      ref.read(settingsProvider.notifier).setTheme(ThemeType.Dark);
+    } else {
+      ref.read(settingsProvider.notifier).setTheme(ThemeType.Light);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -179,9 +188,31 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
               },
               child: ListTile(
                 title: const Text('Manage accounts'),
-                trailing: Icon(Icons.manage_accounts_outlined),
+                trailing: Icon(
+                  Icons.manage_accounts_outlined,
+                  color: Theme.of(context).iconColor,
+                ),
               ),
             ),
+          ),
+          Card(
+            child: Consumer(builder: (context, ref, _) {
+              ref.watch(settingsProvider);
+              ThemeType selectedTheme = ref.read(settingsProvider.notifier).getTheme();
+              return InkWell(
+                splashColor: Theme.of(context).hoverColor,
+                onTap: () {
+                  enableDarkTheme(selectedTheme == ThemeType.Light);
+                },
+                child: ListTile(
+                  title: const Text('Enable dark mode'),
+                  trailing: Switch(
+                    value: selectedTheme == ThemeType.Dark,
+                    onChanged: enableDarkTheme,
+                  ),
+                ),
+              );
+            }),
           ),
           Card(
             child: InkWell(
@@ -191,14 +222,20 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
               },
               child: ListTile(
                 title: const Text('Contribute'),
-                trailing: Icon(Icons.link_outlined),
+                trailing: Icon(
+                  Icons.link_outlined,
+                  color: Theme.of(context).iconColor,
+                ),
               ),
             ),
           ),
           Card(
             child: ListTile(
               title: const Text('Made by Marc Espín'),
-              trailing: Icon(Icons.info_outline),
+              trailing: Icon(
+                Icons.info_outline,
+                color: Theme.of(context).iconColor,
+              ),
             ),
           )
         ],
