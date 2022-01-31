@@ -47,7 +47,7 @@ class TokenCard extends ConsumerWidget {
 
     TokenInfo tokenInfo = tokensTracker.getTokenInfo(token.mint);
 
-    String usdBalance = balanceShorter(token.usdBalance);
+    String usdBalance = token.usdBalance.toStringAsFixed(2);
     String tokenBalance = token.balance.toStringAsFixed(2);
 
     return Padding(
@@ -81,6 +81,7 @@ class TokenCard extends ConsumerWidget {
                 ),
               ),
               Expanded(
+                flex: 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -176,8 +177,8 @@ class TokenCardWithShimmer extends StatelessWidget {
 
 void orderTokensByUSDBalanace(List<Token> accountTokens) {
   accountTokens.sort((prev, next) {
-    double prevBalanace = double.parse(prev.usdBalance);
-    double nextBalanace = double.parse(next.usdBalance);
+    double prevBalanace = prev.usdBalance;
+    double nextBalanace = next.usdBalance;
 
     return nextBalanace.compareTo(prevBalanace);
   });

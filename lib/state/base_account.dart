@@ -6,7 +6,7 @@ import 'package:solana_wallet/state/tracker.dart';
 
 class Token {
   late double balance = 0;
-  late String usdBalance = "0";
+  late double usdBalance = 0;
   late String symbol;
   late String mint;
 
@@ -64,7 +64,7 @@ class BaseAccount {
       Tracker? tracker = tokensTracker.getTracker(token.mint);
       if (tracker != null) {
         double tokenUsdBalance = (token.balance * tracker.usdValue);
-        token.usdBalance = tokenUsdBalance.toString();
+        token.usdBalance = tokenUsdBalance;
         this.usdBalance += tokenUsdBalance;
       }
     } catch (err) {
