@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:solana/solana.dart';
+import 'package:solana_wallet/dialogs/prepare_transaction.dart';
 import 'package:solana_wallet/dialogs/transaction_errored.dart';
 import 'package:solana_wallet/dialogs/transaction_sent.dart';
+import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/states.dart';
 import 'package:solana_wallet/state/wallet_account.dart';
 import 'package:worker_manager/worker_manager.dart';
@@ -18,7 +19,7 @@ String? transactionAddressValidator(String? value) {
   }
 }
 
-String? transactionAmmountValidator(String? value) {
+String? transactionAmountValidator(String? value) {
   if (value == null || value.isEmpty) {
     return 'Empty ammount';
   }
@@ -29,22 +30,12 @@ String? transactionAmmountValidator(String? value) {
   }
 }
 
-Future<bool> makeTransaction(WalletAccount account, String destination, int supply) async {
-  try {
-    account.sendLamportsTo(destination, supply);
-
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
 Future<void> sendTransactionDialog(
   BuildContext context,
   WalletAccount walletAccount,
 ) async {
   String destination = "";
-  double sendAmmount = 0;
+  double sendAmount = 0;
   String accountName = walletAccount.name;
 
   return showDialog<void>(
@@ -71,12 +62,12 @@ Future<void> sendTransactionDialog(
                 Form(
                   autovalidateMode: AutovalidateMode.always,
                   child: TextFormField(
-                    validator: transactionAmmountValidator,
+                    validator: transactionAmountValidator,
                     decoration: InputDecoration(
-                      hintText: 'Ammount of SOLs',
+                      hintText: 'Amount of SOLs',
                     ),
                     onChanged: (String value) async {
-                      sendAmmount = double.parse(value);
+                      sendAmount = double.parse(value);
                     },
                   ),
                 ),
@@ -94,53 +85,17 @@ Future<void> sendTransactionDialog(
               child: const Text('Send'),
               onPressed: () async {
                 bool addressIsOk = transactionAddressValidator(destination) == null;
-                bool balanceIsOk = transactionAmmountValidator("$sendAmmount") == null;
+                bool balanceIsOk = transactionAmountValidator("$sendAmount") == null;
 
                 // Only let send if the address and the ammount is OK
                 if (addressIsOk && balanceIsOk) {
-                  // 1 SOL = 1000000000 lamports
-                  int lamports = (sendAmmount * 1000000000).toInt();
-
                   // Close the dialog
                   Navigator.of(dialogContext).pop();
 
-                  // Show some feedback
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content:
-                          Text('Sending $sendAmmount SOL to ${destination.substring(0, 5)}...'),
-                    ),
-                  );
+                  Transaction tx =
+                      new Transaction(walletAccount.address, destination, sendAmount, false);
 
-                  Executor()
-                      .execute(
-                          arg1: walletAccount,
-                          arg2: destination,
-                          arg3: lamports,
-                          fun3: makeTransaction)
-                      .then(
-                    (res) async {
-                      if (res) {
-                        final accountsProv = ref.read(accountsProvider.notifier);
-
-                        // Display the "Transaction went OK" dialog
-                        await transactionHasBeenSentDialog(
-                          context,
-                          destination,
-                          sendAmmount,
-                        );
-
-                        accountsProv.refreshAccount(accountName);
-                      } else {
-                        // Display the "Transaction went wrong" dialog
-                        await transactionErroredDialog(
-                          context,
-                          destination,
-                          sendAmmount,
-                        );
-                      }
-                    },
-                  );
+                  prepareTransaction(context, tx, walletAccount);
                 }
               },
             ),

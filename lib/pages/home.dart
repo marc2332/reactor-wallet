@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/components/account_home.dart';
 import 'package:solana_wallet/components/accounts_transaction.dart';
-import 'package:solana_wallet/dialogs/send_transaction.dart';
+import 'package:solana_wallet/dialogs/select_transaction_method.dart';
+import 'package:solana_wallet/dialogs/send_transaction_by_address.dart';
 import 'package:solana_wallet/state/base_account.dart';
 import 'package:solana_wallet/state/client_account.dart';
 import 'package:solana_wallet/state/states.dart';
@@ -142,7 +143,7 @@ class AccountSubPage extends ConsumerWidget {
       floatingActionButton: selectedAccount is WalletAccount
           ? FloatingActionButton(
               onPressed: () {
-                sendTransactionDialog(context, selectedAccount);
+                selectTransactionMethod(context, selectedAccount);
               },
               child: const Icon(Icons.payment, color: Colors.white),
             )

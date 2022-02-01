@@ -21,7 +21,7 @@ Future<void> transactionInfo(
           child: ListBody(
             children: <Widget>[
               ListTile(
-                title: const Text('Ammount'),
+                title: const Text('Amount'),
                 subtitle: Text('${transaction.ammount.toStringAsFixed(9)} SOL'),
               ),
               ListTile(

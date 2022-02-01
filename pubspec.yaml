@@ -24,6 +24,7 @@ dependencies:
   hive: ^2.0.5
   hive_flutter: ^1.1.0
   shimmer: ^2.0.0
+  qr_code_scanner: ^0.6.1
 
 dev_dependencies:
   flutter_test:

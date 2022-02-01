@@ -33,7 +33,9 @@ dart format . --line-length 100
 
 ### 🤔 To-do / Ideas
 - [ ] **A name for the app**
-- [ ] Integrate Solana Pay (https://solana-pay-docs.vercel.app/core/wallet-integration)
+- [ ] Integrate QR Scanner for Solana Pay (https://solana-pay-docs.vercel.app/core/wallet-integration)
+    - [x] SOL Transactions (Partialm, WIP)
+    - [ ] SPL Tokens Transactions
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses
