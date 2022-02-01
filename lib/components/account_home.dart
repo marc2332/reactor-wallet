@@ -144,18 +144,21 @@ class AccountInfo extends ConsumerWidget {
                           ),
                           const Text(' SOL'),
                         ] else ...[
-                          Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(
-                              width: 90,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(150, 0, 0, 0),
-                                borderRadius: BorderRadius.circular(3),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 15),
+                            child: Shimmer.fromColors(
+                              baseColor: Colors.grey[300]!,
+                              highlightColor: Colors.grey[100]!,
+                              child: Container(
+                                width: 90,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Color.fromARGB(150, 0, 0, 0),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
                               ),
                             ),
-                          ),
+                          )
                         ],
                       ],
                     ),

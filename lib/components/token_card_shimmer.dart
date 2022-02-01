@@ -10,19 +10,17 @@ class TokenCardWithShimmer extends StatelessWidget {
       padding: EdgeInsets.all(12),
       child: Row(
         children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-              child: Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  width: 35,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(150, 0, 0, 0),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                width: 35,
+                height: 35,
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(150, 0, 0, 0),
+                  borderRadius: BorderRadius.circular(50),
                 ),
               ),
             ),
@@ -37,22 +35,25 @@ class TokenCardWithShimmer extends StatelessWidget {
                   highlightColor: Colors.grey[100]!,
                   child: Container(
                     width: 65,
-                    height: 20,
+                    height: 17,
                     decoration: BoxDecoration(
                       color: Color.fromARGB(150, 0, 0, 0),
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
                 ),
-                Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(150, 0, 0, 0),
-                      borderRadius: BorderRadius.circular(3),
+                Padding(
+                  padding: EdgeInsets.only(top: 5),
+                  child: Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 20,
+                      height: 17,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(150, 0, 0, 0),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ),

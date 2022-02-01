@@ -108,7 +108,7 @@ class AccountSubPage extends ConsumerWidget {
           height: 30,
           decoration: BoxDecoration(
             color: Color.fromARGB(150, 0, 0, 0),
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(5),
           ),
         ),
       );
