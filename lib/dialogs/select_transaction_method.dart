@@ -4,9 +4,9 @@ import 'package:solana_wallet/dialogs/prepare_transaction.dart';
 import 'package:solana_wallet/dialogs/send_transaction_by_address.dart';
 import 'package:solana_wallet/dialogs/transaction_not_suported.dart';
 import 'package:solana_wallet/pages/scan_qr.dart';
-import 'package:solana_wallet/state/base_account.dart';
-import 'package:solana_wallet/state/solana_pay.dart';
-import 'package:solana_wallet/state/wallet_account.dart';
+import 'package:solana_wallet/utils/base_account.dart';
+import 'package:solana_wallet/utils/solana_pay.dart';
+import 'package:solana_wallet/utils/wallet_account.dart';
 
 Future<void> selectTransactionMethod(
   BuildContext context,

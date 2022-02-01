@@ -1,6 +1,6 @@
 import 'package:solana/solana.dart'
     show Ed25519HDKeyPair, RPCClient, RpcClient, SignedTx, SystemProgram, Wallet;
-import 'package:solana_wallet/state/tracker.dart';
+import 'package:solana_wallet/utils/tracker.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'base_account.dart';

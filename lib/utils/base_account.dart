@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:solana/solana.dart';
 
-import 'package:solana_wallet/state/tracker.dart';
+import 'package:solana_wallet/utils/tracker.dart';
 
 class Token {
   late double balance = 0;

@@ -1,5 +1,5 @@
 import 'package:solana/solana.dart' show RPCClient, RpcClient;
-import 'package:solana_wallet/state/tracker.dart';
+import 'package:solana_wallet/utils/tracker.dart';
 
 import 'base_account.dart';
 

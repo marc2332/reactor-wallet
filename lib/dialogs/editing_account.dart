@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:solana_wallet/state/base_account.dart';
-import 'package:solana_wallet/state/states.dart';
+import 'package:solana_wallet/utils/base_account.dart';
+import 'package:solana_wallet/utils/states.dart';
 
 /*
  * Apply changes to a new account

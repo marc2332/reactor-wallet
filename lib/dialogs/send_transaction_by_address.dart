@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/dialogs/prepare_transaction.dart';
-import 'package:solana_wallet/dialogs/transaction_errored.dart';
-import 'package:solana_wallet/dialogs/transaction_sent.dart';
-import 'package:solana_wallet/state/base_account.dart';
-import 'package:solana_wallet/state/states.dart';
-import 'package:solana_wallet/state/wallet_account.dart';
-import 'package:worker_manager/worker_manager.dart';
+import 'package:solana_wallet/utils/base_account.dart';
+import 'package:solana_wallet/utils/wallet_account.dart';
 
 String? transactionAddressValidator(String? value) {
   if (value == null || value.isEmpty) {
