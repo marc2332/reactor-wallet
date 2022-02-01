@@ -34,7 +34,7 @@ dart format . --line-length 100
 ### 🤔 To-do / Ideas
 - [ ] **A name for the app**
 - [ ] Integrate QR Scanner for Solana Pay (https://solana-pay-docs.vercel.app/core/wallet-integration)
-    - [x] SOL Transactions (Partialm, WIP)
+    - [x] SOL Transactions (WIP)
     - [ ] SPL Tokens Transactions
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
