@@ -16,12 +16,7 @@ class ClientAccount extends BaseAccount implements Account {
     name,
     NetworkUrl url,
     TokenTrackers tokensTracker,
-  ) : super(
-          balance,
-          name,
-          url,
-          tokensTracker,
-        ) {
+  ) : super(balance, name, url, tokensTracker) {
     this.address = address;
     this.client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
   }

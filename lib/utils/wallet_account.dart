@@ -38,12 +38,7 @@ class WalletAccount extends BaseAccount implements Account {
     NetworkUrl url,
     this.mnemonic,
     tokensTracker,
-  ) : super(
-          balance,
-          name,
-          url,
-          tokensTracker,
-        ) {
+  ) : super(balance, name, url, tokensTracker) {
     this.address = address;
     client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
   }

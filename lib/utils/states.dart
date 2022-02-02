@@ -221,6 +221,9 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
     // Refresh the balances
     await loadUSDValues();
 
+    // Mark tokens as loaded since there isn't any token to load
+    walletAccount.itemsLoaded[AccountItem.Tokens] = true;
+
     // Add the account to the DB
     accountsBox.put(walletAccount.name, walletAccount.toJson());
 
