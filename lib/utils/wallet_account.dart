@@ -1,5 +1,5 @@
-import 'package:solana/solana.dart'
-    show Ed25519HDKeyPair, RPCClient, RpcClient, SignedTx, SystemProgram, Wallet;
+import 'package:solana/solana.dart' show Ed25519HDKeyPair, ProgramAccount, SolanaClient, Wallet;
+import 'package:solana_wallet/components/network_selector.dart';
 import 'package:solana_wallet/utils/tracker.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:bip39/bip39.dart' as bip39;
@@ -8,7 +8,8 @@ import 'package:encrypt/encrypt.dart';
 
 // Master key to encrypt and decrypt mnemonics, aka passphrases
 final secureKey = Key.fromUtf8(
-    String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"));
+  String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"),
+);
 final iv = IV.fromLength(16);
 
 class WalletAccount extends BaseAccount implements Account {
@@ -17,39 +18,67 @@ class WalletAccount extends BaseAccount implements Account {
   late Wallet wallet;
   final String mnemonic;
 
-  WalletAccount(double balance, name, url, this.mnemonic, tokensTracker)
-      : super(balance, name, url, tokensTracker) {
-    client = RpcClient(url);
+  WalletAccount(
+    double balance,
+    name,
+    NetworkUrl url,
+    this.mnemonic,
+    tokensTracker,
+  ) : super(balance, name, url, tokensTracker) {
+    client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
   }
 
   /*
    * Constructor in case the address is already known
    */
-  WalletAccount.withAddress(double balance, String address, name, url, this.mnemonic, tokensTracker)
-      : super(balance, name, url, tokensTracker) {
+  WalletAccount.withAddress(
+    double balance,
+    String address,
+    name,
+    NetworkUrl url,
+    this.mnemonic,
+    tokensTracker,
+  ) : super(
+          balance,
+          name,
+          url,
+          tokensTracker,
+        ) {
     this.address = address;
-    client = RpcClient(url);
+    client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
   }
 
   /*
-   *
+   * Send SOLs to an adress
    */
+  void sendLamportsTo(String destinationAddress, int amount) async {
+    await client.transferLamports(
+        source: wallet, destination: destinationAddress, lamports: amount);
+  }
 
-  void sendLamportsTo(String destinationAddress, int supply) async {
-    final recentBlockhash = await client.getRecentBlockhash();
+  /*
+   * Send a Token to an adress
+   */
+  void sendSPLTokenTo(String destinationAddress, String tokenMint, int amount) async {
+    // Create a token account for the destination address if it doesn't have one yet
+    ProgramAccount? destinationTokenAccount = await client.getAssociatedTokenAccount(
+      owner: destinationAddress,
+      mint: tokenMint,
+    );
 
-    final message = SystemProgram.transfer(
-      source: address,
+    if (destinationTokenAccount == null)
+      await client.createAssociatedTokenAccount(
+        mint: tokenMint,
+        funder: wallet,
+        owner: destinationAddress,
+      );
+
+    await client.transferSplToken(
+      source: wallet,
+      mint: tokenMint,
       destination: destinationAddress,
-      lamports: supply,
+      amount: amount,
     );
-
-    final SignedTx signedTx = await wallet.signMessage(
-      message: message,
-      recentBlockhash: recentBlockhash.blockhash,
-    );
-
-    await client.sendTransaction(signedTx.encode());
   }
 
   /*
@@ -72,7 +101,7 @@ class WalletAccount extends BaseAccount implements Account {
   /*
    * Create a new WalletAccount with a random mnemonic
    */
-  static Future<WalletAccount> generate(String name, String url, tokensTracker) async {
+  static Future<WalletAccount> generate(String name, NetworkUrl url, tokensTracker) async {
     final String randomMnemonic = bip39.generateMnemonic();
 
     WalletAccount account = new WalletAccount(0, name, url, randomMnemonic, tokensTracker);
@@ -94,7 +123,7 @@ class WalletAccount extends BaseAccount implements Account {
       "name": name,
       "address": address,
       "balance": balance,
-      "url": url,
+      "url": [url.rpc, url.ws],
       "mnemonic": encrypter.encrypt(mnemonic, iv: iv).base64,
       "accountType": accountType.toString(),
       "transactions": transactions.map((tx) => tx.toJson()).toList()

@@ -8,6 +8,11 @@ class ScanQrPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var scanArea =
+        (MediaQuery.of(context).size.width < 400 || MediaQuery.of(context).size.height < 400)
+            ? 250.0
+            : 300.0;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Scan Solana Pay QR')),
       body: Column(
@@ -25,6 +30,13 @@ class ScanQrPage extends StatelessWidget {
                   }
                 });
               },
+              overlay: QrScannerOverlayShape(
+                borderColor: Colors.blue,
+                borderRadius: 5,
+                borderLength: 30,
+                borderWidth: 15,
+                cutOutSize: scanArea,
+              ),
             ),
           ),
         ],

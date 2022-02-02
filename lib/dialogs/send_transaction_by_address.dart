@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/dialogs/prepare_transaction.dart';
 import 'package:solana_wallet/utils/base_account.dart';
+import 'package:solana_wallet/utils/tracker.dart';
 import 'package:solana_wallet/utils/wallet_account.dart';
 
 String? transactionAddressValidator(String? value) {
@@ -32,40 +34,70 @@ Future<void> sendTransactionDialog(
 ) async {
   String destination = "";
   double sendAmount = 0;
-  String accountName = walletAccount.name;
 
   return showDialog<void>(
     context: context,
     builder: (BuildContext dialogContext) {
-      return Consumer(builder: (context, ref, _) {
+      return HookConsumer(builder: (context, ref, _) {
+        // Retrieve all the tokens owned by the account
+        List<Token> tokens = List.from(walletAccount.tokens);
+
+        // Add Solana like if it was a Token just to make the UX easier
+        tokens.insert(0, Token(walletAccount.balance, system_program_id, "SOL"));
+
+        final selectedToken = useState(tokens.first);
+
         return AlertDialog(
-          title: const Text('Send SOL'),
+          title: const Text('Transfer'),
           content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Form(
-                  autovalidateMode: AutovalidateMode.always,
-                  child: TextFormField(
-                    validator: transactionAddressValidator,
-                    decoration: InputDecoration(
-                      hintText: walletAccount.address,
-                    ),
-                    onChanged: (String value) async {
-                      destination = value;
-                    },
-                  ),
+            child: Column(
+              children: [
+                DropdownButton<String>(
+                  iconSize: 20,
+                  value: selectedToken.value.symbol,
+                  icon: const Icon(Icons.arrow_downward, color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
+                  underline: Container(),
+                  onChanged: (String? tokenSymbol) {
+                    if (tokenSymbol != null) {
+                      selectedToken.value =
+                          tokens.firstWhere((token) => token.symbol == tokenSymbol);
+                    }
+                  },
+                  items: tokens.map<DropdownMenuItem<String>>((Token token) {
+                    return DropdownMenuItem<String>(
+                      value: token.symbol,
+                      child: Text(token.symbol),
+                    );
+                  }).toList(),
                 ),
-                Form(
-                  autovalidateMode: AutovalidateMode.always,
-                  child: TextFormField(
-                    validator: transactionAmountValidator,
-                    decoration: InputDecoration(
-                      hintText: 'Amount of SOLs',
+                ListBody(
+                  children: <Widget>[
+                    Form(
+                      autovalidateMode: AutovalidateMode.always,
+                      child: TextFormField(
+                        validator: transactionAddressValidator,
+                        decoration: InputDecoration(
+                          hintText: walletAccount.address,
+                        ),
+                        onChanged: (String value) async {
+                          destination = value;
+                        },
+                      ),
                     ),
-                    onChanged: (String value) async {
-                      sendAmount = double.parse(value);
-                    },
-                  ),
+                    Form(
+                      autovalidateMode: AutovalidateMode.always,
+                      child: TextFormField(
+                        validator: transactionAmountValidator,
+                        decoration: InputDecoration(
+                          hintText: 'Amount',
+                        ),
+                        onChanged: (String value) async {
+                          sendAmount = double.parse(value);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -88,10 +120,15 @@ Future<void> sendTransactionDialog(
                   // Close the dialog
                   Navigator.of(dialogContext).pop();
 
-                  Transaction tx =
-                      new Transaction(walletAccount.address, destination, sendAmount, false);
+                  Transaction tx = new Transaction(
+                    walletAccount.address,
+                    destination,
+                    sendAmount,
+                    false,
+                    selectedToken.value.mint,
+                  );
 
-                  prepareTransaction(context, tx, walletAccount);
+                  prepareTransaction(context, tx, walletAccount, selectedToken.value);
                 }
               },
             ),

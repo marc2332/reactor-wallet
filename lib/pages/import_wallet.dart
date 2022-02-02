@@ -15,7 +15,7 @@ class ImportWallet extends ConsumerStatefulWidget {
 
 class ImportWalletState extends ConsumerState<ImportWallet> {
   late String mnemonic;
-  late String networkURL;
+  late NetworkUrl networkURL;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +51,10 @@ class ImportWalletState extends ConsumerState<ImportWallet> {
                           Padding(
                             padding: EdgeInsets.only(top: 20, bottom: 5),
                             child: NetworkSelector(
-                              (String url) {
-                                networkURL = url;
+                              (NetworkUrl? url) {
+                                if (url != null) {
+                                  networkURL = url;
+                                }
                               },
                             ),
                           )

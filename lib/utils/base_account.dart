@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:solana/solana.dart';
+import 'package:solana_wallet/components/network_selector.dart';
 
 import 'package:solana_wallet/utils/tracker.dart';
 
@@ -17,11 +18,11 @@ enum AccountItem { Tokens, USDBalance, SolBBalance }
 
 class BaseAccount {
   final AccountType accountType = AccountType.Wallet;
-  final String url;
+  final NetworkUrl url;
   late String name;
   late bool isLoaded = true;
 
-  late RpcClient client;
+  late SolanaClient client;
   late String address;
 
   late double balance = 0;
@@ -38,11 +39,15 @@ class BaseAccount {
     return itemsLoaded[item] != null;
   }
 
+  Token getTokenByMint(String mint) {
+    return tokens.firstWhere((token) => token.mint == mint);
+  }
+
   /*
    * Refresh the account balance
    */
   Future<void> refreshBalance() async {
-    int balance = await client.getBalance(address);
+    int balance = await client.rpcClient.getBalance(address);
 
     this.balance = balance.toDouble() / 1000000000;
     itemsLoaded[AccountItem.SolBBalance] = true;
@@ -80,7 +85,7 @@ class BaseAccount {
     Completer completer = new Completer();
 
     // Get all the tokens owned by the account
-    final tokenAccounts = await client.getTokenAccountsByOwner(
+    final tokenAccounts = await client.rpcClient.getTokenAccountsByOwner(
       address,
       TokenAccountsFilter.byProgramId(TokenProgram.programId),
       encoding: Encoding.jsonParsed,
@@ -142,7 +147,7 @@ class BaseAccount {
   Future<void> loadTransactions() async {
     this.transactions = [];
 
-    final response = await client.getTransactionsList(address);
+    final response = await client.rpcClient.getTransactionsList(address);
 
     response.forEach((tx) {
       final message = tx.transaction.message;
@@ -163,6 +168,7 @@ class BaseAccount {
                           transfer.destination,
                           ammount,
                           receivedOrNot,
+                          system_program_id,
                         ),
                       );
                 },
@@ -174,19 +180,7 @@ class BaseAccount {
             },
             splToken: (data) {
               data.parsed.map(
-                transfer: (data) {
-                  SplTokenTransferInfo transfer = data.info;
-                  bool receivedOrNot = transfer.destination == address;
-                  double ammount = double.parse(transfer.amount);
-                  this.transactions.add(
-                        new Transaction(
-                          transfer.source,
-                          transfer.destination,
-                          ammount,
-                          receivedOrNot,
-                        ),
-                      );
-                },
+                transfer: (data) {},
                 transferChecked: (_) {},
                 generic: (_) {},
               );
@@ -208,7 +202,7 @@ class BaseAccount {
 abstract class Account {
   final AccountType accountType;
   late String name;
-  final String url;
+  final NetworkUrl url;
   late bool isLoaded = true;
 
   late double balance = 0;
@@ -234,23 +228,27 @@ class Transaction {
   final String destination;
   final double ammount;
   final bool receivedOrNot;
+  final String programId;
+  late String tokenMint;
 
-  Transaction(this.origin, this.destination, this.ammount, this.receivedOrNot);
+  Transaction(this.origin, this.destination, this.ammount, this.receivedOrNot, this.programId);
 
   Map<String, dynamic> toJson() {
     return {
       "origin": origin,
       "destination": destination,
       "ammount": ammount,
-      "receivedOrNot": receivedOrNot
+      "receivedOrNot": receivedOrNot,
+      "tokenMint": programId
     };
   }
 
   static Transaction fromJson(dynamic tx) {
-    return new Transaction(tx["origin"], tx["destination"], tx["ammount"], tx["receivedOrNot"]);
+    return new Transaction(
+        tx["origin"], tx["destination"], tx["ammount"], tx["receivedOrNot"], tx["tokenMint"]);
   }
 }
 
 class UnsupportedTransaction extends Transaction {
-  UnsupportedTransaction() : super("Unknown", "Unknown", 0.0, false);
+  UnsupportedTransaction() : super("Unknown", "Unknown", 0.0, false, "Unknown");
 }

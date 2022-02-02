@@ -29,10 +29,11 @@ class Tracker {
 class TokenInfo {
   late String name = "Unknown";
   late String logoUrl = "";
-  late String symbol = "?";
+  late String symbol = "Unknown";
+  late String mintAddress;
 
   TokenInfo();
-  TokenInfo.withInfo(this.name, this.logoUrl, this.symbol);
+  TokenInfo.withInfo(this.mintAddress, this.name, this.logoUrl, this.symbol);
 }
 
 /*
@@ -44,12 +45,15 @@ class TokenTrackers {
     system_program_id: new Tracker('solana', system_program_id, "SOL"),
   };
 
-  late Map tokensList;
+  late Map<String, TokenInfo> tokensList = Map();
 
   Future<void> loadTokenList() async {
     var tokensFile = await rootBundle.loadString('assets/tokens_list.json');
     Map tokensList = json.decode(tokensFile);
-    this.tokensList = tokensList;
+    for (final token in tokensList["tokens"]) {
+      this.tokensList[token['address']] =
+          TokenInfo.withInfo(token["address"], token["name"], token["logoURI"], token["symbol"]);
+    }
   }
 
   double getTokenValue(String programMint) {
@@ -73,10 +77,8 @@ class TokenTrackers {
   }
 
   TokenInfo getTokenInfo(String programId) {
-    for (final token in tokensList["tokens"]) {
-      if (token['address'] == programId) {
-        return new TokenInfo.withInfo(token["name"], token["logoURI"], token["symbol"]);
-      }
+    if (tokensList.containsKey(programId)) {
+      return tokensList[programId]!;
     }
     // If not info about the token is found then an "Unknown" token is returned
     return new TokenInfo();

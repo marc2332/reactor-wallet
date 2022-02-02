@@ -1,4 +1,5 @@
-import 'package:solana/solana.dart' show RPCClient, RpcClient;
+import 'package:solana/solana.dart' show SolanaClient;
+import 'package:solana_wallet/components/network_selector.dart';
 import 'package:solana_wallet/utils/tracker.dart';
 
 import 'base_account.dart';
@@ -9,10 +10,20 @@ import 'base_account.dart';
 class ClientAccount extends BaseAccount implements Account {
   final AccountType accountType = AccountType.Client;
 
-  ClientAccount(address, double balance, name, url, TokenTrackers tokensTracker)
-      : super(balance, name, url, tokensTracker) {
+  ClientAccount(
+    address,
+    double balance,
+    name,
+    NetworkUrl url,
+    TokenTrackers tokensTracker,
+  ) : super(
+          balance,
+          name,
+          url,
+          tokensTracker,
+        ) {
     this.address = address;
-    this.client = RpcClient(this.url);
+    this.client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
   }
 
   Map<String, dynamic> toJson() {
@@ -20,7 +31,7 @@ class ClientAccount extends BaseAccount implements Account {
       "name": name,
       "address": address,
       "balance": balance,
-      "url": url,
+      "url": [url.rpc, url.ws],
       "accountType": accountType.toString(),
       "transactions": transactions.map((tx) => tx.toJson()).toList()
     };

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/components/account_home.dart';
 import 'package:solana_wallet/components/accounts_transaction.dart';
+import 'package:solana_wallet/components/network_selector.dart';
 import 'package:solana_wallet/dialogs/select_transaction_method.dart';
 import 'package:solana_wallet/utils/base_account.dart';
 import 'package:solana_wallet/utils/client_account.dart';
@@ -127,7 +128,7 @@ class AccountSubPage extends ConsumerWidget {
         );
       }
     } else {
-      final sampleAccount = ClientAccount("_____", 0, "_____", "_____", tokensTracker);
+      final sampleAccount = ClientAccount("_____", 0, "_____", NetworkUrl("", ""), tokensTracker);
 
       sampleAccount.isLoaded = false;
 

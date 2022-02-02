@@ -1,5 +1,6 @@
 import 'package:hive_flutter/adapters.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:solana_wallet/components/network_selector.dart';
 import 'package:solana_wallet/utils/base_account.dart';
 import 'package:solana_wallet/utils/client_account.dart';
 import 'package:solana_wallet/utils/tracker.dart';
@@ -59,14 +60,23 @@ class SettingsManager extends StateNotifier<Map<String, dynamic>> {
   }
 }
 
+NetworkUrl migrateFromOldUrls(dynamic url) {
+  if (url is List) {
+    return NetworkUrl(url[0], url[1]);
+  } else {
+    return NetworkUrl(url, (url as String).replaceFirst("https", "wss"));
+  }
+}
+
 Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
   await Hive.initFlutter();
 
   // Selected the configured theme
   Box<dynamic> settingsBox = await Hive.openBox('settings');
   SettingsManager settingsManager = ref.read(settingsProvider.notifier);
-  ThemeType selectedTheme =
-      SettingsManager.mapType(settingsBox.get("theme", defaultValue: "Light"));
+  ThemeType selectedTheme = SettingsManager.mapType(
+    settingsBox.get("theme", defaultValue: "Light"),
+  );
   settingsManager.settingsBox = settingsBox;
   settingsManager.setTheme(selectedTheme);
 
@@ -87,7 +97,7 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
         account["address"],
         account["balance"],
         accountName,
-        account["url"],
+        migrateFromOldUrls(account["url"]),
         tokensTracker,
       );
       return MapEntry(accountName, clientAccount);
@@ -96,7 +106,7 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
         account["balance"],
         account["address"],
         accountName,
-        account["url"],
+        migrateFromOldUrls(account["url"]),
         WalletAccount.decryptMnemonic(account["mnemonic"]),
         tokensTracker,
       );
@@ -201,7 +211,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   /*
    * Create a wallet instance
    */
-  Future<void> createWallet(String accountName, String url) async {
+  Future<void> createWallet(String accountName, NetworkUrl url) async {
     // Create the account
     WalletAccount walletAccount = await WalletAccount.generate(accountName, url, tokensTracker);
 
@@ -220,7 +230,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   /*
    * Import a wallet
    */
-  Future<WalletAccount> importWallet(String mnemonic, String url) async {
+  Future<WalletAccount> importWallet(String mnemonic, NetworkUrl url) async {
     // Create the account
     WalletAccount walletAccount =
         new WalletAccount(0, generateAccountName(), url, mnemonic, tokensTracker);
@@ -262,7 +272,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   /*
    * Create an address watcher
    */
-  Future<ClientAccount> createWatcher(String address, String url) async {
+  Future<ClientAccount> createWatcher(String address, NetworkUrl url) async {
     ClientAccount account = new ClientAccount(
       address,
       0,

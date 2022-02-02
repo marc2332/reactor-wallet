@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:solana_wallet/components/network_selector.dart';
 import 'package:solana_wallet/utils/base_account.dart';
 import 'package:solana_wallet/utils/tracker.dart';
 import 'package:solana_wallet/utils/wallet_account.dart';
@@ -7,7 +8,7 @@ import 'package:solana_wallet/utils/theme.dart';
 
 Future<void> accountInfoDialog(context, Account account) async {
   String shortAddress = account.address.substring(0, 13);
-  String network = account.url;
+  NetworkUrl network = account.url;
   String accountType = account.accountType == AccountType.Client ? 'Client' : 'Wallet';
 
   return showDialog<void>(
@@ -40,7 +41,7 @@ Future<void> accountInfoDialog(context, Account account) async {
               ),
               ListTile(
                 title: const Text('Network'),
-                subtitle: Text(network),
+                subtitle: Text(network.rpc),
               ),
               ListTile(
                 title: const Text('Account type'),

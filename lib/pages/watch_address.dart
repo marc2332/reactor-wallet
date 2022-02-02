@@ -15,7 +15,7 @@ class WatchAddress extends ConsumerStatefulWidget {
 
 class WatchAddressState extends ConsumerState<WatchAddress> {
   late String address;
-  late String networkURL;
+  late NetworkUrl networkURL;
 
   WatchAddressState();
 
@@ -55,8 +55,10 @@ class WatchAddressState extends ConsumerState<WatchAddress> {
                         Padding(
                           padding: EdgeInsets.only(top: 20, bottom: 5),
                           child: NetworkSelector(
-                            (String url) {
-                              networkURL = url;
+                            (NetworkUrl? url) {
+                              if (url != null) {
+                                networkURL = url;
+                              }
                             },
                           ),
                         )

@@ -14,8 +14,15 @@ class TransactionSolanaPay {
   String? message;
   String? memo;
   String? splToken;
-  TransactionSolanaPay(this.recipient, this.reference, this.amount, this.label, this.message,
-      this.memo, this.splToken);
+  TransactionSolanaPay(
+    this.recipient,
+    this.reference,
+    this.amount,
+    this.label,
+    this.message,
+    this.memo,
+    this.splToken,
+  );
 }
 
 /// Deserialize a Solana Pay uri

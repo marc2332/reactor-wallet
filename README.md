@@ -35,7 +35,7 @@ dart format . --line-length 100
 - [ ] **A name for the app**
 - [ ] Integrate QR Scanner for Solana Pay (https://solana-pay-docs.vercel.app/core/wallet-integration)
     - [x] SOL Transactions (WIP)
-    - [ ] SPL Tokens Transactions
+    - [x] SPL Tokens Transactions
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses
@@ -51,7 +51,7 @@ dart format . --line-length 100
 - [ ] Ability to display NFTs owned by a wallet 
 - [ ] Upload to https://itsallwidgets.com/
 - [ ] Ability to add a small note when making transactions
-- [ ] Ability to make transactions with SPL Tokens
+- [x] Ability to make transactions with SPL Tokens
 - [ ] Better UX (specially when creating accounts)
 
 MIT License

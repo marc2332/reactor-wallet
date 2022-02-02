@@ -423,11 +423,9 @@ packages:
   solana:
     dependency: "direct main"
     description:
-      path: "packages/solana"
-      ref: HEAD
-      resolved-ref: "5fd86e8d484588af1bf5f047187c79ba461ea518"
-      url: "git://github.com/cryptoplease/cryptoplease-dart.git"
-    source: git
+      name: solana
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.17.2+2"
   source_span:
     dependency: transitive
@@ -589,7 +587,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.8"
+    version: "2.3.10"
   worker_manager:
     dependency: "direct main"
     description:

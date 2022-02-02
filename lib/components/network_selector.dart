@@ -7,15 +7,22 @@ const options = [
   'Custom',
 ];
 
-const urlOptions = {
-  'Mainnet-beta (default)': 'https://solana-api.projectserum.com',
-  'Devnet': 'https://api.devnet.solana.com',
-  'Testnet': 'https://api.testnet.solana.com',
-  'Custom': '',
+var urlOptions = {
+  'Mainnet-beta (default)':
+      NetworkUrl('https://solana-api.projectserum.com', 'ws://solana-api.projectserum.com'),
+  'Devnet': NetworkUrl('https://api.devnet.solana.com', 'ws://api.devnet.solana.com'),
+  'Testnet': NetworkUrl('https://api.testnet.solana.com', 'ws://api.testnet.solana.com'),
+  'Custom': NetworkUrl('', ''),
 };
 
+class NetworkUrl {
+  late String rpc;
+  late String ws;
+  NetworkUrl(this.rpc, this.ws);
+}
+
 class NetworkSelector extends StatefulWidget {
-  Function onSelected;
+  final Function(NetworkUrl?) onSelected;
 
   NetworkSelector(this.onSelected);
 
@@ -26,9 +33,9 @@ class NetworkSelector extends StatefulWidget {
 }
 
 class NetworkSelectorState extends State<NetworkSelector> {
-  String selectedOption = "Mainnet-beta (default)";
-  String customNetworkURL = "";
-  Function onSelected;
+  String selectedOption = urlOptions.keys.first;
+  NetworkUrl customNetwork = NetworkUrl("", "");
+  Function(NetworkUrl?) onSelected;
 
   NetworkSelectorState(this.onSelected);
 
@@ -65,24 +72,43 @@ class NetworkSelectorState extends State<NetworkSelector> {
         ),
         if (selectedOption == 'Custom') ...[
           Padding(
-            padding: EdgeInsets.only(top: 15),
-            child: TextFormField(
-              validator: (String? value) {
-                if (value == null || value.isEmpty) {
-                  return 'Empty URL';
-                } else {
-                  return null;
-                }
-              },
-              decoration: const InputDecoration(
-                hintText: 'Enter a custom netwok URL',
-              ),
-              onChanged: (String value) async {
-                customNetworkURL = value;
-                onSelected(customNetworkURL);
-              },
-            ),
-          ),
+              padding: EdgeInsets.only(top: 15),
+              child: Column(
+                children: [
+                  TextFormField(
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Empty URL';
+                      } else {
+                        return null;
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Enter a custom network URL',
+                    ),
+                    onChanged: (String value) async {
+                      customNetwork.rpc = value;
+                      onSelected(customNetwork);
+                    },
+                  ),
+                  TextFormField(
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Empty URL';
+                      } else {
+                        return null;
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Enter a custom WebSockets URL',
+                    ),
+                    onChanged: (String value) async {
+                      customNetwork.ws = value;
+                      onSelected(customNetwork);
+                    },
+                  ),
+                ],
+              )),
         ]
       ],
     );

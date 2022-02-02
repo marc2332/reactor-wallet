@@ -9,10 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  solana: 
-    git: 
-      url: git://github.com/cryptoplease/cryptoplease-dart.git
-      path: packages/solana
+  solana: ^0.17.2
   google_fonts: ^2.1.0
   bip39: ^1.0.6
   worker_manager: ^4.2.3

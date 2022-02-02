@@ -16,7 +16,7 @@ class CreateWallet extends ConsumerStatefulWidget {
 class CreateWalletState extends ConsumerState<CreateWallet> {
   late String address;
   late String accountName;
-  late String networkURL;
+  late NetworkUrl networkURL;
 
   CreateWalletState();
 
@@ -54,8 +54,10 @@ class CreateWalletState extends ConsumerState<CreateWallet> {
                         Padding(
                           padding: EdgeInsets.only(top: 20, bottom: 5),
                           child: NetworkSelector(
-                            (String url) {
-                              networkURL = url;
+                            (NetworkUrl? url) {
+                              if (url != null) {
+                                networkURL = url;
+                              }
                             },
                           ),
                         )

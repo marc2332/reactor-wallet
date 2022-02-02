@@ -3,7 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:solana_wallet/dialogs/editing_account.dart';
 import 'package:solana_wallet/dialogs/account_info.dart';
 import 'package:solana_wallet/dialogs/remove_account.dart';
-import 'package:solana_wallet/utils/base_account.dart';
 import 'package:solana_wallet/utils/states.dart';
 
 class ManageAccountsPage extends StatefulWidget {
