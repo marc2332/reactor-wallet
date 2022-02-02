@@ -79,22 +79,23 @@ class AccountSubPage extends ConsumerWidget {
                     ? Icons.account_balance_wallet_outlined
                     : Icons.person_pin_outlined;
                 return DropdownMenuItem<Account>(
-                    value: account,
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(right: 15),
-                          child: Icon(icon, color: Colors.white),
+                  value: account,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(right: 15),
+                        child: Icon(icon, color: Colors.white),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(right: 10),
+                        child: Text(
+                          account.name,
+                          style: const TextStyle(color: Colors.white),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 10),
-                          child: Text(
-                            account.name,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ));
+                      ),
+                    ],
+                  ),
+                );
               }).toList();
             },
           ),
@@ -138,7 +139,10 @@ class AccountSubPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: accountHeader),
+      appBar: AppBar(
+        title: accountHeader,
+        toolbarHeight: kToolbarHeight + 10,
+      ),
       floatingActionButton: selectedAccount is WalletAccount
           ? FloatingActionButton(
               onPressed: () {
