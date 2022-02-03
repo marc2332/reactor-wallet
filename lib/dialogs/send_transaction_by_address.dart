@@ -55,8 +55,7 @@ Future<void> sendTransactionDialog(
                 DropdownButton<String>(
                   iconSize: 20,
                   value: selectedToken.value.symbol,
-                  icon: const Icon(Icons.arrow_downward, color: Colors.white),
-                  style: const TextStyle(color: Colors.white),
+                  icon: const Icon(Icons.arrow_downward),
                   underline: Container(),
                   onChanged: (String? tokenSymbol) {
                     if (tokenSymbol != null) {
