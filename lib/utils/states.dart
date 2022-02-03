@@ -1,10 +1,10 @@
 import 'package:hive_flutter/adapters.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:solana_wallet/components/network_selector.dart';
-import 'package:solana_wallet/utils/base_account.dart';
-import 'package:solana_wallet/utils/client_account.dart';
-import 'package:solana_wallet/utils/tracker.dart';
-import 'package:solana_wallet/utils/wallet_account.dart';
+import 'package:reactor_wallet/components/network_selector.dart';
+import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/client_account.dart';
+import 'package:reactor_wallet/utils/tracker.dart';
+import 'package:reactor_wallet/utils/wallet_account.dart';
 
 final appLoadedProvider = StateProvider<bool>((_) {
   return false;

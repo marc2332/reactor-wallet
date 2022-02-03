@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:solana_wallet/dialogs/prepare_transaction.dart';
-import 'package:solana_wallet/utils/base_account.dart';
-import 'package:solana_wallet/utils/tracker.dart';
-import 'package:solana_wallet/utils/wallet_account.dart';
+import 'package:reactor_wallet/dialogs/prepare_transaction.dart';
+import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/tracker.dart';
+import 'package:reactor_wallet/utils/wallet_account.dart';
 
 String? transactionAddressValidator(String? value) {
   if (value == null || value.isEmpty) {

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:solana_wallet/components/token_card.dart';
-import 'package:solana_wallet/components/token_card_shimmer.dart';
-import 'package:solana_wallet/utils/base_account.dart';
-import 'package:solana_wallet/utils/states.dart';
-import 'package:solana_wallet/utils/tracker.dart';
+import 'package:reactor_wallet/components/token_card.dart';
+import 'package:reactor_wallet/components/token_card_shimmer.dart';
+import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/states.dart';
+import 'package:reactor_wallet/utils/tracker.dart';
 
 String balanceShorter(String balance) {
   if (balance.length >= 6) {

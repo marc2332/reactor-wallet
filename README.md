@@ -1,4 +1,4 @@
-## Solana Mobile Wallet
+## Reactor Wallet
 
 A non-custodial Open Source Mobile wallet for Solana made in Flutter.
 
@@ -32,10 +32,10 @@ dart format . --line-length 100
 ```
 
 ### 🤔 To-do / Ideas
-- [ ] **A name for the app**
+- [x] **A name for the app**
 - [ ] Integrate QR Scanner for Solana Pay (https://solana-pay-docs.vercel.app/core/wallet-integration)
-    - [x] SOL Transactions
-    - [x] SPL Tokens Transactions
+    - [x] SOL Transactions (Experimental)
+    - [x] SPL Tokens Transactions (Experimental)
     - [ ] Support for Reference, Label, Message, Memo
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet

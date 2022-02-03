@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:solana_wallet/utils/states.dart';
-import 'package:solana_wallet/utils/theme.dart';
+import 'package:reactor_wallet/utils/states.dart';
+import 'package:reactor_wallet/utils/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsSubPage extends ConsumerStatefulWidget {

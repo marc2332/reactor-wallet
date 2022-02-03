@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:solana_wallet/components/account_home.dart';
-import 'package:solana_wallet/components/accounts_transaction.dart';
-import 'package:solana_wallet/components/network_selector.dart';
-import 'package:solana_wallet/dialogs/select_transaction_method.dart';
-import 'package:solana_wallet/utils/base_account.dart';
-import 'package:solana_wallet/utils/client_account.dart';
-import 'package:solana_wallet/utils/states.dart';
-import 'package:solana_wallet/utils/tracker.dart';
-import 'package:solana_wallet/utils/wallet_account.dart';
+import 'package:reactor_wallet/components/account_home.dart';
+import 'package:reactor_wallet/components/accounts_transaction.dart';
+import 'package:reactor_wallet/components/network_selector.dart';
+import 'package:reactor_wallet/dialogs/select_transaction_method.dart';
+import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/client_account.dart';
+import 'package:reactor_wallet/utils/states.dart';
+import 'package:reactor_wallet/utils/tracker.dart';
+import 'package:reactor_wallet/utils/wallet_account.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:solana_wallet/utils/theme.dart';
+import 'package:reactor_wallet/utils/theme.dart';
 
 /*
  * Accounts sub page

@@ -1,6 +1,6 @@
 {
-    "name": "solana_wallet",
-    "short_name": "solana_wallet",
+    "name": "reactor_wallet",
+    "short_name": "reactor_wallet",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
