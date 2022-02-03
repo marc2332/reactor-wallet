@@ -27,8 +27,17 @@ dev_dependencies:
   change_app_package_name: ^1.0.0
   flutter_test:
     sdk: flutter
+  msix: ^2.8.12
 
 flutter:
   uses-material-design: true
   assets:
     - assets/
+
+msix_config:
+  display_name: Reactor Wallet
+  publisher_display_name: Marc Espín Sanz
+  identity_name: MarcEspinSanz.Reactor.Wallet
+  msix_version: 0.1.0.0
+  logo_path: ./windows/runner/resources/app_icon.ico
+  capabilities: "internetClient"

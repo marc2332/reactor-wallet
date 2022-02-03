@@ -40,7 +40,7 @@ class App extends HookConsumerWidget {
     }, []);
 
     return MaterialApp(
-      title: 'Solana wallet',
+      title: 'Reactor Wallet',
       theme: lighTheme,
       darkTheme: darkTheme,
       themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,

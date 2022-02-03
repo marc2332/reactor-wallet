@@ -11,7 +11,7 @@ class TokenCardWithShimmer extends StatelessWidget {
       child: Row(
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+            padding: EdgeInsets.all(5),
             child: Shimmer.fromColors(
               baseColor: Colors.grey[300]!,
               highlightColor: Colors.grey[100]!,

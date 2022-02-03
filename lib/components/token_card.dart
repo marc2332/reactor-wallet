@@ -32,7 +32,7 @@ class TokenCard extends ConsumerWidget {
             children: [
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                  padding: EdgeInsets.all(5),
                   child: WrapperImage(tokenInfo.logoUrl),
                 ),
               ),

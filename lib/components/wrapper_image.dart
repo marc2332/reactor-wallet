@@ -12,8 +12,8 @@ class WrapperImage extends StatelessWidget {
     if (isImage.hasMatch(url)) {
       return CachedNetworkImage(
         imageUrl: url,
-        height: 30,
-        width: 30,
+        height: 20,
+        width: 35,
         errorWidget: (context, url, error) => const Icon(Icons.no_accounts_outlined),
       );
     } else {

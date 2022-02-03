@@ -192,6 +192,12 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
     refreshAllState();
   }
 
+  void selectFirstAccountIfAnySelected(){
+    final selectedAccount = ref.read(selectedAccountProvider.notifier);
+
+    if(selectedAccount.state == null) selectedAccount.state = state.values.first;
+  }
+
   Future<void> refreshAccounts() async {
     for (final account in state.values) {
       // Refresh the account transactions
@@ -227,6 +233,9 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
     // Add the account to the DB
     accountsBox.put(walletAccount.name, walletAccount.toJson());
 
+    // Select this wallet if there wasn't any account created
+    selectFirstAccountIfAnySelected();
+
     refreshAllState();
   }
 
@@ -255,6 +264,9 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
 
     // Add the account to the DB
     accountsBox.put(walletAccount.name, walletAccount.toJson());
+
+    // Select this wallet if there wasn't any account created
+    selectFirstAccountIfAnySelected();
 
     refreshAllState();
 
@@ -298,6 +310,9 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
 
     // Add  the account to the DB
     accountsBox.put(account.name, account.toJson());
+
+    // Select this account if there wasn't any account created
+    selectFirstAccountIfAnySelected();
 
     refreshAllState();
 

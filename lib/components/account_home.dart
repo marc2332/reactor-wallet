@@ -27,6 +27,7 @@ void orderTokensByUSDBalanace(List<Token> accountTokens) {
 
 class AccountTokens extends StatelessWidget {
   final Account account;
+  final ScrollController list_controller = ScrollController();
 
   AccountTokens(this.account);
 
@@ -65,6 +66,7 @@ class AccountTokens extends StatelessWidget {
               );
             } else {
               return ListView.builder(
+                controller: list_controller,
                 itemCount: accountTokens.length,
                 shrinkWrap: true,
                 physics: BouncingScrollPhysics(
@@ -77,6 +79,7 @@ class AccountTokens extends StatelessWidget {
             }
           } else {
             return ListView.builder(
+              controller: list_controller,
               itemCount: 7,
               shrinkWrap: true,
               physics: BouncingScrollPhysics(),
