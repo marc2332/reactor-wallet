@@ -94,12 +94,12 @@ class WalletAccount extends BaseAccount implements Account {
   }
 
   /*
-   * Create a new WalletAccount with a random mnemonic
+   * Create a WalletAccount with a random mnemonic
    */
   static Future<WalletAccount> generate(String name, NetworkUrl url, tokensTracker) async {
     final String randomMnemonic = bip39.generateMnemonic();
 
-    WalletAccount account = new WalletAccount(0, name, url, randomMnemonic, tokensTracker);
+    WalletAccount account = WalletAccount(0, name, url, randomMnemonic, tokensTracker);
     await account.loadKeyPair();
     await account.refreshBalance();
     return account;

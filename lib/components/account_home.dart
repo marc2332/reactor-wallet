@@ -201,7 +201,7 @@ class AccountInfo extends ConsumerWidget {
                         ? OutlinedButton(
                             onPressed: () {
                               Clipboard.setData(
-                                new ClipboardData(text: account.address),
+                                ClipboardData(text: account.address),
                               ).then((_) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(

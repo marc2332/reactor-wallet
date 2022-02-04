@@ -34,7 +34,7 @@ Future<void> transactionInfo(
                   ),
                   onPressed: () {
                     Clipboard.setData(
-                      new ClipboardData(text: involvedAddress),
+                      ClipboardData(text: involvedAddress),
                     ).then(
                       (_) {
                         ScaffoldMessenger.of(context).showSnackBar(

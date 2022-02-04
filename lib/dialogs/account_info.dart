@@ -26,7 +26,7 @@ Future<void> accountInfoDialog(context, Account account) async {
                   icon: Icon(Icons.copy_all_outlined, color: Theme.of(context).iconColor),
                   onPressed: () {
                     Clipboard.setData(
-                      new ClipboardData(text: account.address),
+                      ClipboardData(text: account.address),
                     ).then(
                       (_) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,7 +58,7 @@ Future<void> accountInfoDialog(context, Account account) async {
 
                       // Copy the account's seedphrase to the clipboard
                       Clipboard.setData(
-                        new ClipboardData(text: walletAccount.mnemonic),
+                        ClipboardData(text: walletAccount.mnemonic),
                       ).then(
                         (_) {
                           ScaffoldMessenger.of(context).showSnackBar(

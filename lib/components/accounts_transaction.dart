@@ -16,7 +16,7 @@ class UnsupportedTransactionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime date = new DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
     String readableDate = hourMinutFormatter.format(date);
 
     return Flex(
@@ -59,7 +59,7 @@ class TransactionCard extends StatelessWidget {
     String shortAddress =
         toMe ? transaction.origin.substring(0, 5) : transaction.destination.substring(0, 5);
 
-    DateTime date = new DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
     String readableDate = hourMinutFormatter.format(date);
 
     return Flex(
@@ -103,24 +103,24 @@ class TransactionCard extends StatelessWidget {
 }
 
 List getAllBlockNumbers(List<TransactionDetails> txs) {
-  Map<int, List<TransactionDetails>> blocks = Map();
+  Map<String, List<TransactionDetails>> blocks = Map();
 
-  txs.forEach((dynamic tx) {
-    if (blocks[tx.blockTime] == null) blocks[tx.blockTime] = [];
+  for (var tx in txs) {
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(tx.blockTime * 1000);
+    String readableDate = dayFormatter.format(date);
 
-    blocks[tx.blockTime]!.add(tx);
-  });
+    if (blocks[readableDate] == null) blocks[readableDate] = [];
+
+    blocks[readableDate]!.add(tx);
+  }
 
   List<dynamic> items = [];
 
-  blocks.entries.forEach((entry) {
-    DateTime date = new DateTime.fromMillisecondsSinceEpoch(entry.key * 1000);
-    String readableDate = dayFormatter.format(date);
-
-    items.add(readableDate);
+  for (var entry in blocks.entries) {
+    items.add(entry.key);
 
     items.addAll(entry.value);
-  });
+  }
 
   return items;
 }

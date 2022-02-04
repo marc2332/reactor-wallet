@@ -24,19 +24,19 @@ final selectedAccountProvider = StateProvider<Account?>((_) {
 });
 
 final tokensTrackerProvider = Provider<TokenTrackers>((_) {
-  return new TokenTrackers();
+  return TokenTrackers();
 });
 
 final accountsProvider = StateNotifierProvider<AccountsManager, Map<String, Account>>((ref) {
   TokenTrackers tokensTracker = ref.read(tokensTrackerProvider);
-  return new AccountsManager(tokensTracker, ref);
+  return AccountsManager(tokensTracker, ref);
 });
 
 class SettingsManager extends StateNotifier<Map<String, dynamic>> {
   late Box<dynamic> settingsBox;
   final StateNotifierProviderRef ref;
 
-  SettingsManager(this.ref) : super(new Map()) {
+  SettingsManager(this.ref) : super(Map()) {
     state["theme"] = ThemeType.Light.name;
   }
 
@@ -167,7 +167,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   late Box<dynamic> accountsBox;
   final StateNotifierProviderRef ref;
 
-  AccountsManager(this.tokensTracker, this.ref) : super(new Map());
+  AccountsManager(this.tokensTracker, this.ref) : super(Map());
 
   Future<void> loadUSDValues() async {
     List<String> tokenNames = tokensTracker.trackers.values
@@ -245,7 +245,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   Future<WalletAccount> importWallet(String mnemonic, NetworkUrl url) async {
     // Create the account
     WalletAccount walletAccount =
-        new WalletAccount(0, generateAccountName(), url, mnemonic, tokensTracker);
+        WalletAccount(0, generateAccountName(), url, mnemonic, tokensTracker);
 
     // Create key pair
     await walletAccount.loadKeyPair();
@@ -274,7 +274,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   }
 
   /*
-  * Generate an available random name for the new Account
+  * Generate an available random name for the Account
   */
   String generateAccountName() {
     int accountN = 0;
@@ -288,7 +288,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
    * Create an address watcher
    */
   Future<ClientAccount> createWatcher(String address, NetworkUrl url) async {
-    ClientAccount account = new ClientAccount(
+    ClientAccount account = ClientAccount(
       address,
       0,
       generateAccountName(),
@@ -355,6 +355,6 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
 
   // Update the state
   void refreshAllState() {
-    state = new Map.from(state);
+    state = Map.from(state);
   }
 }

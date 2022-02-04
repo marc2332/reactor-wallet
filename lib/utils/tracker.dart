@@ -42,7 +42,7 @@ class TokenInfo {
 class TokenTrackers {
   // List of Token trackers
   late Map<String, Tracker> trackers = {
-    system_program_id: new Tracker('solana', system_program_id, "SOL"),
+    system_program_id: Tracker('solana', system_program_id, "SOL"),
   };
 
   late Map<String, TokenInfo> tokensList = Map();
@@ -81,7 +81,7 @@ class TokenTrackers {
       return tokensList[programId]!;
     }
     // If not info about the token is found then an "Unknown" token is returned
-    return new TokenInfo();
+    return TokenInfo();
   }
 
   Tracker? addTrackerByProgramMint(String programMint) {
@@ -89,7 +89,7 @@ class TokenTrackers {
     if (!trackers.containsKey(programMint)) {
       TokenInfo tokenInfo = getTokenInfo(programMint);
 
-      trackers[programMint] = new Tracker(tokenInfo.name, programMint, tokenInfo.symbol);
+      trackers[programMint] = Tracker(tokenInfo.name, programMint, tokenInfo.symbol);
 
       return trackers[programMint];
     }
@@ -101,7 +101,7 @@ class TokenTrackers {
  */
 Future<Map<String, double>> getTokenUsdValue(List<String> tokens) async {
   try {
-    Map<String, String> headers = new Map();
+    Map<String, String> headers = Map();
     headers['Accept'] = 'application/json';
     headers['Access-Control-Allow-Origin'] = '*';
     Http.Response response = await Http.get(

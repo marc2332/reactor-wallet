@@ -119,7 +119,7 @@ Future<void> sendTransactionDialog(
                   // Close the dialog
                   Navigator.of(dialogContext).pop();
 
-                  Transaction tx = new Transaction(
+                  Transaction tx = Transaction(
                     walletAccount.address,
                     destination,
                     sendAmount,

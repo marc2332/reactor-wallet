@@ -82,7 +82,7 @@ class BaseAccount {
    */
   Future<void> loadTokens() async {
     this.tokens = [];
-    Completer completer = new Completer();
+    Completer completer = Completer();
 
     // Get all the tokens owned by the account
     final tokenAccounts = await client.rpcClient.getTokenAccountsByOwner(
@@ -114,7 +114,7 @@ class BaseAccount {
                       : tokensTracker.getTokenInfo(tokenMint).symbol;
 
                   // Add the token to this account
-                  tokens.add(new Token(balance, tokenMint, symbol));
+                  tokens.add(Token(balance, tokenMint, symbol));
 
                   completedTokenAccounts++;
 
@@ -163,13 +163,13 @@ class BaseAccount {
                   double ammount = transfer.lamports.toDouble() / 1000000000;
                   print(tx.blockTime);
                   this.transactions.add(
-                        new TransactionDetails(transfer.source, transfer.destination, ammount,
+                        TransactionDetails(transfer.source, transfer.destination, ammount,
                             receivedOrNot, system_program_id, tx.blockTime!),
                       );
                 },
                 transferChecked: (_) {},
                 unsupported: (_) {
-                  this.transactions.add(new UnsupportedTransaction(tx.blockTime!));
+                  this.transactions.add(UnsupportedTransaction(tx.blockTime!));
                 },
               );
             },
@@ -182,7 +182,7 @@ class BaseAccount {
             },
             memo: (_) {},
             unsupported: (_) {
-              this.transactions.add(new UnsupportedTransaction(tx.blockTime!));
+              this.transactions.add(UnsupportedTransaction(tx.blockTime!));
             },
           );
         }

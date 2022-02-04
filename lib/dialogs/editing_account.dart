@@ -4,7 +4,7 @@ import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/states.dart';
 
 /*
- * Apply changes to a new account
+ * Apply changes to a account
  */
 void applyAccount(Account account, WidgetRef ref, String accountName) {
   final accountsProv = ref.read(accountsProvider.notifier);

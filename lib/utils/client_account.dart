@@ -33,6 +33,6 @@ class ClientAccount extends BaseAccount implements Account {
   }
 
   static ClientAccount from(ClientAccount from) {
-    return new ClientAccount(from.address, from.balance, from.name, from.url, from.tokensTracker);
+    return ClientAccount(from.address, from.balance, from.name, from.url, from.tokensTracker);
   }
 }

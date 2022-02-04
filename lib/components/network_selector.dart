@@ -28,7 +28,7 @@ class NetworkSelector extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new NetworkSelectorState(onSelected);
+    return NetworkSelectorState(onSelected);
   }
 }
 
@@ -72,43 +72,44 @@ class NetworkSelectorState extends State<NetworkSelector> {
         ),
         if (selectedOption == 'Custom') ...[
           Padding(
-              padding: EdgeInsets.only(top: 15),
-              child: Column(
-                children: [
-                  TextFormField(
-                    validator: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Empty URL';
-                      } else {
-                        return null;
-                      }
-                    },
-                    decoration: const InputDecoration(
-                      hintText: 'Enter a custom network URL',
-                    ),
-                    onChanged: (String value) async {
-                      customNetwork.rpc = value;
-                      onSelected(customNetwork);
-                    },
+            padding: EdgeInsets.only(top: 15),
+            child: Column(
+              children: [
+                TextFormField(
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Empty URL';
+                    } else {
+                      return null;
+                    }
+                  },
+                  decoration: const InputDecoration(
+                    hintText: 'Enter a custom network URL',
                   ),
-                  TextFormField(
-                    validator: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Empty URL';
-                      } else {
-                        return null;
-                      }
-                    },
-                    decoration: const InputDecoration(
-                      hintText: 'Enter a custom WebSockets URL',
-                    ),
-                    onChanged: (String value) async {
-                      customNetwork.ws = value;
-                      onSelected(customNetwork);
-                    },
+                  onChanged: (String value) async {
+                    customNetwork.rpc = value;
+                    onSelected(customNetwork);
+                  },
+                ),
+                TextFormField(
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Empty URL';
+                    } else {
+                      return null;
+                    }
+                  },
+                  decoration: const InputDecoration(
+                    hintText: 'Enter a custom WebSockets URL',
                   ),
-                ],
-              )),
+                  onChanged: (String value) async {
+                    customNetwork.ws = value;
+                    onSelected(customNetwork);
+                  },
+                ),
+              ],
+            ),
+          ),
         ]
       ],
     );
