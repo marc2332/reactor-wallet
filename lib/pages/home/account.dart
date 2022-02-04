@@ -42,7 +42,7 @@ class AccountSubPage extends ConsumerWidget {
         borderRadius: BorderRadius.circular(5),
         onTap: () {},
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: DropdownButton<Account>(
             iconSize: 20,
             value: selectedAccount,
@@ -63,7 +63,7 @@ class AccountSubPage extends ConsumerWidget {
                   child: Row(
                     children: [
                       Padding(
-                        padding: EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 15),
                         child: Icon(icon, color: Theme.of(context).iconColor),
                       ),
                       Text(
@@ -83,11 +83,11 @@ class AccountSubPage extends ConsumerWidget {
                   child: Row(
                     children: [
                       Padding(
-                        padding: EdgeInsets.only(right: 15),
+                        padding: const EdgeInsets.only(right: 15),
                         child: Icon(icon, color: Colors.white),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(right: 10),
+                        padding: const EdgeInsets.only(right: 10),
                         child: Text(
                           account.name,
                           style: const TextStyle(color: Colors.white),

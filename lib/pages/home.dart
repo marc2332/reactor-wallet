@@ -39,7 +39,7 @@ class HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       body: page,
       bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: BottomNavigationBar(
           onTap: (int page) {
             setState(() {

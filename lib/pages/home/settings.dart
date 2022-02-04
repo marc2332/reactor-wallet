@@ -28,7 +28,7 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 40, left: 20, right: 20),
+      padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
       child: ListView(
         physics: BouncingScrollPhysics(),
         children: [

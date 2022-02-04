@@ -20,19 +20,19 @@ class TokenCard extends ConsumerWidget {
     String tokenBalance = token.balance.toStringAsFixed(2);
 
     return Padding(
-      padding: EdgeInsets.all(4),
+      padding: const EdgeInsets.all(4),
       child: InkWell(
         borderRadius: BorderRadius.circular(5),
         splashColor: Theme.of(context).hoverColor,
         onTap: () {},
         child: Padding(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Flex(
             direction: Axis.horizontal,
             children: [
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   child: WrapperImage(tokenInfo.logoUrl),
                 ),
               ),
@@ -54,7 +54,7 @@ class TokenCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Padding(padding: EdgeInsets.only(right: 10), child: Text('$usdBalance\$'))
+                    Padding(padding: const EdgeInsets.only(right: 10), child: Text('$usdBalance\$'))
                   ],
                 ),
               ),

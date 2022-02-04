@@ -12,7 +12,7 @@ Future<void> transactionErroredDialog(context, String destination, double ammoun
               Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(15),
                     child: Icon(
                       Icons.error_outline_outlined,
                       color: Colors.red,
@@ -21,7 +21,7 @@ Future<void> transactionErroredDialog(context, String destination, double ammoun
                   ),
                   Text("Could not sent $ammount SOL to"),
                   Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: Text(
                       "$destination",
                       style: TextStyle(

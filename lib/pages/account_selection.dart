@@ -13,7 +13,7 @@ class AccountSelectionPage extends StatelessWidget {
         title: const Text("Account selection"),
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Center(
           child: Flex(
             direction: Axis.vertical,
@@ -32,7 +32,7 @@ class AccountSelectionPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: EdgeInsets.all(15),
+                          padding: const EdgeInsets.all(15),
                           child: Icon(
                             Icons.person_pin_outlined,
                             size: 30.0,
@@ -58,7 +58,7 @@ class AccountSelectionPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: EdgeInsets.all(15),
+                          padding: const EdgeInsets.all(15),
                           child: Icon(
                             Icons.import_export_outlined,
                             size: 30.0,
@@ -84,7 +84,7 @@ class AccountSelectionPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: EdgeInsets.all(15),
+                          padding: const EdgeInsets.all(15),
                           child: Icon(
                             Icons.create_outlined,
                             size: 30.0,

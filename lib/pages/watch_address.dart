@@ -32,7 +32,7 @@ class WatchAddressState extends ConsumerState<WatchAddress> {
                 autovalidateMode: AutovalidateMode.always,
                 child: Expanded(
                   child: Padding(
-                    padding: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(15),
                     child: Column(
                       children: [
                         TextFormField(
@@ -53,9 +53,9 @@ class WatchAddressState extends ConsumerState<WatchAddress> {
                           },
                         ),
                         Padding(
-                          padding: EdgeInsets.only(top: 20, bottom: 5),
+                          padding: const EdgeInsets.only(top: 20, bottom: 5),
                           child: NetworkSelector(
-                            (NetworkUrl? url) {
+                            onSelected: (NetworkUrl? url) {
                               if (url != null) {
                                 networkURL = url;
                               }

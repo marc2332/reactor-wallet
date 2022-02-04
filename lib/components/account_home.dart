@@ -34,7 +34,7 @@ class AccountTokens extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).dividerColor),
@@ -56,7 +56,7 @@ class AccountTokens extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(top: 20),
+                          padding: const EdgeInsets.only(top: 20),
                           child: const Text("This address doesn't own any token"),
                         )
                       ],
@@ -132,7 +132,7 @@ class AccountInfo extends ConsumerWidget {
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(bottom: 10, top: 15),
+                    padding: const EdgeInsets.only(bottom: 10, top: 15),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -148,7 +148,7 @@ class AccountInfo extends ConsumerWidget {
                           const Text(' SOL'),
                         ] else ...[
                           Padding(
-                            padding: EdgeInsets.only(bottom: 15),
+                            padding: const EdgeInsets.only(bottom: 15),
                             child: Shimmer.fromColors(
                               baseColor: Colors.grey[300]!,
                               highlightColor: Colors.grey[100]!,
@@ -196,7 +196,7 @@ class AccountInfo extends ConsumerWidget {
                     )
                   ],
                   Padding(
-                    padding: EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.only(top: 10),
                     child: account.isLoaded
                         ? OutlinedButton(
                             onPressed: () {

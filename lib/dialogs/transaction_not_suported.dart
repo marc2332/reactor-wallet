@@ -12,7 +12,7 @@ Future<void> transactionNotSupportedDialog(context) async {
               Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(15),
                     child: Icon(
                       Icons.error_outline_outlined,
                       color: Colors.red,

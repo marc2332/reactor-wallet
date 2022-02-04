@@ -26,7 +26,7 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
         },
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Consumer(
           builder: (context, ref, child) {
             final accounts = ref.watch(accountsProvider).values.toList();

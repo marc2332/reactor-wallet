@@ -24,18 +24,18 @@ class UnsupportedTransactionCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(readableDate),
         ),
         Expanded(
           child: Card(
             child: Padding(
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               child: Row(
                 children: [
                   Icon(Icons.block_outlined),
                   Padding(
-                    padding: EdgeInsets.only(left: 20),
+                    padding: const EdgeInsets.only(left: 20),
                     child: Text('Unsupported transaction'),
                   )
                 ],
@@ -67,7 +67,7 @@ class TransactionCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(readableDate),
         ),
         Expanded(
@@ -78,7 +78,7 @@ class TransactionCard extends StatelessWidget {
                 transactionInfo(context, transaction);
               },
               child: Padding(
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 child: Row(
                   children: [
                     Icon(
@@ -86,7 +86,7 @@ class TransactionCard extends StatelessWidget {
                       color: Theme.of(context).iconColor,
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 20),
+                      padding: const EdgeInsets.only(left: 20),
                       child: Text(
                         '${toMe ? '+' : '-'}${transaction.ammount.toString()} SOL ${toMe ? 'from' : 'to'} $shortAddress...',
                       ),
@@ -142,7 +142,7 @@ class AccountTransactions extends HookConsumerWidget {
 
     return Padding(
       key: key,
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: RefreshIndicator(
@@ -170,7 +170,7 @@ class AccountTransactions extends HookConsumerWidget {
               } else {
                 String blockTime = item as String;
                 return Padding(
-                  padding: EdgeInsets.all(7),
+                  padding: const EdgeInsets.all(7),
                   child: Text(
                     blockTime,
                     style: TextStyle(color: Theme.of(context).fadedTextColor),

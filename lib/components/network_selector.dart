@@ -24,12 +24,10 @@ class NetworkUrl {
 class NetworkSelector extends StatefulWidget {
   final Function(NetworkUrl?) onSelected;
 
-  NetworkSelector(this.onSelected);
+  const NetworkSelector({Key? key, required this.onSelected}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() {
-    return NetworkSelectorState(onSelected);
-  }
+  State<StatefulWidget> createState() => NetworkSelectorState(onSelected);
 }
 
 class NetworkSelectorState extends State<NetworkSelector> {
@@ -46,7 +44,7 @@ class NetworkSelectorState extends State<NetworkSelector> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(top: 15),
+          padding: const EdgeInsets.only(top: 15),
           child: DropdownButton<String>(
             value: selectedOption,
             iconSize: 24,
@@ -72,7 +70,7 @@ class NetworkSelectorState extends State<NetworkSelector> {
         ),
         if (selectedOption == 'Custom') ...[
           Padding(
-            padding: EdgeInsets.only(top: 15),
+            padding: const EdgeInsets.only(top: 15),
             child: Column(
               children: [
                 TextFormField(

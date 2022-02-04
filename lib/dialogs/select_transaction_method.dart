@@ -102,12 +102,12 @@ Future<void> selectTransactionMethod(
                       }
                     },
                     child: Padding(
-                      padding: EdgeInsets.all(15),
+                      padding: const EdgeInsets.all(15),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(right: 7),
+                            padding: const EdgeInsets.only(right: 7),
                             child: Icon(Icons.qr_code_2_outlined),
                           ),
                           const Text("Solana Pay QR"),
@@ -126,12 +126,12 @@ Future<void> selectTransactionMethod(
                       sendTransactionDialog(context, walletAccount);
                     },
                     child: Padding(
-                      padding: EdgeInsets.all(15),
+                      padding: const EdgeInsets.all(15),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(right: 7),
+                            padding: const EdgeInsets.only(right: 7),
                             child: Icon(Icons.account_balance_wallet_outlined),
                           ),
                           const Text("Address"),
