@@ -5,7 +5,7 @@ import 'package:reactor_wallet/utils/theme.dart';
 
 Future<void> transactionInfo(
   BuildContext context,
-  Transaction transaction,
+  TransactionDetails transaction,
 ) async {
   bool toMe = transaction.receivedOrNot;
   String involvedAddress = toMe ? transaction.origin : transaction.destination;

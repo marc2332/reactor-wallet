@@ -54,5 +54,7 @@ dart format . --line-length 100
 - [ ] Ability to add a small note when making transactions
 - [x] Ability to make transactions with SPL Tokens
 - [ ] Better UX (specially when creating accounts)
+- [ ] Transactions Timestamps
+- [ ] Better Windows UX (e.g, using split views, adding refresh buttons)
 
 MIT License

@@ -192,10 +192,10 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
     refreshAllState();
   }
 
-  void selectFirstAccountIfAnySelected(){
+  void selectFirstAccountIfAnySelected() {
     final selectedAccount = ref.read(selectedAccountProvider.notifier);
 
-    if(selectedAccount.state == null) selectedAccount.state = state.values.first;
+    if (selectedAccount.state == null) selectedAccount.state = state.values.first;
   }
 
   Future<void> refreshAccounts() async {

@@ -28,7 +28,7 @@ class BaseAccount {
   late double balance = 0;
   late double usdBalance = 0;
   late TokenTrackers tokensTracker;
-  late List<Transaction> transactions = [];
+  late List<TransactionDetails> transactions = [];
   late List<Token> tokens = [];
 
   final itemsLoaded = Map<AccountItem, bool>();
@@ -161,20 +161,15 @@ class BaseAccount {
                   ParsedSystemTransferInformation transfer = data.info;
                   bool receivedOrNot = transfer.destination == address;
                   double ammount = transfer.lamports.toDouble() / 1000000000;
-
+                  print(tx.blockTime);
                   this.transactions.add(
-                        new Transaction(
-                          transfer.source,
-                          transfer.destination,
-                          ammount,
-                          receivedOrNot,
-                          system_program_id,
-                        ),
+                        new TransactionDetails(transfer.source, transfer.destination, ammount,
+                            receivedOrNot, system_program_id, tx.blockTime!),
                       );
                 },
                 transferChecked: (_) {},
                 unsupported: (_) {
-                  this.transactions.add(new UnsupportedTransaction());
+                  this.transactions.add(new UnsupportedTransaction(tx.blockTime!));
                 },
               );
             },
@@ -187,7 +182,7 @@ class BaseAccount {
             },
             memo: (_) {},
             unsupported: (_) {
-              this.transactions.add(new UnsupportedTransaction());
+              this.transactions.add(new UnsupportedTransaction(tx.blockTime!));
             },
           );
         }
@@ -204,12 +199,13 @@ abstract class Account {
   late String name;
   final NetworkUrl url;
   late bool isLoaded = true;
+  late SolanaClient client;
 
   late double balance = 0;
   late double usdBalance = 0;
   late String address;
   late TokenTrackers tokensTracker;
-  late List<Transaction> transactions = [];
+  late List<TransactionDetails> transactions = [];
   late List<Token> tokens = [];
 
   Account(this.accountType, this.name, this.url);
@@ -223,6 +219,30 @@ abstract class Account {
   Map<String, dynamic> toJson();
 }
 
+class TransactionDetails {
+  final String origin;
+  final String destination;
+  final double ammount;
+  final bool receivedOrNot;
+  final String programId;
+  late String tokenMint;
+  final int blockTime;
+
+  TransactionDetails(this.origin, this.destination, this.ammount, this.receivedOrNot,
+      this.programId, this.blockTime);
+
+  Map<String, dynamic> toJson() {
+    return {
+      "origin": origin,
+      "destination": destination,
+      "ammount": ammount,
+      "receivedOrNot": receivedOrNot,
+      "tokenMint": programId,
+      "blockNumber": blockTime
+    };
+  }
+}
+
 class Transaction {
   final String origin;
   final String destination;
@@ -232,23 +252,9 @@ class Transaction {
   late String tokenMint;
 
   Transaction(this.origin, this.destination, this.ammount, this.receivedOrNot, this.programId);
-
-  Map<String, dynamic> toJson() {
-    return {
-      "origin": origin,
-      "destination": destination,
-      "ammount": ammount,
-      "receivedOrNot": receivedOrNot,
-      "tokenMint": programId
-    };
-  }
-
-  static Transaction fromJson(dynamic tx) {
-    return new Transaction(
-        tx["origin"], tx["destination"], tx["ammount"], tx["receivedOrNot"], tx["tokenMint"]);
-  }
 }
 
-class UnsupportedTransaction extends Transaction {
-  UnsupportedTransaction() : super("Unknown", "Unknown", 0.0, false, "Unknown");
+class UnsupportedTransaction extends TransactionDetails {
+  UnsupportedTransaction(int blockTime)
+      : super("Unknown", "Unknown", 0.0, false, "Unknown", blockTime);
 }
