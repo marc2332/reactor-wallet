@@ -11,7 +11,7 @@ Future<void> transactionHasBeenSentDialog(context, String destination, double am
             children: <Widget>[
               Column(
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(15),
                     child: Icon(
                       Icons.task_alt_outlined,
@@ -21,10 +21,10 @@ Future<void> transactionHasBeenSentDialog(context, String destination, double am
                   ),
                   Text("Successfully sent $ammount SOL to"),
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     child: Text(
-                      destination,
-                      style: const TextStyle(
+                      "$destination",
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),

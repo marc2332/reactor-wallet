@@ -18,7 +18,7 @@ import 'package:reactor_wallet/utils/theme.dart';
 class AccountSubPage extends ConsumerWidget {
   final String route;
 
-  const AccountSubPage(this.route, {Key? key}) : super(key: key);
+  AccountSubPage(this.route);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,7 +42,7 @@ class AccountSubPage extends ConsumerWidget {
         borderRadius: BorderRadius.circular(5),
         onTap: () {},
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: EdgeInsets.symmetric(horizontal: 10),
           child: DropdownButton<Account>(
             iconSize: 20,
             value: selectedAccount,
@@ -63,7 +63,7 @@ class AccountSubPage extends ConsumerWidget {
                   child: Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(right: 15),
+                        padding: EdgeInsets.only(right: 15),
                         child: Icon(icon, color: Theme.of(context).iconColor),
                       ),
                       Text(
@@ -83,11 +83,11 @@ class AccountSubPage extends ConsumerWidget {
                   child: Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(right: 15),
+                        padding: EdgeInsets.only(right: 15),
                         child: Icon(icon, color: Colors.white),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(right: 10),
+                        padding: EdgeInsets.only(right: 10),
                         child: Text(
                           account.name,
                           style: const TextStyle(color: Colors.white),
@@ -109,7 +109,7 @@ class AccountSubPage extends ConsumerWidget {
           width: 75,
           height: 30,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(150, 0, 0, 0),
+            color: Color.fromARGB(150, 0, 0, 0),
             borderRadius: BorderRadius.circular(5),
           ),
         ),

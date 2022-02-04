@@ -7,7 +7,7 @@ import 'package:reactor_wallet/utils/states.dart';
  * Getting Started Page
  */
 class WatchAddress extends ConsumerStatefulWidget {
-  const WatchAddress({Key? key}) : super(key: key);
+  WatchAddress({Key? key}) : super(key: key);
 
   @override
   WatchAddressState createState() => WatchAddressState();
@@ -32,7 +32,7 @@ class WatchAddressState extends ConsumerState<WatchAddress> {
                 autovalidateMode: AutovalidateMode.always,
                 child: Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(15),
+                    padding: EdgeInsets.all(15),
                     child: Column(
                       children: [
                         TextFormField(
@@ -53,7 +53,7 @@ class WatchAddressState extends ConsumerState<WatchAddress> {
                           },
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 20, bottom: 5),
+                          padding: EdgeInsets.only(top: 20, bottom: 5),
                           child: NetworkSelector(
                             (NetworkUrl? url) {
                               if (url != null) {

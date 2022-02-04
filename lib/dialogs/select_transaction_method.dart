@@ -41,7 +41,7 @@ Future<void> selectTransactionMethod(
                             TransactionSolanaPay txData = parseUri(uriSolanaPay);
 
                             if (txData.splToken == null) {
-                              Transaction tx = Transaction(
+                              Transaction tx = new Transaction(
                                 walletAccount.address,
                                 txData.recipient,
                                 txData.amount,
@@ -55,10 +55,10 @@ Future<void> selectTransactionMethod(
                                 context,
                                 tx,
                                 walletAccount,
-                                Token(walletAccount.balance, system_program_id, "SOL"),
+                                new Token(walletAccount.balance, system_program_id, "SOL"),
                               );
                             } else {
-                              Transaction tx = Transaction(
+                              Transaction tx = new Transaction(
                                 walletAccount.address,
                                 txData.recipient,
                                 txData.amount,
@@ -90,11 +90,15 @@ Future<void> selectTransactionMethod(
                             // Invalid URI
                             transactionNotSupportedDialog(context);
                           } catch (err) {
+                            print(err);
                             transactionNotSupportedDialog(context);
                           }
                         } else {
+                          print("No uri found");
                           transactionNotSupportedDialog(context);
                         }
+                      } else {
+                        print("Cancelled");
                       }
                     },
                     child: Padding(

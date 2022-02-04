@@ -11,7 +11,7 @@ Future<void> transactionErroredDialog(context, String destination, double ammoun
             children: <Widget>[
               Column(
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(15),
                     child: Icon(
                       Icons.error_outline_outlined,
@@ -23,8 +23,8 @@ Future<void> transactionErroredDialog(context, String destination, double ammoun
                   Padding(
                     padding: EdgeInsets.all(20),
                     child: Text(
-                      destination,
-                      style: const TextStyle(
+                      "$destination",
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
                     ),

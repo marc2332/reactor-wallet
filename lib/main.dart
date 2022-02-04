@@ -28,14 +28,12 @@ main() async {
 }
 
 class App extends HookConsumerWidget {
-  const App({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     TokenTrackers tokensTracer = ref.read(tokensTrackerProvider);
     ref.watch(settingsProvider);
     ThemeType selectedTheme = ref.read(settingsProvider.notifier).getTheme();
-    bool isDarkTheme = selectedTheme == ThemeType.dark;
+    bool isDarkTheme = selectedTheme == ThemeType.Dark;
 
     useEffect(() {
       loadState(tokensTracer, ref);
@@ -49,11 +47,11 @@ class App extends HookConsumerWidget {
       initialRoute: '/home',
       routes: {
         '/home': (_) => HomePage(),
-        '/account_selection': (_) => const AccountSelectionPage(),
-        '/watch_address': (_) => const WatchAddress(),
+        '/account_selection': (_) => AccountSelectionPage(),
+        '/watch_address': (_) => WatchAddress(),
         '/create_wallet': (_) => CreateWallet(),
-        '/import_wallet': (_) => const ImportWallet(),
-        '/manage_accounts': (_) => const ManageAccountsPage(),
+        '/import_wallet': (_) => ImportWallet(),
+        '/manage_accounts': (_) => ManageAccountsPage(),
       },
     );
   }

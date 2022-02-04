@@ -31,7 +31,7 @@ TransactionSolanaPay parseUri(String uriSolanaPay) {
   String recipient = uri.path;
   dynamic meta = uri.queryParameters;
 
-  return TransactionSolanaPay(
+  return new TransactionSolanaPay(
     recipient,
     meta['reference'],
     double.parse(meta['amount']),

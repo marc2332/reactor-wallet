@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
  * Account Selection Page
  */
 class AccountSelectionPage extends StatelessWidget {
-  const AccountSelectionPage({Key? key}) : super(key: key);
+  AccountSelectionPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class AccountSelectionPage extends StatelessWidget {
         title: const Text("Account selection"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         child: Center(
           child: Flex(
             direction: Axis.vertical,
@@ -30,7 +30,7 @@ class AccountSelectionPage extends StatelessWidget {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
+                      children: [
                         Padding(
                           padding: EdgeInsets.all(15),
                           child: Icon(
@@ -38,7 +38,7 @@ class AccountSelectionPage extends StatelessWidget {
                             size: 30.0,
                           ),
                         ),
-                        Text("Watch address"),
+                        const Text("Watch address"),
                       ],
                     ),
                   ),

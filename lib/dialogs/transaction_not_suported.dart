@@ -10,7 +10,7 @@ Future<void> transactionNotSupportedDialog(context) async {
           child: ListBody(
             children: <Widget>[
               Column(
-                children: const [
+                children: [
                   Padding(
                     padding: EdgeInsets.all(15),
                     child: Icon(

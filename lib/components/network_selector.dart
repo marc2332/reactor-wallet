@@ -24,10 +24,12 @@ class NetworkUrl {
 class NetworkSelector extends StatefulWidget {
   final Function(NetworkUrl?) onSelected;
 
-  const NetworkSelector(this.onSelected, {Key? key}) : super(key: key);
+  NetworkSelector(this.onSelected);
 
   @override
-  State<StatefulWidget> createState() => NetworkSelectorState(onSelected);
+  State<StatefulWidget> createState() {
+    return new NetworkSelectorState(onSelected);
+  }
 }
 
 class NetworkSelectorState extends State<NetworkSelector> {
@@ -44,7 +46,7 @@ class NetworkSelectorState extends State<NetworkSelector> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 15),
+          padding: EdgeInsets.only(top: 15),
           child: DropdownButton<String>(
             value: selectedOption,
             iconSize: 24,
@@ -70,44 +72,43 @@ class NetworkSelectorState extends State<NetworkSelector> {
         ),
         if (selectedOption == 'Custom') ...[
           Padding(
-            padding: const EdgeInsets.only(top: 15),
-            child: Column(
-              children: [
-                TextFormField(
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Empty URL';
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: const InputDecoration(
-                    hintText: 'Enter a custom network URL',
+              padding: EdgeInsets.only(top: 15),
+              child: Column(
+                children: [
+                  TextFormField(
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Empty URL';
+                      } else {
+                        return null;
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Enter a custom network URL',
+                    ),
+                    onChanged: (String value) async {
+                      customNetwork.rpc = value;
+                      onSelected(customNetwork);
+                    },
                   ),
-                  onChanged: (String value) async {
-                    customNetwork.rpc = value;
-                    onSelected(customNetwork);
-                  },
-                ),
-                TextFormField(
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Empty URL';
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: const InputDecoration(
-                    hintText: 'Enter a custom WebSockets URL',
+                  TextFormField(
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Empty URL';
+                      } else {
+                        return null;
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      hintText: 'Enter a custom WebSockets URL',
+                    ),
+                    onChanged: (String value) async {
+                      customNetwork.ws = value;
+                      onSelected(customNetwork);
+                    },
                   ),
-                  onChanged: (String value) async {
-                    customNetwork.ws = value;
-                    onSelected(customNetwork);
-                  },
-                ),
-              ],
-            ),
-          ),
+                ],
+              )),
         ]
       ],
     );

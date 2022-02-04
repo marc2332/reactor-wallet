@@ -6,15 +6,22 @@ import 'package:reactor_wallet/utils/states.dart';
 /*
  * Getting Started Page
  */
-class CreateWallet extends ConsumerWidget {
+class CreateWallet extends ConsumerStatefulWidget {
+  CreateWallet({Key? key}) : super(key: key);
+
+  @override
+  CreateWalletState createState() => CreateWalletState();
+}
+
+class CreateWalletState extends ConsumerState<CreateWallet> {
   late String address;
   late String accountName;
   late NetworkUrl networkURL;
 
-  CreateWallet({Key? key}) : super(key: key);
+  CreateWalletState();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Create wallet')),
       body: Column(
@@ -26,7 +33,7 @@ class CreateWallet extends ConsumerWidget {
                 autovalidateMode: AutovalidateMode.always,
                 child: Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(15),
+                    padding: EdgeInsets.all(15),
                     child: Column(
                       children: [
                         TextFormField(
@@ -45,7 +52,7 @@ class CreateWallet extends ConsumerWidget {
                           },
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 20, bottom: 5),
+                          padding: EdgeInsets.only(top: 20, bottom: 5),
                           child: NetworkSelector(
                             (NetworkUrl? url) {
                               if (url != null) {
@@ -66,9 +73,7 @@ class CreateWallet extends ConsumerWidget {
             children: [
               ElevatedButton(
                 child: const Text("Create Wallet"),
-                onPressed: () {
-                  createWallet(context, ref);
-                },
+                onPressed: createWallet,
               )
             ],
           )
@@ -77,10 +82,10 @@ class CreateWallet extends ConsumerWidget {
     );
   }
 
-  void createWallet(BuildContext context, WidgetRef ref) async {
+  void createWallet() async {
     final accountsProv = ref.read(accountsProvider.notifier);
 
-    if (accountName.isNotEmpty && !accountsProv.state.containsKey(accountName)) {
+    if (accountName.length > 0 && !accountsProv.state.containsKey(accountName)) {
       accountsProv.createWallet(accountName, networkURL).then((_) {
         // Go to Home page
         Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);

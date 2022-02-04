@@ -27,14 +27,14 @@ void orderTokensByUSDBalanace(List<Token> accountTokens) {
 
 class AccountTokens extends StatelessWidget {
   final Account account;
-  final ScrollController listController = ScrollController();
+  final ScrollController list_controller = ScrollController();
 
-  AccountTokens(this.account, {Key? key}) : super(key: key);
+  AccountTokens(this.account);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).dividerColor),
@@ -54,10 +54,10 @@ class AccountTokens extends StatelessWidget {
                   children: [
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Padding(
                           padding: EdgeInsets.only(top: 20),
-                          child: Text("This address doesn't own any token"),
+                          child: const Text("This address doesn't own any token"),
                         )
                       ],
                     )
@@ -66,10 +66,10 @@ class AccountTokens extends StatelessWidget {
               );
             } else {
               return ListView.builder(
-                controller: listController,
+                controller: list_controller,
                 itemCount: accountTokens.length,
                 shrinkWrap: true,
-                physics: const BouncingScrollPhysics(
+                physics: BouncingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
                 itemBuilder: (context, index) {
@@ -79,12 +79,12 @@ class AccountTokens extends StatelessWidget {
             }
           } else {
             return ListView.builder(
-              controller: listController,
+              controller: list_controller,
               itemCount: 7,
               shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
+              physics: BouncingScrollPhysics(),
               itemBuilder: (context, index) {
-                return const TokenCardWithShimmer();
+                return TokenCardWithShimmer();
               },
             );
           }
@@ -97,7 +97,7 @@ class AccountTokens extends StatelessWidget {
 class AccountInfo extends ConsumerWidget {
   final Account account;
 
-  const AccountInfo(this.account, {Key? key}) : super(key: key);
+  AccountInfo(this.account);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -128,11 +128,11 @@ class AccountInfo extends ConsumerWidget {
               return true;
             },
             child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 10, top: 15),
+                    padding: EdgeInsets.only(bottom: 10, top: 15),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -140,7 +140,7 @@ class AccountInfo extends ConsumerWidget {
                           Text(
                             solBalance,
                             style: GoogleFonts.poppins(
-                              textStyle: const TextStyle(
+                              textStyle: TextStyle(
                                 fontSize: 40,
                               ),
                             ),
@@ -148,7 +148,7 @@ class AccountInfo extends ConsumerWidget {
                           const Text(' SOL'),
                         ] else ...[
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 15),
+                            padding: EdgeInsets.only(bottom: 15),
                             child: Shimmer.fromColors(
                               baseColor: Colors.grey[300]!,
                               highlightColor: Colors.grey[100]!,
@@ -156,7 +156,7 @@ class AccountInfo extends ConsumerWidget {
                                 width: 90,
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: const Color.fromARGB(150, 0, 0, 0),
+                                  color: Color.fromARGB(150, 0, 0, 0),
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                               ),
@@ -173,7 +173,7 @@ class AccountInfo extends ConsumerWidget {
                         Text(
                           '$usdBalance\$',
                           style: GoogleFonts.lato(
-                            textStyle: const TextStyle(
+                            textStyle: TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.w900,
                             ),
@@ -189,22 +189,22 @@ class AccountInfo extends ConsumerWidget {
                         width: 70,
                         height: 35,
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(150, 0, 0, 0),
+                          color: Color.fromARGB(150, 0, 0, 0),
                           borderRadius: BorderRadius.circular(3),
                         ),
                       ),
                     )
                   ],
                   Padding(
-                    padding: const EdgeInsets.only(top: 10),
+                    padding: EdgeInsets.only(top: 10),
                     child: account.isLoaded
                         ? OutlinedButton(
                             onPressed: () {
                               Clipboard.setData(
-                                ClipboardData(text: account.address),
+                                new ClipboardData(text: account.address),
                               ).then((_) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text("Address copied to clipboard"),
                                   ),
                                 );
@@ -222,7 +222,7 @@ class AccountInfo extends ConsumerWidget {
                               width: 80,
                               height: 20,
                               decoration: BoxDecoration(
-                                color: const Color.fromARGB(150, 0, 0, 0),
+                                color: Color.fromARGB(150, 0, 0, 0),
                                 borderRadius: BorderRadius.circular(3),
                               ),
                             ),
@@ -239,16 +239,16 @@ class AccountInfo extends ConsumerWidget {
 }
 
 class AccountHome extends ConsumerStatefulWidget {
-  const AccountHome({Key? key, required this.account}) : super(key: key);
+  AccountHome({Key? key, required this.account}) : super(key: key);
 
   final Account account;
 
   @override
-  AccountHomeState createState() => AccountHomeState(account);
+  AccountHomeState createState() => AccountHomeState(this.account);
 }
 
 class AccountHomeState extends ConsumerState<AccountHome> {
-  final Account account;
+  late Account account;
 
   AccountHomeState(this.account);
 

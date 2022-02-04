@@ -34,11 +34,11 @@ Future<void> transactionInfo(
                   ),
                   onPressed: () {
                     Clipboard.setData(
-                      ClipboardData(text: involvedAddress),
+                      new ClipboardData(text: involvedAddress),
                     ).then(
                       (_) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text("Address copied to clipboard"),
                           ),
                         );

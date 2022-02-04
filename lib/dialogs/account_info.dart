@@ -20,17 +20,17 @@ Future<void> accountInfoDialog(context, Account account) async {
           child: ListBody(
             children: <Widget>[
               ListTile(
-                title: const Text('Address'),
+                title: Text('Address'),
                 subtitle: Text('$shortAddress...'),
                 trailing: IconButton(
                   icon: Icon(Icons.copy_all_outlined, color: Theme.of(context).iconColor),
                   onPressed: () {
                     Clipboard.setData(
-                      ClipboardData(text: account.address),
+                      new ClipboardData(text: account.address),
                     ).then(
                       (_) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text("Address copied to clipboard"),
                           ),
                         );
@@ -58,11 +58,11 @@ Future<void> accountInfoDialog(context, Account account) async {
 
                       // Copy the account's seedphrase to the clipboard
                       Clipboard.setData(
-                        ClipboardData(text: walletAccount.mnemonic),
+                        new ClipboardData(text: walletAccount.mnemonic),
                       ).then(
                         (_) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text("Address copied to clipboard"),
                             ),
                           );

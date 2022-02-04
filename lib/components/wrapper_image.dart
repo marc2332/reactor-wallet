@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class WrapperImage extends StatelessWidget {
   final String url;
 
-  const WrapperImage(this.url, {Key? key}) : super(key: key);
+  WrapperImage(this.url);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class WrapperImage extends StatelessWidget {
         errorWidget: (context, url, error) => const Icon(Icons.no_accounts_outlined),
       );
     } else {
-      return const SizedBox(width: 30, height: 30, child: Icon(Icons.no_accounts_outlined));
+      return Container(width: 30, height: 30, child: const Icon(Icons.no_accounts_outlined));
     }
   }
 }

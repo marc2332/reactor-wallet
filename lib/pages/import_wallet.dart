@@ -7,7 +7,7 @@ import 'package:reactor_wallet/utils/states.dart';
  * Getting Started Page
  */
 class ImportWallet extends ConsumerStatefulWidget {
-  const ImportWallet({Key? key}) : super(key: key);
+  ImportWallet({Key? key}) : super(key: key);
 
   @override
   ImportWalletState createState() => ImportWalletState();
@@ -30,7 +30,7 @@ class ImportWalletState extends ConsumerState<ImportWallet> {
                 autovalidateMode: AutovalidateMode.always,
                 child: Expanded(
                   child: Padding(
-                      padding: const EdgeInsets.all(15),
+                      padding: EdgeInsets.all(15),
                       child: Column(
                         children: [
                           TextFormField(
@@ -49,7 +49,7 @@ class ImportWalletState extends ConsumerState<ImportWallet> {
                             },
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 20, bottom: 5),
+                            padding: EdgeInsets.only(top: 20, bottom: 5),
                             child: NetworkSelector(
                               (NetworkUrl? url) {
                                 if (url != null) {
