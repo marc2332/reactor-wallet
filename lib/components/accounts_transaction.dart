@@ -51,7 +51,7 @@ class UnsupportedTransactionCard extends StatelessWidget {
 class TransactionCard extends StatelessWidget {
   final TransactionDetails transaction;
 
-  const TransactionCard(this.transaction);
+  const TransactionCard(this.transaction, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +59,7 @@ class TransactionCard extends StatelessWidget {
     String shortAddress =
         toMe ? transaction.origin.substring(0, 5) : transaction.destination.substring(0, 5);
 
-    DateTime date = new DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
     String readableDate = hourMinutFormatter.format(date);
 
     return Flex(
@@ -67,7 +67,7 @@ class TransactionCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(readableDate),
         ),
         Expanded(
@@ -78,7 +78,7 @@ class TransactionCard extends StatelessWidget {
                 transactionInfo(context, transaction);
               },
               child: Padding(
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 child: Row(
                   children: [
                     Icon(
@@ -86,7 +86,7 @@ class TransactionCard extends StatelessWidget {
                       color: Theme.of(context).iconColor,
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 20),
+                      padding: const EdgeInsets.only(left: 20),
                       child: Text(
                         '${toMe ? '+' : '-'}${transaction.ammount.toString()} SOL ${toMe ? 'from' : 'to'} $shortAddress...',
                       ),
@@ -103,24 +103,24 @@ class TransactionCard extends StatelessWidget {
 }
 
 List getAllBlockNumbers(List<TransactionDetails> txs) {
-  Map<int, List<TransactionDetails>> blocks = Map();
+  Map<int, List<TransactionDetails>> blocks = {};
 
-  txs.forEach((dynamic tx) {
+  for (var tx in txs) {
     if (blocks[tx.blockTime] == null) blocks[tx.blockTime] = [];
 
     blocks[tx.blockTime]!.add(tx);
-  });
+  }
 
   List<dynamic> items = [];
 
-  blocks.entries.forEach((entry) {
-    DateTime date = new DateTime.fromMillisecondsSinceEpoch(entry.key * 1000);
+  for (var entry in blocks.entries) {
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(entry.key * 1000);
     String readableDate = dayFormatter.format(date);
 
     items.add(readableDate);
 
     items.addAll(entry.value);
-  });
+  }
 
   return items;
 }
@@ -128,7 +128,7 @@ List getAllBlockNumbers(List<TransactionDetails> txs) {
 class AccountTransactions extends HookConsumerWidget {
   final Account account;
 
-  AccountTransactions({Key? key, required this.account});
+  const AccountTransactions({Key? key, required this.account}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -142,7 +142,7 @@ class AccountTransactions extends HookConsumerWidget {
 
     return Padding(
       key: key,
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: RefreshIndicator(
@@ -153,7 +153,7 @@ class AccountTransactions extends HookConsumerWidget {
             await accountsProv.refreshAccount(account.name);
           },
           child: ListView.builder(
-            physics: BouncingScrollPhysics(
+            physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
             ),
             itemCount: items.length,
@@ -170,7 +170,7 @@ class AccountTransactions extends HookConsumerWidget {
               } else {
                 String blockTime = item as String;
                 return Padding(
-                  padding: EdgeInsets.all(7),
+                  padding: const EdgeInsets.all(7),
                   child: Text(
                     blockTime,
                     style: TextStyle(color: Theme.of(context).fadedTextColor),

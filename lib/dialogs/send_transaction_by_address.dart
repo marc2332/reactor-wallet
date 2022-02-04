@@ -88,7 +88,7 @@ Future<void> sendTransactionDialog(
                       autovalidateMode: AutovalidateMode.always,
                       child: TextFormField(
                         validator: transactionAmountValidator,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Amount',
                         ),
                         onChanged: (String value) async {

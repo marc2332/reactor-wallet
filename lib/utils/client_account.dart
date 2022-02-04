@@ -8,6 +8,7 @@ import 'base_account.dart';
  * Simple Address Client to watch over an specific address
  */
 class ClientAccount extends BaseAccount implements Account {
+  @override
   final AccountType accountType = AccountType.Client;
 
   ClientAccount(
@@ -18,7 +19,7 @@ class ClientAccount extends BaseAccount implements Account {
     TokenTrackers tokensTracker,
   ) : super(balance, name, url, tokensTracker) {
     this.address = address;
-    this.client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
+    client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
   }
 
   Map<String, dynamic> toJson() {
@@ -33,6 +34,6 @@ class ClientAccount extends BaseAccount implements Account {
   }
 
   static ClientAccount from(ClientAccount from) {
-    return new ClientAccount(from.address, from.balance, from.name, from.url, from.tokensTracker);
+    return ClientAccount(from.address, from.balance, from.name, from.url, from.tokensTracker);
   }
 }

@@ -10,7 +10,7 @@ Future<void> insuficientFundsDialog(context) async {
           child: ListBody(
             children: <Widget>[
               Column(
-                children: [
+                children: const [
                   Padding(
                     padding: EdgeInsets.all(15),
                     child: Icon(

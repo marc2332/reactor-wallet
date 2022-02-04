@@ -42,10 +42,10 @@ class TokenInfo {
 class TokenTrackers {
   // List of Token trackers
   late Map<String, Tracker> trackers = {
-    system_program_id: new Tracker('solana', system_program_id, "SOL"),
+    system_program_id: Tracker('solana', system_program_id, "SOL"),
   };
 
-  late Map<String, TokenInfo> tokensList = Map();
+  late Map<String, TokenInfo> tokensList = {};
 
   Future<void> loadTokenList() async {
     var tokensFile = await rootBundle.loadString('assets/tokens_list.json');
@@ -81,7 +81,7 @@ class TokenTrackers {
       return tokensList[programId]!;
     }
     // If not info about the token is found then an "Unknown" token is returned
-    return new TokenInfo();
+    return TokenInfo();
   }
 
   Tracker? addTrackerByProgramMint(String programMint) {
@@ -89,10 +89,11 @@ class TokenTrackers {
     if (!trackers.containsKey(programMint)) {
       TokenInfo tokenInfo = getTokenInfo(programMint);
 
-      trackers[programMint] = new Tracker(tokenInfo.name, programMint, tokenInfo.symbol);
+      trackers[programMint] = Tracker(tokenInfo.name, programMint, tokenInfo.symbol);
 
       return trackers[programMint];
     }
+    return null;
   }
 }
 
@@ -101,9 +102,10 @@ class TokenTrackers {
  */
 Future<Map<String, double>> getTokenUsdValue(List<String> tokens) async {
   try {
-    Map<String, String> headers = new Map();
-    headers['Accept'] = 'application/json';
-    headers['Access-Control-Allow-Origin'] = '*';
+    Map<String, String> headers = {
+      "Accept": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    };
     Http.Response response = await Http.get(
       Uri.http(
         'api.coingecko.com',
@@ -127,7 +129,6 @@ Future<Map<String, double>> getTokenUsdValue(List<String> tokens) async {
 
     return values;
   } catch (err) {
-    print(err);
     return {tokens[0]: 0};
   }
 }

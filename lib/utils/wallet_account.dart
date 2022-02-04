@@ -8,11 +8,12 @@ import 'package:encrypt/encrypt.dart';
 
 // Master key to encrypt and decrypt mnemonics, aka passphrases
 final secureKey = Key.fromUtf8(
-  String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"),
+  const String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"),
 );
 final iv = IV.fromLength(16);
 
 class WalletAccount extends BaseAccount implements Account {
+  @override
   final AccountType accountType = AccountType.Wallet;
 
   late Wallet wallet;
@@ -61,12 +62,13 @@ class WalletAccount extends BaseAccount implements Account {
       mint: tokenMint,
     );
 
-    if (destinationTokenAccount == null)
+    if (destinationTokenAccount == null) {
       await client.createAssociatedTokenAccount(
         mint: tokenMint,
         funder: wallet,
         owner: destinationAddress,
       );
+    }
 
     await client.transferSplToken(
       source: wallet,
@@ -89,8 +91,8 @@ class WalletAccount extends BaseAccount implements Account {
    */
   Future<void> loadKeyPair() async {
     final Ed25519HDKeyPair keyPair = await Executor().execute(arg1: mnemonic, fun1: createKeyPair);
-    this.wallet = keyPair;
-    this.address = wallet.address;
+    wallet = keyPair;
+    address = wallet.address;
   }
 
   /*
@@ -99,7 +101,7 @@ class WalletAccount extends BaseAccount implements Account {
   static Future<WalletAccount> generate(String name, NetworkUrl url, tokensTracker) async {
     final String randomMnemonic = bip39.generateMnemonic();
 
-    WalletAccount account = new WalletAccount(0, name, url, randomMnemonic, tokensTracker);
+    WalletAccount account = WalletAccount(0, name, url, randomMnemonic, tokensTracker);
     await account.loadKeyPair();
     await account.refreshBalance();
     return account;
@@ -111,6 +113,7 @@ class WalletAccount extends BaseAccount implements Account {
     return encrypter.decrypt(Encrypted.fromBase64(mnemonic), iv: iv);
   }
 
+  @override
   Map<String, dynamic> toJson() {
     final encrypter = Encrypter(AES(secureKey));
 

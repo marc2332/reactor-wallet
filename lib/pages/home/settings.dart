@@ -19,18 +19,18 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
 
   void enableDarkTheme(bool value) {
     if (value) {
-      ref.read(settingsProvider.notifier).setTheme(ThemeType.Dark);
+      ref.read(settingsProvider.notifier).setTheme(ThemeType.dark);
     } else {
-      ref.read(settingsProvider.notifier).setTheme(ThemeType.Light);
+      ref.read(settingsProvider.notifier).setTheme(ThemeType.light);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 40, left: 20, right: 20),
+      padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
       child: ListView(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         children: [
           Card(
             child: InkWell(
@@ -54,12 +54,12 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
               return InkWell(
                 splashColor: Theme.of(context).hoverColor,
                 onTap: () {
-                  enableDarkTheme(selectedTheme == ThemeType.Light);
+                  enableDarkTheme(selectedTheme == ThemeType.light);
                 },
                 child: ListTile(
                   title: const Text('Enable dark mode'),
                   trailing: Switch(
-                    value: selectedTheme == ThemeType.Dark,
+                    value: selectedTheme == ThemeType.dark,
                     onChanged: enableDarkTheme,
                   ),
                 ),
@@ -102,7 +102,7 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
       await launch(url);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Could not open browser."),
         ),
       );

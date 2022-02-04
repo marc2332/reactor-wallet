@@ -11,8 +11,8 @@ final appLoadedProvider = StateProvider<bool>((_) {
 });
 
 enum ThemeType {
-  Light,
-  Dark,
+  light,
+  dark,
 }
 
 final settingsProvider = StateNotifierProvider<SettingsManager, Map<String, dynamic>>((ref) {
@@ -24,20 +24,20 @@ final selectedAccountProvider = StateProvider<Account?>((_) {
 });
 
 final tokensTrackerProvider = Provider<TokenTrackers>((_) {
-  return new TokenTrackers();
+  return TokenTrackers();
 });
 
 final accountsProvider = StateNotifierProvider<AccountsManager, Map<String, Account>>((ref) {
   TokenTrackers tokensTracker = ref.read(tokensTrackerProvider);
-  return new AccountsManager(tokensTracker, ref);
+  return AccountsManager(tokensTracker, ref);
 });
 
 class SettingsManager extends StateNotifier<Map<String, dynamic>> {
   late Box<dynamic> settingsBox;
   final StateNotifierProviderRef ref;
 
-  SettingsManager(this.ref) : super(new Map()) {
-    state["theme"] = ThemeType.Light.name;
+  SettingsManager(this.ref) : super({}) {
+    state["theme"] = ThemeType.light.name;
   }
 
   void setTheme(ThemeType theme) {
@@ -52,10 +52,10 @@ class SettingsManager extends StateNotifier<Map<String, dynamic>> {
 
   static ThemeType mapType(String type) {
     switch (type) {
-      case "Dark":
-        return ThemeType.Dark;
+      case "dark":
+        return ThemeType.dark;
       default:
-        return ThemeType.Light;
+        return ThemeType.light;
     }
   }
 }
@@ -167,7 +167,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   late Box<dynamic> accountsBox;
   final StateNotifierProviderRef ref;
 
-  AccountsManager(this.tokensTracker, this.ref) : super(new Map());
+  AccountsManager(this.tokensTracker, this.ref) : super({});
 
   Future<void> loadUSDValues() async {
     List<String> tokenNames = tokensTracker.trackers.values
@@ -177,13 +177,13 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
 
     Map<String, double> usdValues = await getTokenUsdValue(tokenNames);
 
-    tokensTracker.trackers.values.forEach((tracker) {
+    for (var tracker in tokensTracker.trackers.values) {
       double? usdValue = usdValues[tracker.name.toLowerCase()];
 
       if (usdValue != null) {
         tokensTracker.setTokenValue(tracker.programMint, usdValue);
       }
-    });
+    }
 
     for (final account in state.values) {
       await account.refreshBalance();
@@ -195,7 +195,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   void selectFirstAccountIfAnySelected() {
     final selectedAccount = ref.read(selectedAccountProvider.notifier);
 
-    if (selectedAccount.state == null) selectedAccount.state = state.values.first;
+    selectedAccount.state ??= state.values.first;
   }
 
   Future<void> refreshAccounts() async {
@@ -244,8 +244,13 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
    */
   Future<WalletAccount> importWallet(String mnemonic, NetworkUrl url) async {
     // Create the account
-    WalletAccount walletAccount =
-        new WalletAccount(0, generateAccountName(), url, mnemonic, tokensTracker);
+    WalletAccount walletAccount = WalletAccount(
+      0,
+      generateAccountName(),
+      url,
+      mnemonic,
+      tokensTracker,
+    );
 
     // Create key pair
     await walletAccount.loadKeyPair();
@@ -288,7 +293,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
    * Create an address watcher
    */
   Future<ClientAccount> createWatcher(String address, NetworkUrl url) async {
-    ClientAccount account = new ClientAccount(
+    ClientAccount account = ClientAccount(
       address,
       0,
       generateAccountName(),
@@ -355,6 +360,6 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
 
   // Update the state
   void refreshAllState() {
-    state = new Map.from(state);
+    state = Map.from(state);
   }
 }

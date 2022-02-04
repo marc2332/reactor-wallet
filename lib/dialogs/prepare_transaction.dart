@@ -58,11 +58,11 @@ Future<void> prepareTransaction(
                     hasEnoughFunds.value = true;
                   }
                 } else {
-                  walletAccount.tokens.forEach((token) {
+                  for (var token in walletAccount.tokens) {
                     if (token.balance >= transaction.ammount) {
                       hasEnoughFunds.value = true;
                     }
-                  });
+                  }
                 }
 
                 if (!hasEnoughFunds.value) {
