@@ -40,6 +40,6 @@ msix_config:
   display_name: Reactor Wallet
   publisher_display_name: Marc Espín Sanz
   identity_name: MarcEspinSanz.Reactor.Wallet
-  msix_version: 0.1.0.0
+  msix_version: 0.1.0.1
   logo_path: ./windows/runner/resources/app_icon.ico
   capabilities: "internetClient"

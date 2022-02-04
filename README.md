@@ -1,15 +1,18 @@
-## Reactor Wallet
+## 💳 Reactor Wallet
 
-A non-custodial Open Source Mobile wallet for Solana made in Flutter.
 
-⚠ It's on **alpha**. WIP.
+Rector Wallet is a **experimental** wallet for the [Solana Blockchain](https://solana.com) made with Flutter.
+
+Its on **alpha** stage, be careful when using it.
 
 ### 😎 Features
+- Experimental [Solana Pay](https://solanapay.com) integration
 - Watch over any address you want
 - Display SPL Tokens and transactions
 - Import and create multiple wallets
 - Show the USD equivalent of the address balance and all it's tokens combined
 
+It should work fine on **Android** and **Windows**, I haven't tried on the other platforms.
 
 ![Example screenshot](screenshot.png)
 
@@ -54,7 +57,7 @@ dart format . --line-length 100
 - [ ] Ability to add a small note when making transactions
 - [x] Ability to make transactions with SPL Tokens
 - [ ] Better UX (specially when creating accounts)
-- [ ] Transactions Timestamps
+- [x] Transactions Timestamps
 - [ ] Better Windows UX (e.g, using split views, adding refresh buttons)
 
 MIT License
