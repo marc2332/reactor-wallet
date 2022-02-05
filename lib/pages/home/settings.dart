@@ -63,7 +63,7 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
           }),
           ClickableCard(
             onTap: () async {
-              openURL('https://github.com/marc2332/solana-mobile-wallet');
+              openURL('https://github.com/marc2332/reactor-wallet');
             },
             child: ListTile(
               title: const Text('Contribute'),
@@ -73,7 +73,22 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
               ),
             ),
           ),
-          Card(
+          ClickableCard(
+            onTap: () async {
+              openURL('https://github.com/marc2332/reactor-wallet#-support-this-project');
+            },
+            child: ListTile(
+              title: const Text('Donate'),
+              trailing: Icon(
+                Icons.monetization_on_outlined,
+                color: Theme.of(context).iconColor,
+              ),
+            ),
+          ),
+          ClickableCard(
+            onTap: () {
+              openURL('https://github.com/marc2332');
+            },
             child: ListTile(
               title: const Text('Made by Marc Espín'),
               trailing: Icon(
