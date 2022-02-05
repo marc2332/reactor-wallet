@@ -14,7 +14,7 @@ class Token {
   Token(this.balance, this.mint, this.symbol);
 }
 
-enum AccountItem { Tokens, USDBalance, SolBBalance }
+enum AccountItem { tokens, usdBalance, solBalance, transactions }
 
 class BaseAccount {
   final AccountType accountType = AccountType.Wallet;
@@ -31,7 +31,7 @@ class BaseAccount {
   late List<TransactionDetails> transactions = [];
   late List<Token> tokens = [];
 
-  final itemsLoaded = Map<AccountItem, bool>();
+  final itemsLoaded = <AccountItem, bool>{};
 
   BaseAccount(this.balance, this.name, this.url, this.tokensTracker);
 
@@ -50,11 +50,11 @@ class BaseAccount {
     int balance = await client.rpcClient.getBalance(address);
 
     this.balance = balance.toDouble() / 1000000000;
-    itemsLoaded[AccountItem.SolBBalance] = true;
+    itemsLoaded[AccountItem.solBalance] = true;
 
     this.usdBalance = this.balance * tokensTracker.getTokenValue(system_program_id);
 
-    itemsLoaded[AccountItem.USDBalance] = true;
+    itemsLoaded[AccountItem.usdBalance] = true;
 
     for (final token in tokens) {
       updateUsdFromTokenValue(token);
@@ -81,29 +81,26 @@ class BaseAccount {
     * Loads all the tokens (spl-program mints) owned by this account
    */
   Future<void> loadTokens() async {
-    this.tokens = [];
-    Completer completer = Completer();
+    tokens = [];
 
     // Get all the tokens owned by the account
     final tokenAccounts = await client.rpcClient.getTokenAccountsByOwner(
       address,
-      TokenAccountsFilter.byProgramId(TokenProgram.programId),
+      const TokenAccountsFilter.byProgramId(TokenProgram.programId),
       encoding: Encoding.jsonParsed,
     );
-
-    int completedTokenAccounts = 0;
 
     for (final tokenAccount in tokenAccounts) {
       ParsedAccountData? data = tokenAccount.account.data as ParsedAccountData?;
 
       if (data != null) {
         data.when(
-          splToken: (data) async {
+          splToken: (data) {
             data.when(
                 account: (mintData, type, accountType) {
                   String tokenMint = mintData.mint;
                   String? uiBalance = mintData.tokenAmount.uiAmountString;
-                  double balance = double.parse(uiBalance != null ? uiBalance : "0");
+                  double balance = double.parse(uiBalance ?? "0");
 
                   // Start tracking the token
                   Tracker? tracker = tokensTracker.addTrackerByProgramMint(tokenMint);
@@ -115,13 +112,6 @@ class BaseAccount {
 
                   // Add the token to this account
                   tokens.add(Token(balance, tokenMint, symbol));
-
-                  completedTokenAccounts++;
-
-                  if (completedTokenAccounts == tokenAccounts.length) {
-                    completer.complete();
-                    itemsLoaded[AccountItem.Tokens] = true;
-                  }
                 },
                 mint: (_, __, ___) {},
                 unknown: (_) {});
@@ -132,27 +122,21 @@ class BaseAccount {
       }
     }
 
-    // fallback: Complete the completer if the account has no tokens
-    if (tokenAccounts.length == 0) {
-      completer.complete();
-      itemsLoaded[AccountItem.Tokens] = true;
-    }
-
-    return completer.future;
+    itemsLoaded[AccountItem.tokens] = true;
   }
 
   /*
    * Load the Address's transactions into the account
    */
   Future<void> loadTransactions() async {
-    this.transactions = [];
+    transactions = [];
 
     final response = await client.rpcClient.getTransactionsList(address);
 
-    response.forEach((tx) {
+    for (var tx in response) {
       final message = tx.transaction.message;
 
-      message.instructions.forEach((instruction) {
+      for (var instruction in message.instructions) {
         if (instruction is ParsedInstruction) {
           instruction.map(
             system: (data) {
@@ -161,15 +145,21 @@ class BaseAccount {
                   ParsedSystemTransferInformation transfer = data.info;
                   bool receivedOrNot = transfer.destination == address;
                   double ammount = transfer.lamports.toDouble() / 1000000000;
-                  print(tx.blockTime);
-                  this.transactions.add(
-                        TransactionDetails(transfer.source, transfer.destination, ammount,
-                            receivedOrNot, system_program_id, tx.blockTime!),
-                      );
+
+                  transactions.add(
+                    TransactionDetails(
+                      transfer.source,
+                      transfer.destination,
+                      ammount,
+                      receivedOrNot,
+                      system_program_id,
+                      tx.blockTime!,
+                    ),
+                  );
                 },
                 transferChecked: (_) {},
                 unsupported: (_) {
-                  this.transactions.add(UnsupportedTransaction(tx.blockTime!));
+                  transactions.add(UnsupportedTransaction(tx.blockTime!));
                 },
               );
             },
@@ -182,12 +172,14 @@ class BaseAccount {
             },
             memo: (_) {},
             unsupported: (_) {
-              this.transactions.add(UnsupportedTransaction(tx.blockTime!));
+              transactions.add(UnsupportedTransaction(tx.blockTime!));
             },
           );
         }
-      });
-    });
+      }
+    }
+
+    itemsLoaded[AccountItem.transactions] = true;
   }
 }
 

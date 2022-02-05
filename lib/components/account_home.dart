@@ -45,7 +45,7 @@ class AccountTokens extends StatelessWidget {
           List<Token> accountTokens = List.from(account.tokens);
           orderTokensByUSDBalanace(accountTokens);
 
-          if (account.isItemLoaded(AccountItem.Tokens)) {
+          if (account.isItemLoaded(AccountItem.tokens)) {
             if (accountTokenQuantity == 0) {
               return SizedBox(
                 height: MediaQuery.of(context).size.height - 350,
@@ -136,7 +136,7 @@ class AccountInfo extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        if (account.isLoaded && account.isItemLoaded(AccountItem.SolBBalance)) ...[
+                        if (account.isLoaded && account.isItemLoaded(AccountItem.solBalance)) ...[
                           Text(
                             solBalance,
                             style: GoogleFonts.poppins(
@@ -166,7 +166,7 @@ class AccountInfo extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  if (account.isLoaded && account.isItemLoaded(AccountItem.USDBalance)) ...[
+                  if (account.isLoaded && account.isItemLoaded(AccountItem.usdBalance)) ...[
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
