@@ -6,7 +6,7 @@ import 'package:reactor_wallet/components/account_home.dart';
 import 'package:reactor_wallet/components/accounts_transaction.dart';
 import 'package:reactor_wallet/components/clickable_card.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
-import 'package:reactor_wallet/components/page_wrapper.dart';
+import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/dialogs/select_transaction_method.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/client_account.dart';

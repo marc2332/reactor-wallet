@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:reactor_wallet/components/page_wrapper.dart';
+import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'home/account.dart';
 import 'home/settings.dart';
 
