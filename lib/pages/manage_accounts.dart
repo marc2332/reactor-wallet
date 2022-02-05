@@ -33,13 +33,13 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
 
             return ListView(
               shrinkWrap: true,
-              physics: BouncingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               children: accounts.map((account) {
                 return Card(
                   child: ListTile(
-                    subtitle: Text("Press for more info"),
+                    subtitle: const Text("Press for more info"),
                     trailing: IconButton(
-                      icon: Icon(Icons.mode_edit_outline_outlined),
+                      icon: const Icon(Icons.mode_edit_outline_outlined),
                       onPressed: () {
                         editAccountDialog(context, account);
                       },
@@ -48,7 +48,7 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
                     title:
                         Text('${account.name} (${account.address.toString().substring(0, 5)}...)'),
                     leading: IconButton(
-                      icon: Icon(Icons.remove_circle_outline),
+                      icon: const Icon(Icons.remove_circle_outline),
                       onPressed: () {
                         removeAccountDialog(context, account);
                       },

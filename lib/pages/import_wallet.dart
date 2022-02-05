@@ -7,7 +7,7 @@ import 'package:reactor_wallet/utils/states.dart';
  * Getting Started Page
  */
 class ImportWallet extends ConsumerStatefulWidget {
-  ImportWallet({Key? key}) : super(key: key);
+  const ImportWallet({Key? key}) : super(key: key);
 
   @override
   ImportWalletState createState() => ImportWalletState();

@@ -7,7 +7,7 @@ import 'package:reactor_wallet/utils/states.dart';
  * Getting Started Page
  */
 class CreateWallet extends ConsumerStatefulWidget {
-  CreateWallet({Key? key}) : super(key: key);
+  const CreateWallet({Key? key}) : super(key: key);
 
   @override
   CreateWalletState createState() => CreateWalletState();

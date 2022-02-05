@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:reactor_wallet/dialogs/transaction_info.dart';
+import 'package:reactor_wallet/components/transaction_card.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/states.dart';
 import 'package:reactor_wallet/utils/theme.dart';
@@ -9,98 +9,6 @@ import 'package:reactor_wallet/utils/theme.dart';
 DateFormat hourMinutFormatter = DateFormat.Hm();
 DateFormat dayFormatter = DateFormat.yMMMMEEEEd();
 
-class UnsupportedTransactionCard extends StatelessWidget {
-  final TransactionDetails transaction;
-
-  const UnsupportedTransactionCard(this.transaction);
-
-  @override
-  Widget build(BuildContext context) {
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
-    String readableDate = hourMinutFormatter.format(date);
-
-    return Flex(
-      direction: Axis.horizontal,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Text(readableDate),
-        ),
-        Expanded(
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Row(
-                children: [
-                  Icon(Icons.block_outlined),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Text('Unsupported transaction'),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class TransactionCard extends StatelessWidget {
-  final TransactionDetails transaction;
-
-  const TransactionCard(this.transaction);
-
-  @override
-  Widget build(BuildContext context) {
-    bool toMe = transaction.receivedOrNot;
-    String shortAddress =
-        toMe ? transaction.origin.substring(0, 5) : transaction.destination.substring(0, 5);
-
-    DateTime date = DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
-    String readableDate = hourMinutFormatter.format(date);
-
-    return Flex(
-      direction: Axis.horizontal,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Text(readableDate),
-        ),
-        Expanded(
-          child: Card(
-            child: InkWell(
-              borderRadius: BorderRadius.circular(5),
-              onTap: () {
-                transactionInfo(context, transaction);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Row(
-                  children: [
-                    Icon(
-                      toMe ? Icons.call_received_outlined : Icons.call_made_outlined,
-                      color: Theme.of(context).iconColor,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Text(
-                        '${toMe ? '+' : '-'}${transaction.ammount.toString()} SOL ${toMe ? 'from' : 'to'} $shortAddress...',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 List getAllBlockNumbers(List<TransactionDetails> txs) {
   Map<String, List<TransactionDetails>> blocks = Map();
@@ -128,7 +36,7 @@ List getAllBlockNumbers(List<TransactionDetails> txs) {
 class AccountTransactions extends HookConsumerWidget {
   final Account account;
 
-  AccountTransactions({Key? key, required this.account});
+  const AccountTransactions({Key? key,required this.account}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -153,7 +61,7 @@ class AccountTransactions extends HookConsumerWidget {
             await accountsProv.refreshAccount(account.name);
           },
           child: ListView.builder(
-            physics: BouncingScrollPhysics(
+            physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
             ),
             itemCount: items.length,

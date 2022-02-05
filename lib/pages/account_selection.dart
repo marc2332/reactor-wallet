@@ -30,7 +30,7 @@ class AccountSelectionPage extends StatelessWidget {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
+                      children: const [
                         Padding(
                           padding: const EdgeInsets.all(15),
                           child: Icon(
@@ -38,7 +38,7 @@ class AccountSelectionPage extends StatelessWidget {
                             size: 30.0,
                           ),
                         ),
-                        const Text("Watch address"),
+                        Text("Watch address"),
                       ],
                     ),
                   ),
@@ -56,7 +56,7 @@ class AccountSelectionPage extends StatelessWidget {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
+                      children: const [
                         Padding(
                           padding: const EdgeInsets.all(15),
                           child: Icon(
@@ -64,7 +64,7 @@ class AccountSelectionPage extends StatelessWidget {
                             size: 30.0,
                           ),
                         ),
-                        const Text("Import wallet"),
+                        Text("Import wallet"),
                       ],
                     ),
                   ),
@@ -82,7 +82,7 @@ class AccountSelectionPage extends StatelessWidget {
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
+                      children: const [
                         Padding(
                           padding: const EdgeInsets.all(15),
                           child: Icon(
@@ -90,7 +90,7 @@ class AccountSelectionPage extends StatelessWidget {
                             size: 30.0,
                           ),
                         ),
-                        const Text("Create wallet"),
+                        Text("Create wallet"),
                       ],
                     ),
                   ),

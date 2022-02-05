@@ -7,7 +7,7 @@ import 'home/settings.dart';
  * Home Page
  */
 class HomePage extends ConsumerStatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   HomePageState createState() => HomePageState();
@@ -49,7 +49,7 @@ class HomePageState extends ConsumerState<HomePage> {
           elevation: 0,
           currentIndex: currentPage,
           showUnselectedLabels: false,
-          items: [
+          items: const [
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.account_balance_wallet),
               icon: Icon(Icons.account_balance_wallet_outlined),
