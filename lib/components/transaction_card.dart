@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reactor_wallet/components/clickable_card.dart';
 import 'package:reactor_wallet/dialogs/transaction_info.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/theme.dart';
@@ -28,28 +29,25 @@ class TransactionCard extends StatelessWidget {
           child: Text(readableDate),
         ),
         Expanded(
-          child: Card(
-            child: InkWell(
-              borderRadius: BorderRadius.circular(5),
-              onTap: () {
-                transactionInfo(context, transaction);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Row(
-                  children: [
-                    Icon(
-                      toMe ? Icons.call_received_outlined : Icons.call_made_outlined,
-                      color: Theme.of(context).iconColor,
+          child: ClickableCard(
+            onTap: () {
+              transactionInfo(context, transaction);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Row(
+                children: [
+                  Icon(
+                    toMe ? Icons.call_received_outlined : Icons.call_made_outlined,
+                    color: Theme.of(context).iconColor,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: Text(
+                      '${toMe ? '+' : '-'}${transaction.ammount.toString()} SOL ${toMe ? 'from' : 'to'} $shortAddress...',
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Text(
-                        '${toMe ? '+' : '-'}${transaction.ammount.toString()} SOL ${toMe ? 'from' : 'to'} $shortAddress...',
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -58,7 +56,6 @@ class TransactionCard extends StatelessWidget {
     );
   }
 }
-
 
 class UnsupportedTransactionCard extends StatelessWidget {
   final TransactionDetails transaction;

@@ -8,7 +8,7 @@ import 'package:reactor_wallet/utils/tracker.dart';
 class TokenCard extends ConsumerWidget {
   final Token token;
 
-  const TokenCard(this.token);
+  const TokenCard(this.token, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,7 +24,6 @@ class TokenCard extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(5),
         splashColor: Theme.of(context).hoverColor,
-        onTap: () {},
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Flex(

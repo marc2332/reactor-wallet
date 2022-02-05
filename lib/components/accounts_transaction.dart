@@ -9,7 +9,6 @@ import 'package:reactor_wallet/utils/theme.dart';
 DateFormat hourMinutFormatter = DateFormat.Hm();
 DateFormat dayFormatter = DateFormat.yMMMMEEEEd();
 
-
 List getAllBlockNumbers(List<TransactionDetails> txs) {
   Map<String, List<TransactionDetails>> blocks = Map();
 
@@ -36,7 +35,7 @@ List getAllBlockNumbers(List<TransactionDetails> txs) {
 class AccountTransactions extends HookConsumerWidget {
   final Account account;
 
-  const AccountTransactions({Key? key,required this.account}) : super(key: key);
+  const AccountTransactions({Key? key, required this.account}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
