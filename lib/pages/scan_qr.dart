@@ -25,7 +25,6 @@ class ScanQrPage extends StatelessWidget {
                 this.controller = controller;
 
                 controller.scannedDataStream.listen((scanData) {
-                 
                   if (hasScanned == false) {
                     hasScanned = true;
                     Navigator.pop(context, scanData);
