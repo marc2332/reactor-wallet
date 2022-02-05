@@ -6,13 +6,14 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'base_account.dart';
 import 'package:encrypt/encrypt.dart';
 
-// Master key to encrypt and decrypt mnemonics, aka passphrases
+// Master key to encrypt and decrypt mnemonics, aka passphrases, this is included when creating the build
 final secureKey = Key.fromUtf8(
-  String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"),
+  const String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"),
 );
 final iv = IV.fromLength(16);
 
 class WalletAccount extends BaseAccount implements Account {
+  @override
   final AccountType accountType = AccountType.Wallet;
 
   late Wallet wallet;
@@ -61,12 +62,13 @@ class WalletAccount extends BaseAccount implements Account {
       mint: tokenMint,
     );
 
-    if (destinationTokenAccount == null)
+    if (destinationTokenAccount == null) {
       await client.createAssociatedTokenAccount(
         mint: tokenMint,
         funder: wallet,
         owner: destinationAddress,
       );
+    }
 
     await client.transferSplToken(
       source: wallet,
@@ -105,12 +107,16 @@ class WalletAccount extends BaseAccount implements Account {
     return account;
   }
 
+  /*
+   * Decrypt the mnemonic using the master key
+   */
   static String decryptMnemonic(String mnemonic) {
     final encrypter = Encrypter(AES(secureKey));
 
     return encrypter.decrypt(Encrypted.fromBase64(mnemonic), iv: iv);
   }
 
+  @override
   Map<String, dynamic> toJson() {
     final encrypter = Encrypter(AES(secureKey));
 
