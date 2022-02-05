@@ -8,7 +8,8 @@ import 'package:encrypt/encrypt.dart';
 
 // Master key to encrypt and decrypt mnemonics, aka passphrases, this is included when creating the build
 final secureKey = Key.fromUtf8(
-  const String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"),
+  // ignore: prefer_const_constructors
+  String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"),
 );
 final iv = IV.fromLength(16);
 
