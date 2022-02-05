@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reactor_wallet/components/page_wrapper.dart';
 import 'home/account.dart';
 import 'home/settings.dart';
 
@@ -28,44 +29,47 @@ class HomePageState extends ConsumerState<HomePage> {
 
       // Settings sub page
       case 1:
-        page = const AccountSubPage("/transactions");
+        page = AccountSubPage("/transactions");
         break;
 
       // Account sub page
       default:
-        page = const AccountSubPage("/home");
+        page = AccountSubPage("/home");
     }
 
     return Scaffold(
       body: page,
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: BottomNavigationBar(
-          onTap: (int page) {
-            setState(() {
-              currentPage = page;
-            });
-          },
-          elevation: 0,
-          currentIndex: currentPage,
-          showUnselectedLabels: false,
-          items: const [
-            BottomNavigationBarItem(
-              activeIcon: Icon(Icons.account_balance_wallet),
-              icon: Icon(Icons.account_balance_wallet_outlined),
-              label: 'Account',
-            ),
-            BottomNavigationBarItem(
-              activeIcon: Icon(Icons.timeline),
-              icon: Icon(Icons.timeline),
-              label: 'Transactions',
-            ),
-            BottomNavigationBarItem(
-              activeIcon: Icon(Icons.settings),
-              icon: Icon(Icons.settings_outlined),
-              label: 'Settings',
-            ),
-          ],
+      bottomNavigationBar: ResponsiveSizer(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+          child: BottomNavigationBar(
+            onTap: (int page) {
+              setState(() {
+                currentPage = page;
+              });
+            },
+            elevation: 0,
+            currentIndex: currentPage,
+            showUnselectedLabels: false,
+            items: const [
+              BottomNavigationBarItem(
+                activeIcon: Icon(Icons.account_balance_wallet),
+                icon: Icon(Icons.account_balance_wallet_outlined),
+                label: 'Account',
+              ),
+              BottomNavigationBarItem(
+                activeIcon: Icon(Icons.timeline),
+                icon: Icon(Icons.timeline),
+                label: 'Transactions',
+              ),
+              BottomNavigationBarItem(
+                activeIcon: Icon(Icons.settings),
+                icon: Icon(Icons.settings_outlined),
+                label: 'Settings',
+              ),
+            ],
+          ),
         ),
       ),
     );

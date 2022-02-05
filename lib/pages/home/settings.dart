@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/clickable_card.dart';
+import 'package:reactor_wallet/components/page_wrapper.dart';
 import 'package:reactor_wallet/utils/states.dart';
 import 'package:reactor_wallet/utils/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,76 +29,78 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-      child: ListView(
-        physics: const BouncingScrollPhysics(),
-        children: [
-          ClickableCard(
-            onTap: () async {
-              Navigator.pushNamed(context, '/manage_accounts');
-            },
-            child: ListTile(
-              title: const Text('Manage accounts'),
-              trailing: Icon(
-                Icons.manage_accounts_outlined,
-                color: Theme.of(context).iconColor,
-              ),
-            ),
-          ),
-          Consumer(builder: (context, ref, _) {
-            ref.watch(settingsProvider);
-            ThemeType selectedTheme = ref.read(settingsProvider.notifier).getTheme();
-            return ClickableCard(
-              onTap: () {
-                enableDarkTheme(selectedTheme == ThemeType.light);
+    return ResponsiveSizer(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
+        child: ListView(
+          physics: const BouncingScrollPhysics(),
+          children: [
+            ClickableCard(
+              onTap: () async {
+                Navigator.pushNamed(context, '/manage_accounts');
               },
               child: ListTile(
-                title: const Text('Enable dark mode'),
-                trailing: Switch(
-                  value: selectedTheme == ThemeType.dark,
-                  onChanged: enableDarkTheme,
+                title: const Text('Manage accounts'),
+                trailing: Icon(
+                  Icons.manage_accounts_outlined,
+                  color: Theme.of(context).iconColor,
                 ),
               ),
-            );
-          }),
-          ClickableCard(
-            onTap: () async {
-              openURL('https://github.com/marc2332/reactor-wallet');
-            },
-            child: ListTile(
-              title: const Text('Contribute'),
-              trailing: Icon(
-                Icons.link_outlined,
-                color: Theme.of(context).iconColor,
+            ),
+            Consumer(builder: (context, ref, _) {
+              ref.watch(settingsProvider);
+              ThemeType selectedTheme = ref.read(settingsProvider.notifier).getTheme();
+              return ClickableCard(
+                onTap: () {
+                  enableDarkTheme(selectedTheme == ThemeType.light);
+                },
+                child: ListTile(
+                  title: const Text('Enable dark mode'),
+                  trailing: Switch(
+                    value: selectedTheme == ThemeType.dark,
+                    onChanged: enableDarkTheme,
+                  ),
+                ),
+              );
+            }),
+            ClickableCard(
+              onTap: () async {
+                openURL('https://github.com/marc2332/reactor-wallet');
+              },
+              child: ListTile(
+                title: const Text('Contribute'),
+                trailing: Icon(
+                  Icons.link_outlined,
+                  color: Theme.of(context).iconColor,
+                ),
               ),
             ),
-          ),
-          ClickableCard(
-            onTap: () async {
-              openURL('https://github.com/marc2332/reactor-wallet#-support-this-project');
-            },
-            child: ListTile(
-              title: const Text('Donate'),
-              trailing: Icon(
-                Icons.monetization_on_outlined,
-                color: Theme.of(context).iconColor,
+            ClickableCard(
+              onTap: () async {
+                openURL('https://github.com/marc2332/reactor-wallet#-support-this-project');
+              },
+              child: ListTile(
+                title: const Text('Donate'),
+                trailing: Icon(
+                  Icons.monetization_on_outlined,
+                  color: Theme.of(context).iconColor,
+                ),
               ),
             ),
-          ),
-          ClickableCard(
-            onTap: () {
-              openURL('https://github.com/marc2332');
-            },
-            child: ListTile(
-              title: const Text('Made by Marc Espín'),
-              trailing: Icon(
-                Icons.info_outline,
-                color: Theme.of(context).iconColor,
+            ClickableCard(
+              onTap: () {
+                openURL('https://github.com/marc2332');
+              },
+              child: ListTile(
+                title: const Text('Made by Marc Espín'),
+                trailing: Icon(
+                  Icons.info_outline,
+                  color: Theme.of(context).iconColor,
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

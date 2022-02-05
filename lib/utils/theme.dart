@@ -10,15 +10,25 @@ extension CustomColors on ThemeData {
   Color get fadedTextColor {
     return (brightness == Brightness.light) ? Colors.grey : Colors.white54;
   }
+
+  Color get selectedTextColor {
+    return (brightness == Brightness.light) ? Colors.blue.shade200 : Colors.orange.shade200;
+  }
+
+  Color get splashColorWhenBackgroundIsPrimary {
+    return (brightness == Brightness.light) ? Colors.blue.shade100 : Colors.orange.shade100;
+  }
 }
 
 // Light theme style
 ThemeData lighTheme = ThemeData(
   primarySwatch: Colors.blue,
+  appBarTheme: const AppBarTheme(backgroundColor: Colors.blue),
 );
 
 // Dark theme style
 ThemeData darkTheme = ThemeData(
+  primaryColor: Colors.yellow.shade800,
   brightness: Brightness.dark,
   dialogBackgroundColor: Colors.grey[850],
   dialogTheme: const DialogTheme(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,16 +15,21 @@ import 'package:reactor_wallet/utils/theme.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'pages/home.dart';
 import 'pages/account_selection.dart';
+import 'package:desktop_window/desktop_window.dart';
 
 main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows) {
+    await DesktopWindow.setMinWindowSize(const Size(400, 400));
+  }
+
   LicenseRegistry.addLicense(() async* {
     final license = await rootBundle.loadString('fonts/OFL.txt');
     yield LicenseEntryWithLineBreaks(['fonts'], license);
   });
 
   await Executor().warmUp();
-
-  WidgetsFlutterBinding.ensureInitialized();
 
   runApp(ProviderScope(child: App()));
 }

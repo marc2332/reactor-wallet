@@ -6,13 +6,15 @@ import 'package:reactor_wallet/utils/theme.dart';
  */
 class ClickableCard extends StatelessWidget {
   final Widget child;
+  Color? color = null;
   final void Function() onTap;
 
-  const ClickableCard({Key? key, required this.child, required this.onTap}) : super(key: key);
+  ClickableCard({Key? key, required this.child, required this.onTap, this.color}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: color,
       child: InkWell(
         borderRadius: BorderRadius.circular(5),
         splashColor: Theme.of(context).hoverColor,

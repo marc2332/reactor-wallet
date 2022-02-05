@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/account_home.dart';
 import 'package:reactor_wallet/components/accounts_transaction.dart';
+import 'package:reactor_wallet/components/clickable_card.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
+import 'package:reactor_wallet/components/page_wrapper.dart';
 import 'package:reactor_wallet/dialogs/select_transaction_method.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/client_account.dart';
@@ -13,6 +15,99 @@ import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:reactor_wallet/utils/theme.dart';
+
+/*
+ * Sidebar - alternative to appbar on Desktop
+ */
+class SideBar extends HookConsumerWidget {
+  final List<Account> accounts;
+  final ScrollController listController = ScrollController();
+
+  SideBar({Key? key, required this.accounts}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedAccount = ref.watch(selectedAccountProvider);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Container(
+        width: 100,
+        decoration: BoxDecoration(
+          color: Theme.of(context).appBarTheme.backgroundColor,
+          borderRadius: const BorderRadius.only(
+            bottomRight: Radius.circular(10),
+          ),
+          boxShadow: const [
+            BoxShadow(
+              blurRadius: 10,
+              color: Color.fromARGB(100, 0, 0, 0),
+            ),
+          ],
+        ),
+        child: Flex(
+          direction: Axis.vertical,
+          children: [
+            Expanded(
+              child: ListView(
+                controller: listController,
+                children: accounts.map((Account account) {
+                  IconData icon = account.accountType == AccountType.Wallet
+                      ? Icons.account_balance_wallet_outlined
+                      : Icons.person_pin_outlined;
+                  return SizedBox(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(5),
+                      splashColor: Theme.of(context).primaryColorLight,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(6),
+                            child: Icon(
+                              icon,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: selectedAccount == account
+                                  ? Theme.of(context).selectedTextColor
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Text(
+                              account.name,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        ref.read(selectedAccountProvider.notifier).state = account;
+                      },
+                    ),
+                    height: 80,
+                  );
+                }).toList(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: MaterialButton(
+                height: 50,
+                shape: const CircleBorder(),
+                onPressed: () => {},
+                child: const Icon(Icons.refresh_outlined, color: Colors.white),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 /*
  * Accounts sub page
@@ -143,24 +238,28 @@ class AccountSubPage extends ConsumerWidget {
       );
     }
 
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
-      appBar: AppBar(
-        title: accountHeader,
-        toolbarHeight: kToolbarHeight + 10,
-        actions: Platform.isWindows
-            ? [
-                IconButton(
-                  onPressed: () async {
-                    if (selectedAccount != null) {
-                      final accountsProv = ref.read(accountsProvider.notifier);
-                      await accountsProv.refreshAccount(selectedAccount.name);
-                    }
-                  },
-                  icon: const Icon(Icons.refresh_outlined),
-                )
-              ]
-            : null,
-      ),
+      appBar: screenSize.width < 600
+          ? AppBar(
+              title: accountHeader,
+              toolbarHeight: kToolbarHeight + 10,
+              actions: Platform.isWindows
+                  ? [
+                      IconButton(
+                        onPressed: () async {
+                          if (selectedAccount != null) {
+                            final accountsProv = ref.read(accountsProvider.notifier);
+                            await accountsProv.refreshAccount(selectedAccount.name);
+                          }
+                        },
+                        icon: const Icon(Icons.refresh_outlined),
+                      )
+                    ]
+                  : null,
+            )
+          : null,
       floatingActionButton: selectedAccount is WalletAccount
           ? FloatingActionButton(
               onPressed: () {
@@ -169,7 +268,23 @@ class AccountSubPage extends ConsumerWidget {
               child: const Icon(Icons.payment, color: Colors.white),
             )
           : null,
-      body: accountBody,
+      body: SizedBox(
+        height: screenSize.height,
+        width: screenSize.width,
+        child: Flex(
+          direction: Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (screenSize.width >= 600) ...[
+              SideBar(accounts: accounts),
+            ],
+            Expanded(
+              flex: 1,
+              child: ResponsiveSizer(triggerWidth: 700, child: accountBody),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
