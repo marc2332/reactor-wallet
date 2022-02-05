@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/account_home.dart';
@@ -59,19 +61,20 @@ class AccountSubPage extends ConsumerWidget {
                   ? Icons.account_balance_wallet_outlined
                   : Icons.person_pin_outlined;
               return DropdownMenuItem<Account>(
-                  value: account,
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 15),
-                        child: Icon(icon, color: Theme.of(context).iconColor),
-                      ),
-                      Text(
-                        account.name,
-                        style: Theme.of(context).textTheme.bodyText1,
-                      ),
-                    ],
-                  ));
+                value: account,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: Icon(icon, color: Theme.of(context).iconColor),
+                    ),
+                    Text(
+                      account.name,
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                  ],
+                ),
+              );
             }).toList(),
             selectedItemBuilder: (BuildContext context) {
               return accounts.map<DropdownMenuItem<Account>>((Account account) {
@@ -142,6 +145,19 @@ class AccountSubPage extends ConsumerWidget {
       appBar: AppBar(
         title: accountHeader,
         toolbarHeight: kToolbarHeight + 10,
+        actions: Platform.isWindows
+            ? [
+                IconButton(
+                  onPressed: () async {
+                    if (selectedAccount != null) {
+                      final accountsProv = ref.read(accountsProvider.notifier);
+                      await accountsProv.refreshAccount(selectedAccount.name);
+                    }
+                  },
+                  icon: const Icon(Icons.refresh_outlined),
+                )
+              ]
+            : null,
       ),
       floatingActionButton: selectedAccount is WalletAccount
           ? FloatingActionButton(
