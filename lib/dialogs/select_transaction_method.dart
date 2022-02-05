@@ -90,27 +90,23 @@ Future<void> selectTransactionMethod(
                             // Invalid URI
                             transactionNotSupportedDialog(context);
                           } catch (err) {
-                            print(err);
                             transactionNotSupportedDialog(context);
                           }
                         } else {
-                          print("No uri found");
                           transactionNotSupportedDialog(context);
                         }
-                      } else {
-                        print("Cancelled");
                       }
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(15),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           Padding(
-                            padding: const EdgeInsets.only(right: 7),
+                            padding: EdgeInsets.only(right: 7),
                             child: Icon(Icons.qr_code_2_outlined),
                           ),
-                          const Text("Solana Pay QR"),
+                          Text("Solana Pay QR"),
                         ],
                       ),
                     ),
@@ -129,12 +125,12 @@ Future<void> selectTransactionMethod(
                       padding: const EdgeInsets.all(15),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           Padding(
-                            padding: const EdgeInsets.only(right: 7),
+                            padding: EdgeInsets.only(right: 7),
                             child: Icon(Icons.account_balance_wallet_outlined),
                           ),
-                          const Text("Address"),
+                          Text("Address"),
                         ],
                       ),
                     ),

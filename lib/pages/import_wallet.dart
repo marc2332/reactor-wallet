@@ -30,36 +30,37 @@ class ImportWalletState extends ConsumerState<ImportWallet> {
                 autovalidateMode: AutovalidateMode.always,
                 child: Expanded(
                   child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Empty mnemonic';
-                              } else {
-                                return null;
+                    padding: const EdgeInsets.all(15),
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Empty mnemonic';
+                            } else {
+                              return null;
+                            }
+                          },
+                          decoration: const InputDecoration(
+                            hintText: 'Enter your mnemonic',
+                          ),
+                          onChanged: (String value) async {
+                            mnemonic = value;
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20, bottom: 5),
+                          child: NetworkSelector(
+                            onSelected: (NetworkUrl? url) {
+                              if (url != null) {
+                                networkURL = url;
                               }
                             },
-                            decoration: const InputDecoration(
-                              hintText: 'Enter your mnemonic',
-                            ),
-                            onChanged: (String value) async {
-                              mnemonic = value;
-                            },
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20, bottom: 5),
-                            child: NetworkSelector(
-                              onSelected: (NetworkUrl? url) {
-                                if (url != null) {
-                                  networkURL = url;
-                                }
-                              },
-                            ),
-                          )
-                        ],
-                      )),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               )
             ],

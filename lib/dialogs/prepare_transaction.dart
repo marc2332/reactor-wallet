@@ -14,8 +14,6 @@ import 'package:worker_manager/worker_manager.dart';
 Future<bool> makeTransactionWithLamports(
     WalletAccount account, String destination, int supply) async {
   try {
-    account.sendLamportsTo(destination, supply);
-
     return true;
   } catch (e) {
     return false;
@@ -123,48 +121,33 @@ Future<void> prepareTransaction(
                             ),
                           );
 
-                          Future? sender;
+                          try {
+                            if (transaction.programId == system_program_id) {
+                              // Convert SOL to lamport
+                              int lamports = (transaction.ammount * 1000000000).toInt();
+                              walletAccount.sendLamportsTo(transaction.destination, lamports);
+                            } else {
+                              int amount = transaction.ammount.toInt();
+                              walletAccount.sendSPLTokenTo(
+                                  transaction.destination, token.mint, amount);
+                            }
 
-                          if (transaction.programId == system_program_id) {
-                            // Convert SOL to lamport
-                            int lamports = (transaction.ammount * 1000000000).toInt();
-                            sender = Executor().execute(
-                              arg1: walletAccount,
-                              arg2: transaction.destination,
-                              arg3: lamports,
-                              fun3: makeTransactionWithLamports,
+                            // TODO: This should wait for the signature to be confirmed, and then show the "transactionHasBeenSentDialog"
+
+                            // Display the "Transaction went OK" dialog
+                            transactionHasBeenSentDialog(
+                              context,
+                              transaction.destination,
+                              transaction.ammount,
                             );
-                          } else {
-                            sender = Executor().execute(
-                              arg1: walletAccount,
-                              arg2: transaction.destination,
-                              arg3: token.mint,
-                              arg4: transaction.ammount.toInt(),
-                              fun4: makeTransactionWithToken,
+                          } catch (_) {
+                            // Display the "Transaction went wrong" dialog
+                            transactionErroredDialog(
+                              context,
+                              transaction.destination,
+                              transaction.ammount,
                             );
                           }
-
-                          sender.then((res) async {
-                            if (res) {
-                              final accountsProv = ref.read(accountsProvider.notifier);
-
-                              // Display the "Transaction went OK" dialog
-                              await transactionHasBeenSentDialog(
-                                context,
-                                transaction.destination,
-                                transaction.ammount,
-                              );
-
-                              accountsProv.refreshAccount(walletAccount.name);
-                            } else {
-                              // Display the "Transaction went wrong" dialog
-                              await transactionErroredDialog(
-                                context,
-                                transaction.destination,
-                                transaction.ammount,
-                              );
-                            }
-                          });
                         }
                       : null,
                 ),

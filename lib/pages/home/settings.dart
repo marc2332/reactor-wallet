@@ -20,9 +20,9 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
 
   void enableDarkTheme(bool value) {
     if (value) {
-      ref.read(settingsProvider.notifier).setTheme(ThemeType.Dark);
+      ref.read(settingsProvider.notifier).setTheme(ThemeType.dark);
     } else {
-      ref.read(settingsProvider.notifier).setTheme(ThemeType.Light);
+      ref.read(settingsProvider.notifier).setTheme(ThemeType.light);
     }
   }
 
@@ -50,12 +50,12 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
             ThemeType selectedTheme = ref.read(settingsProvider.notifier).getTheme();
             return ClickableCard(
               onTap: () {
-                enableDarkTheme(selectedTheme == ThemeType.Light);
+                enableDarkTheme(selectedTheme == ThemeType.light);
               },
               child: ListTile(
                 title: const Text('Enable dark mode'),
                 trailing: Switch(
-                  value: selectedTheme == ThemeType.Dark,
+                  value: selectedTheme == ThemeType.dark,
                   onChanged: enableDarkTheme,
                 ),
               ),

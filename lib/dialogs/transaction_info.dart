@@ -38,7 +38,7 @@ Future<void> transactionInfo(
                     ).then(
                       (_) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text("Address copied to clipboard"),
                           ),
                         );

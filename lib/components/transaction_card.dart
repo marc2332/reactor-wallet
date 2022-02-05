@@ -19,6 +19,10 @@ class TransactionCard extends StatelessWidget {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
     String readableDate = hourMinutFormatter.format(date);
 
+    String transactionAmount = transaction.ammount.toString().length >= 7
+        ? transaction.ammount.toStringAsFixed(9)
+        : transaction.ammount.toString();
+
     return Flex(
       direction: Axis.horizontal,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -43,7 +47,7 @@ class TransactionCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 20),
                     child: Text(
-                      '${toMe ? '+' : '-'}${transaction.ammount.toString()} SOL ${toMe ? 'from' : 'to'} $shortAddress...',
+                      '${toMe ? '+' : '-'} $transactionAmount SOL ${toMe ? 'from' : 'to'} $shortAddress...',
                     ),
                   ),
                 ],

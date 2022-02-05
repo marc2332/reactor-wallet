@@ -88,7 +88,7 @@ Future<void> sendTransactionDialog(
                       autovalidateMode: AutovalidateMode.always,
                       child: TextFormField(
                         validator: transactionAmountValidator,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Amount',
                         ),
                         onChanged: (String value) async {
@@ -112,7 +112,7 @@ Future<void> sendTransactionDialog(
               child: const Text('Send'),
               onPressed: () async {
                 bool addressIsOk = transactionAddressValidator(destination) == null;
-                bool balanceIsOk = transactionAmountValidator("$sendAmount") == null;
+                bool balanceIsOk = transactionAmountValidator(sendAmount.toString()) == null;
 
                 // Only let send if the address and the ammount is OK
                 if (addressIsOk && balanceIsOk) {

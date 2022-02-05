@@ -24,6 +24,7 @@ class TokenCard extends ConsumerWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(5),
         splashColor: Theme.of(context).hoverColor,
+        onTap: () {},
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Flex(
@@ -42,7 +43,7 @@ class TokenCard extends ConsumerWidget {
                   children: [
                     Text(
                       tokenInfo.name,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(tokenBalance),
                   ],

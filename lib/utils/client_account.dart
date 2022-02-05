@@ -1,11 +1,10 @@
+import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:solana/solana.dart' show SolanaClient;
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
 
-import 'base_account.dart';
-
 /*
- * Simple Address Client to watch over an specific address
+ * Address Client to watch over an specific address
  */
 class ClientAccount extends BaseAccount implements Account {
   @override
@@ -19,7 +18,10 @@ class ClientAccount extends BaseAccount implements Account {
     TokenTrackers tokensTracker,
   ) : super(balance, name, url, tokensTracker) {
     this.address = address;
-    client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
+    client = SolanaClient(
+      rpcUrl: Uri.parse(url.rpc),
+      websocketUrl: Uri.parse(url.ws),
+    );
   }
 
   @override

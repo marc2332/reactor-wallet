@@ -19,7 +19,7 @@ class TokenCardWithShimmer extends StatelessWidget {
                 width: 35,
                 height: 35,
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(150, 0, 0, 0),
+                  color: const Color.fromARGB(150, 0, 0, 0),
                   borderRadius: BorderRadius.circular(50),
                 ),
               ),
@@ -37,7 +37,7 @@ class TokenCardWithShimmer extends StatelessWidget {
                     width: 65,
                     height: 17,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(150, 0, 0, 0),
+                      color: const Color.fromARGB(150, 0, 0, 0),
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
@@ -51,7 +51,7 @@ class TokenCardWithShimmer extends StatelessWidget {
                       width: 20,
                       height: 17,
                       decoration: BoxDecoration(
-                        color: Color.fromARGB(150, 0, 0, 0),
+                        color: const Color.fromARGB(150, 0, 0, 0),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -68,7 +68,7 @@ class TokenCardWithShimmer extends StatelessWidget {
                 width: 10,
                 height: 20,
                 decoration: BoxDecoration(
-                  color: Color.fromARGB(150, 0, 0, 0),
+                  color: const Color.fromARGB(150, 0, 0, 0),
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),

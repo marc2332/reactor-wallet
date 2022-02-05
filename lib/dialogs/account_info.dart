@@ -20,7 +20,7 @@ Future<void> accountInfoDialog(context, Account account) async {
           child: ListBody(
             children: <Widget>[
               ListTile(
-                title: Text('Address'),
+                title: const Text('Address'),
                 subtitle: Text('$shortAddress...'),
                 trailing: IconButton(
                   icon: Icon(Icons.copy_all_outlined, color: Theme.of(context).iconColor),
@@ -30,7 +30,7 @@ Future<void> accountInfoDialog(context, Account account) async {
                     ).then(
                       (_) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text("Address copied to clipboard"),
                           ),
                         );
@@ -62,7 +62,7 @@ Future<void> accountInfoDialog(context, Account account) async {
                       ).then(
                         (_) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                            const SnackBar(
                               content: Text("Address copied to clipboard"),
                             ),
                           );

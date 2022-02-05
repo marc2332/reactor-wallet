@@ -11,8 +11,8 @@ final appLoadedProvider = StateProvider<bool>((_) {
 });
 
 enum ThemeType {
-  Light,
-  Dark,
+  light,
+  dark,
 }
 
 final settingsProvider = StateNotifierProvider<SettingsManager, Map<String, dynamic>>((ref) {
@@ -36,8 +36,8 @@ class SettingsManager extends StateNotifier<Map<String, dynamic>> {
   late Box<dynamic> settingsBox;
   final StateNotifierProviderRef ref;
 
-  SettingsManager(this.ref) : super(Map()) {
-    state["theme"] = ThemeType.Light.name;
+  SettingsManager(this.ref) : super({}) {
+    state["theme"] = ThemeType.light.name;
   }
 
   void setTheme(ThemeType theme) {
@@ -52,10 +52,10 @@ class SettingsManager extends StateNotifier<Map<String, dynamic>> {
 
   static ThemeType mapType(String type) {
     switch (type) {
-      case "Dark":
-        return ThemeType.Dark;
+      case "dark":
+        return ThemeType.dark;
       default:
-        return ThemeType.Light;
+        return ThemeType.light;
     }
   }
 }
@@ -68,6 +68,9 @@ NetworkUrl migrateFromOldUrls(dynamic url) {
   }
 }
 
+/*
+ * Read, parse andl load the stored data from Hive into the state providers
+ */
 Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
   await Hive.initFlutter();
 
@@ -85,9 +88,10 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
   AccountsManager manager = ref.read(accountsProvider.notifier);
   manager.accountsBox = accountsBox;
 
+  // Parse the accounts into instances
   Map<dynamic, dynamic> jsonAccounts = accountsBox.toMap();
 
-  Map<String, Account> accountsMap = jsonAccounts.map((accountName, account) {
+  Map<String, Account> accountsState = jsonAccounts.map((accountName, account) {
     AccountType accountType = account["accountType"] == AccountType.Client.toString()
         ? AccountType.Client
         : AccountType.Wallet;
@@ -114,11 +118,10 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
     }
   });
 
-  ref.read(accountsProvider.notifier).state = accountsMap;
-  Map<String, Account> state = ref.read(accountsProvider.notifier).state;
+  ref.read(accountsProvider.notifier).state = accountsState;
 
-  if (state.values.isNotEmpty) {
-    ref.read(selectedAccountProvider.notifier).state = state.values.first;
+  if (accountsState.values.isNotEmpty) {
+    ref.read(selectedAccountProvider.notifier).state = accountsState.values.first;
   }
 
   ref.read(appLoadedProvider.notifier).state = true;
@@ -129,21 +132,21 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
 
   int accountWithLoadedTokens = 0;
 
-  for (Account account in state.values) {
+  for (Account account in accountsState.values) {
     // Fetch every saved account's balance
     if (account.accountType == AccountType.Wallet) {
       account = account as WalletAccount;
       /*
-        * Load the key's pair if it's a Wallet account
-        */
+       * Load the key's pair if it's a Wallet account
+       */
       account.loadKeyPair().then((_) {
         manager.refreshAllState();
       });
     }
 
     /*
-      * Load the transactions list and the tokens list
-      */
+     * Load the transactions list and the tokens list
+     */
     account.loadTransactions().then((_) {
       manager.refreshAllState();
     });
@@ -152,7 +155,7 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
       accountWithLoadedTokens++;
 
       // When all accounts have loaded it's tokens then fetch it's price
-      if (accountWithLoadedTokens == state.length) {
+      if (accountWithLoadedTokens == accountsState.length) {
         await manager.loadUSDValues();
       }
 
@@ -167,7 +170,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   late Box<dynamic> accountsBox;
   final StateNotifierProviderRef ref;
 
-  AccountsManager(this.tokensTracker, this.ref) : super(Map());
+  AccountsManager(this.tokensTracker, this.ref) : super({});
 
   Future<void> loadUSDValues() async {
     List<String> tokenNames = tokensTracker.trackers.values
@@ -177,13 +180,13 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
 
     Map<String, double> usdValues = await getTokenUsdValue(tokenNames);
 
-    tokensTracker.trackers.values.forEach((tracker) {
+    for (var tracker in tokensTracker.trackers.values) {
       double? usdValue = usdValues[tracker.name.toLowerCase()];
 
       if (usdValue != null) {
         tokensTracker.setTokenValue(tracker.programMint, usdValue);
       }
-    });
+    }
 
     for (final account in state.values) {
       await account.refreshBalance();
@@ -195,7 +198,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   void selectFirstAccountIfAnySelected() {
     final selectedAccount = ref.read(selectedAccountProvider.notifier);
 
-    if (selectedAccount.state == null) selectedAccount.state = state.values.first;
+    selectedAccount.state ??= state.values.first;
   }
 
   Future<void> refreshAccounts() async {
@@ -275,8 +278,8 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   }
 
   /*
-  * Generate an available random name for the Account
-  */
+   * Generate an available random name for the Account
+   */
   String generateAccountName() {
     int accountN = 0;
     while (state.containsKey("Account $accountN")) {
@@ -320,6 +323,9 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
     return account;
   }
 
+  /*
+   * Refresh the balanace, tokens, and transactions of an account
+   */
   Future<void> refreshAccount(String accountName) async {
     Account? account = state[accountName];
 
@@ -334,6 +340,9 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
     refreshAllState();
   }
 
+  /*
+   * Remove an account
+   */
   void removeAccount(Account account) {
     // Remove from the state
     state.remove(account.name);
@@ -344,6 +353,9 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
     refreshAllState();
   }
 
+  /*
+   * Rename an account's name
+   */
   void renameAccount(Account account, String name) {
     accountsBox.delete(account.name);
 

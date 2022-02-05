@@ -33,7 +33,7 @@ class App extends HookConsumerWidget {
     TokenTrackers tokensTracer = ref.read(tokensTrackerProvider);
     ref.watch(settingsProvider);
     ThemeType selectedTheme = ref.read(settingsProvider.notifier).getTheme();
-    bool isDarkTheme = selectedTheme == ThemeType.Dark;
+    bool isDarkTheme = selectedTheme == ThemeType.dark;
 
     useEffect(() {
       loadState(tokensTracer, ref);

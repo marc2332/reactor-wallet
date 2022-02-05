@@ -85,7 +85,7 @@ class CreateWalletState extends ConsumerState<CreateWallet> {
   void createWallet() async {
     final accountsProv = ref.read(accountsProvider.notifier);
 
-    if (accountName.length > 0 && !accountsProv.state.containsKey(accountName)) {
+    if (accountName.isNotEmpty && !accountsProv.state.containsKey(accountName)) {
       accountsProv.createWallet(accountName, networkURL).then((_) {
         // Go to Home page
         Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);

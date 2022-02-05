@@ -86,7 +86,7 @@ class BaseAccount {
   }
 
   /*
-  * Loads all the tokens (spl-program mints) owned by this account
+   * Loads all the tokens (spl-program mints) owned by this account
    */
   Future<void> loadTokens() async {
     tokens = [];

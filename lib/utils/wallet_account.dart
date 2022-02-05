@@ -92,8 +92,8 @@ class WalletAccount extends BaseAccount implements Account {
    */
   Future<void> loadKeyPair() async {
     final Ed25519HDKeyPair keyPair = await Executor().execute(arg1: mnemonic, fun1: createKeyPair);
-    this.wallet = keyPair;
-    this.address = wallet.address;
+    wallet = keyPair;
+    address = wallet.address;
   }
 
   /*

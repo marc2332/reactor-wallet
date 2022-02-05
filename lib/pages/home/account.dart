@@ -33,6 +33,7 @@ class AccountSubPage extends ConsumerWidget {
     Widget? accountBody;
     Widget? accountHeader;
 
+    // If the account is loaded and no account is found then open the Account Selection page in order to create an account
     if (isAppLoaded && selectedAccount == null) {
       WidgetsBinding.instance?.addPostFrameCallback((_) {
         Navigator.pushReplacementNamed(context, "/account_selection");
@@ -42,6 +43,8 @@ class AccountSubPage extends ConsumerWidget {
     if (selectedAccount != null) {
       accountHeader = InkWell(
         borderRadius: BorderRadius.circular(5),
+        // Disable ripple effect on Windows
+        onTap: Platform.isWindows ? null : () {},
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: DropdownButton<Account>(

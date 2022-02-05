@@ -45,7 +45,7 @@ class TokenTrackers {
     system_program_id: Tracker('solana', system_program_id, "SOL"),
   };
 
-  late Map<String, TokenInfo> tokensList = Map();
+  late Map<String, TokenInfo> tokensList = {};
 
   Future<void> loadTokenList() async {
     var tokensFile = await rootBundle.loadString('assets/tokens_list.json');
@@ -101,7 +101,7 @@ class TokenTrackers {
  */
 Future<Map<String, double>> getTokenUsdValue(List<String> tokens) async {
   try {
-    Map<String, String> headers = Map();
+    Map<String, String> headers = {};
     headers['Accept'] = 'application/json';
     headers['Access-Control-Allow-Origin'] = '*';
     Http.Response response = await Http.get(

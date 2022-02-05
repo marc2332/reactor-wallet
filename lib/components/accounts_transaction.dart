@@ -12,7 +12,7 @@ DateFormat hourMinutFormatter = DateFormat.Hm();
 DateFormat dayFormatter = DateFormat.yMMMMEEEEd();
 
 List getAllBlockNumbers(List<TransactionDetails> txs) {
-  Map<String, List<TransactionDetails>> blocks = Map();
+  Map<String, List<TransactionDetails>> blocks = {};
 
   for (var tx in txs) {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(tx.blockTime * 1000);
