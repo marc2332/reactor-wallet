@@ -41,6 +41,7 @@ dart format . --line-length 100
     - [x] SOL Transactions (Experimental)
     - [x] SPL Tokens Transactions (Experimental)
     - [ ] Support for Reference, Label, Message, Memo
+    - [ ] QR Generator (like https://github.com/solana-labs/solana-pay/tree/master/point-of-sale does )
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses
@@ -59,6 +60,6 @@ dart format . --line-length 100
 - [x] Ability to make transactions with SPL Tokens
 - [ ] Better UX (specially when creating accounts)
 - [x] Transactions Timestamps
-- [ ] Better Windows UX (e.g, using split views, adding refresh buttons)
+- [ ] Better Windows UX (e.g, using split views)
 
 MIT License
