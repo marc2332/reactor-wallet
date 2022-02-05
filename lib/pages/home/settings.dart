@@ -94,7 +94,7 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
       await launch(url);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Could not open browser."),
         ),
       );

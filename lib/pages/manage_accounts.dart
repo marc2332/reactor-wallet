@@ -6,7 +6,7 @@ import 'package:reactor_wallet/dialogs/remove_account.dart';
 import 'package:reactor_wallet/utils/states.dart';
 
 class ManageAccountsPage extends StatefulWidget {
-  ManageAccountsPage({Key? key}) : super(key: key);
+  const ManageAccountsPage({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => ManageAccountsPageState();
@@ -45,8 +45,9 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
                       },
                     ),
                     enableFeedback: true,
-                    title:
-                        Text('${account.name} (${account.address.toString().substring(0, 5)}...)'),
+                    title: Text(
+                      '${account.name} (${account.address.toString().substring(0, 5)}...)',
+                    ),
                     leading: IconButton(
                       icon: const Icon(Icons.remove_circle_outline),
                       onPressed: () {

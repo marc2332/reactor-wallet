@@ -20,7 +20,7 @@ import 'package:reactor_wallet/utils/theme.dart';
 class AccountSubPage extends ConsumerWidget {
   final String route;
 
-  AccountSubPage(this.route);
+  const AccountSubPage(this.route, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,7 +42,6 @@ class AccountSubPage extends ConsumerWidget {
     if (selectedAccount != null) {
       accountHeader = InkWell(
         borderRadius: BorderRadius.circular(5),
-        onTap: () {},
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: DropdownButton<Account>(
@@ -112,7 +111,7 @@ class AccountSubPage extends ConsumerWidget {
           width: 75,
           height: 30,
           decoration: BoxDecoration(
-            color: Color.fromARGB(150, 0, 0, 0),
+            color: const Color.fromARGB(150, 0, 0, 0),
             borderRadius: BorderRadius.circular(5),
           ),
         ),

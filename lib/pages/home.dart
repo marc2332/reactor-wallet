@@ -23,17 +23,17 @@ class HomePageState extends ConsumerState<HomePage> {
     switch (currentPage) {
       // Settings sub page
       case 2:
-        page = SettingsSubPage();
+        page = const SettingsSubPage();
         break;
 
       // Settings sub page
       case 1:
-        page = AccountSubPage("/transactions");
+        page = const AccountSubPage("/transactions");
         break;
 
       // Account sub page
       default:
-        page = AccountSubPage("/home");
+        page = const AccountSubPage("/home");
     }
 
     return Scaffold(

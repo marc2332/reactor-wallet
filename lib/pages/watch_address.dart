@@ -7,7 +7,7 @@ import 'package:reactor_wallet/utils/states.dart';
  * Getting Started Page
  */
 class WatchAddress extends ConsumerStatefulWidget {
-  WatchAddress({Key? key}) : super(key: key);
+  const WatchAddress({Key? key}) : super(key: key);
 
   @override
   WatchAddressState createState() => WatchAddressState();

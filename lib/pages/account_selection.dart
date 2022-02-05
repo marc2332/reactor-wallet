@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
  * Account Selection Page
  */
 class AccountSelectionPage extends StatelessWidget {
-  AccountSelectionPage({Key? key}) : super(key: key);
+  const AccountSelectionPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class AccountSelectionPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: const [
                         Padding(
-                          padding: const EdgeInsets.all(15),
+                          padding: EdgeInsets.all(15),
                           child: Icon(
                             Icons.person_pin_outlined,
                             size: 30.0,
@@ -58,7 +58,7 @@ class AccountSelectionPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: const [
                         Padding(
-                          padding: const EdgeInsets.all(15),
+                          padding: EdgeInsets.all(15),
                           child: Icon(
                             Icons.import_export_outlined,
                             size: 30.0,
@@ -84,7 +84,7 @@ class AccountSelectionPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: const [
                         Padding(
-                          padding: const EdgeInsets.all(15),
+                          padding: EdgeInsets.all(15),
                           child: Icon(
                             Icons.create_outlined,
                             size: 30.0,

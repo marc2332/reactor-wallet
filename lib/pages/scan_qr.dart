@@ -3,8 +3,9 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class ScanQrPage extends StatelessWidget {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  late QRViewController? controller;
-  bool hasScanned = false;
+  late bool hasScanned = false;
+
+  ScanQrPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +23,6 @@ class ScanQrPage extends StatelessWidget {
             child: QRView(
               key: qrKey,
               onQRViewCreated: (QRViewController controller) {
-                this.controller = controller;
-
                 controller.scannedDataStream.listen((scanData) {
                   if (hasScanned == false) {
                     hasScanned = true;
