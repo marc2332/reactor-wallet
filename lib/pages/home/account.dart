@@ -93,7 +93,7 @@ class SideBar extends HookConsumerWidget {
                 }).toList(),
               ),
             ),
-            if(Platform.isWindows) ...[
+            if (Platform.isWindows) ...[
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: MaterialButton(
