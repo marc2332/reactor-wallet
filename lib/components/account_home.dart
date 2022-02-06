@@ -16,6 +16,9 @@ String balanceShorter(String balance) {
   return balance;
 }
 
+/*
+ * Sort the tokens from more valuable to less valuable
+ */
 void orderTokensByUSDBalanace(List<Token> accountTokens) {
   accountTokens.sort((prev, next) {
     double prevBalanace = prev.usdBalance;
@@ -27,9 +30,9 @@ void orderTokensByUSDBalanace(List<Token> accountTokens) {
 
 class AccountTokens extends StatelessWidget {
   final Account account;
-  final ScrollController list_controller = ScrollController();
+  final ScrollController listController = ScrollController();
 
-  AccountTokens(this.account);
+  AccountTokens(this.account, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -54,10 +57,10 @@ class AccountTokens extends StatelessWidget {
                   children: [
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                      children: const [
                         Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: const Text("This address doesn't own any token"),
+                          padding: EdgeInsets.only(top: 20),
+                          child: Text("This address doesn't own any token"),
                         )
                       ],
                     )
@@ -66,10 +69,10 @@ class AccountTokens extends StatelessWidget {
               );
             } else {
               return ListView.builder(
-                controller: list_controller,
+                controller: listController,
                 itemCount: accountTokens.length,
                 shrinkWrap: true,
-                physics: BouncingScrollPhysics(
+                physics: const BouncingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
                 itemBuilder: (context, index) {
@@ -79,12 +82,12 @@ class AccountTokens extends StatelessWidget {
             }
           } else {
             return ListView.builder(
-              controller: list_controller,
+              controller: listController,
               itemCount: 7,
               shrinkWrap: true,
-              physics: BouncingScrollPhysics(),
+              physics: const BouncingScrollPhysics(),
               itemBuilder: (context, index) {
-                return TokenCardWithShimmer();
+                return const TokenCardWithShimmer();
               },
             );
           }
@@ -94,10 +97,145 @@ class AccountTokens extends StatelessWidget {
   }
 }
 
+class SolBalance extends StatelessWidget {
+  final String solBalance;
+  final bool isReady;
+
+  const SolBalance({Key? key, required this.solBalance, required this.isReady}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, top: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (isReady) ...[
+            Text(
+              solBalance,
+              style: GoogleFonts.poppins(
+                textStyle: const TextStyle(
+                  fontSize: 40,
+                ),
+              ),
+            ),
+            const Text(' SOL'),
+          ] else ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 90,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(150, 0, 0, 0),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class USDBalance extends StatelessWidget {
+  final String usdBalance;
+  final bool isReady;
+
+  const USDBalance({Key? key, required this.usdBalance, required this.isReady}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (isReady) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '$usdBalance\$',
+            style: GoogleFonts.lato(
+              textStyle: const TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          )
+        ],
+      );
+    } else {
+      return Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Container(
+          width: 70,
+          height: 35,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(150, 0, 0, 0),
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+      );
+    }
+  }
+}
+
+class AddressButton extends StatelessWidget {
+  final String address;
+  final String accountTypeText;
+  final bool isReady;
+
+  const AddressButton({
+    Key? key,
+    required this.address,
+    required this.accountTypeText,
+    required this.isReady,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (isReady) {
+      return OutlinedButton(
+        onPressed: () {
+          Clipboard.setData(
+            ClipboardData(text: address),
+          ).then((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Address copied to clipboard"),
+              ),
+            );
+          });
+        },
+        child: Text(
+          '$accountTypeText (${address.substring(0, 5)}...)',
+          style: Theme.of(context).textTheme.button,
+        ),
+      );
+    } else {
+      return Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Container(
+          width: 80,
+          height: 20,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(150, 0, 0, 0),
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+      );
+    }
+  }
+}
+
 class AccountInfo extends ConsumerWidget {
   final Account account;
 
-  AccountInfo(this.account);
+  const AccountInfo(this.account, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -128,105 +266,24 @@ class AccountInfo extends ConsumerWidget {
               return true;
             },
             child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10, top: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (account.isLoaded && account.isItemLoaded(AccountItem.solBalance)) ...[
-                          Text(
-                            solBalance,
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                fontSize: 40,
-                              ),
-                            ),
-                          ),
-                          const Text(' SOL'),
-                        ] else ...[
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 15),
-                            child: Shimmer.fromColors(
-                              baseColor: Colors.grey[300]!,
-                              highlightColor: Colors.grey[100]!,
-                              child: Container(
-                                width: 90,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Color.fromARGB(150, 0, 0, 0),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      ],
-                    ),
+                  SolBalance(
+                    solBalance: solBalance,
+                    isReady: account.isLoaded && account.isItemLoaded(AccountItem.solBalance),
                   ),
-                  if (account.isLoaded && account.isItemLoaded(AccountItem.usdBalance)) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$usdBalance\$',
-                          style: GoogleFonts.lato(
-                            textStyle: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        )
-                      ],
-                    )
-                  ] else ...[
-                    Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(
-                        width: 70,
-                        height: 35,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(150, 0, 0, 0),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                      ),
-                    )
-                  ],
+                  USDBalance(
+                    usdBalance: usdBalance,
+                    isReady: account.isLoaded && account.isItemLoaded(AccountItem.usdBalance),
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
-                    child: account.isLoaded
-                        ? OutlinedButton(
-                            onPressed: () {
-                              Clipboard.setData(
-                                ClipboardData(text: account.address),
-                              ).then((_) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text("Address copied to clipboard"),
-                                  ),
-                                );
-                              });
-                            },
-                            child: Text(
-                              '$accountTypeText (${account.address.substring(0, 5)}...)',
-                              style: Theme.of(context).textTheme.button,
-                            ),
-                          )
-                        : Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(
-                              width: 80,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(150, 0, 0, 0),
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            ),
-                          ),
+                    child: AddressButton(
+                      address: account.address,
+                      accountTypeText: accountTypeText,
+                      isReady: account.isLoaded,
+                    ),
                   ),
                 ],
               ),
@@ -238,19 +295,10 @@ class AccountInfo extends ConsumerWidget {
   }
 }
 
-class AccountHome extends ConsumerStatefulWidget {
-  AccountHome({Key? key, required this.account}) : super(key: key);
-
+class AccountHome extends StatelessWidget {
   final Account account;
 
-  @override
-  AccountHomeState createState() => AccountHomeState(this.account);
-}
-
-class AccountHomeState extends ConsumerState<AccountHome> {
-  late Account account;
-
-  AccountHomeState(this.account);
+  const AccountHome({Key? key, required this.account}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

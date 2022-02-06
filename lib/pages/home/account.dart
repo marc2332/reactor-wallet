@@ -220,10 +220,7 @@ class AccountSubPage extends ConsumerWidget {
 
     if (selectedAccount != null) {
       if (route == "/home") {
-        accountBody = AccountHome(
-          key: Key(selectedAccount.name),
-          account: selectedAccount,
-        );
+        accountBody = AccountHome(account: selectedAccount);
       } else {
         accountBody = AccountTransactions(
           key: Key(selectedAccount.name),

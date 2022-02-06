@@ -21,7 +21,7 @@ class ManageAccountsPageState extends State<ManageAccountsPage> {
         title: const Text("Accounts"),
       ),
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.person_add_alt_1_outlined),
+        child: const Icon(Icons.person_add_alt_1_outlined, color: Colors.white),
         onPressed: () {
           Navigator.pushNamed(context, "/account_selection");
         },

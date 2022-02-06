@@ -53,12 +53,12 @@ class App extends HookConsumerWidget {
       themeMode: isDarkTheme ? ThemeMode.dark : ThemeMode.light,
       initialRoute: '/home',
       routes: {
-        '/home': (_) => HomePage(),
-        '/account_selection': (_) => AccountSelectionPage(),
-        '/watch_address': (_) => WatchAddress(),
-        '/create_wallet': (_) => CreateWallet(),
-        '/import_wallet': (_) => ImportWallet(),
-        '/manage_accounts': (_) => ManageAccountsPage(),
+        '/home': (_) => const HomePage(),
+        '/account_selection': (_) => const AccountSelectionPage(),
+        '/watch_address': (_) => const WatchAddress(),
+        '/create_wallet': (_) => const CreateWallet(),
+        '/import_wallet': (_) => const ImportWallet(),
+        '/manage_accounts': (_) => const ManageAccountsPage(),
       },
     );
   }
