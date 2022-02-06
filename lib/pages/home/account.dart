@@ -93,15 +93,17 @@ class SideBar extends HookConsumerWidget {
                 }).toList(),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: MaterialButton(
-                height: 50,
-                shape: const CircleBorder(),
-                onPressed: () => {},
-                child: const Icon(Icons.refresh_outlined, color: Colors.white),
-              ),
-            )
+            if(Platform.isWindows) ...[
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: MaterialButton(
+                  height: 50,
+                  shape: const CircleBorder(),
+                  onPressed: () => {},
+                  child: const Icon(Icons.refresh_outlined, color: Colors.white),
+                ),
+              )
+            ]
           ],
         ),
       ),
