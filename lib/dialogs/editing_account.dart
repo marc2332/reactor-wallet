@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reactor_wallet/dialogs/error_popup.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/states.dart';
 
@@ -53,8 +54,16 @@ Future<void> editAccountDialog(BuildContext context, Account account) async {
                 TextButton(
                   child: const Text('Apply'),
                   onPressed: () {
-                    applyAccount(account, ref, accountName);
-                    Navigator.of(context).pop();
+                    try {
+                      applyAccount(account, ref, accountName);
+                      Navigator.of(context).pop();
+                    } on AccountAlreadyExists {
+                      errorMessage(
+                        context,
+                        "Can't rename account",
+                        "An account with name '$accountName' already exists",
+                      );
+                    }
                   },
                 ),
               ],

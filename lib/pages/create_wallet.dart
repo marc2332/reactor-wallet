@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
+import 'package:reactor_wallet/dialogs/error_popup.dart';
 import 'package:reactor_wallet/utils/states.dart';
 
 /*
@@ -85,11 +86,25 @@ class CreateWalletState extends ConsumerState<CreateWallet> {
   void createWallet() async {
     final accountsProv = ref.read(accountsProvider.notifier);
 
-    if (accountName.isNotEmpty && !accountsProv.state.containsKey(accountName)) {
-      accountsProv.createWallet(accountName, networkURL).then((_) {
+    if (accountName.isNotEmpty) {
+      try {
+        await accountsProv.createWallet(accountName, networkURL);
+
         // Go to Home page
         Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
-      });
+      } catch (err) {
+        errorMessage(
+          context,
+          "Can't create account",
+          "An account with name '$accountName' already exists",
+        );
+      }
+    } else {
+      errorMessage(
+        context,
+        "Empty name",
+        "The account must have a name",
+      );
     }
   }
 }

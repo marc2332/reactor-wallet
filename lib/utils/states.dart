@@ -221,6 +221,8 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
    * Create a wallet instance
    */
   Future<void> createWallet(String accountName, NetworkUrl url) async {
+    if (state.containsKey(accountName)) throw AccountAlreadyExists();
+
     // Create the account
     WalletAccount walletAccount = await WalletAccount.generate(accountName, url, tokensTracker);
 
@@ -356,10 +358,12 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   /*
    * Rename an account's name
    */
-  void renameAccount(Account account, String name) {
+  void renameAccount(Account account, String accountName) {
+    if (state.containsKey(accountName)) throw AccountAlreadyExists();
+
     accountsBox.delete(account.name);
 
-    account.name = name;
+    account.name = accountName;
 
     accountsBox.put(account.name, account.toJson());
 
@@ -370,4 +374,8 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   void refreshAllState() {
     state = Map.from(state);
   }
+}
+
+class AccountAlreadyExists implements Exception {
+  AccountAlreadyExists();
 }
