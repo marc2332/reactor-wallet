@@ -1,32 +1,39 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:reactor_wallet/components/size_wrapper.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/pages/collectible_info.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/states.dart';
 
-class AccountCollectibles extends StatelessWidget {
+class AccountCollectibles extends ConsumerWidget {
   final Account account;
 
   const AccountCollectibles({Key? key, required this.account}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final collectibles = account.tokens.whereType<NFT>();
     final screenSize = MediaQuery.of(context).size;
     final columnsNumber = screenSize.width > 750 ? 3 : 2;
 
-    return Scaffold(
-      body: ResponsiveSizer(
-        triggerWidth: 700,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: RefreshIndicator(
+          key: Key(account.address),
+          onRefresh: () async {
+            // Refresh the account when pulling down
+            final accountsProv = ref.read(accountsProvider.notifier);
+            await accountsProv.refreshAccount(account.name);
+          },
           child: collectibles.isEmpty
               ? const Center(
                   child: Text("This address doesn't own any collectible"),
                 )
               : GridView.count(
                   crossAxisCount: columnsNumber,
-                  physics: const BouncingScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   children: collectibles.map((nft) {
                     final screenSize = MediaQuery.of(context).size;
