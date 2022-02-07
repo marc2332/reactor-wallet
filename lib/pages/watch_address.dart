@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
+import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/utils/states.dart';
 
 /*
@@ -23,62 +24,64 @@ class WatchAddressState extends ConsumerState<WatchAddress> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Watch an address')),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Form(
-                autovalidateMode: AutovalidateMode.always,
-                child: Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          validator: (String? value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Empty address';
-                            } else if (value.length < 43 || value.length > 50) {
-                              return 'Address length is not correct';
-                            } else {
-                              return null;
-                            }
-                          },
-                          decoration: const InputDecoration(
-                            hintText: 'Enter your address',
-                          ),
-                          onChanged: (String value) async {
-                            address = value;
-                          },
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20, bottom: 5),
-                          child: NetworkSelector(
-                            onSelected: (NetworkUrl? url) {
-                              if (url != null) {
-                                networkURL = url;
+      body: ResponsiveSizer(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Form(
+                  autovalidateMode: AutovalidateMode.always,
+                  child: Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            validator: (String? value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Empty address';
+                              } else if (value.length < 43 || value.length > 50) {
+                                return 'Address length is not correct';
+                              } else {
+                                return null;
                               }
                             },
+                            decoration: const InputDecoration(
+                              hintText: 'Enter your address',
+                            ),
+                            onChanged: (String value) async {
+                              address = value;
+                            },
                           ),
-                        )
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20, bottom: 5),
+                            child: NetworkSelector(
+                              onSelected: (NetworkUrl? url) {
+                                if (url != null) {
+                                  networkURL = url;
+                                }
+                              },
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                child: const Text("Continue"),
-                onPressed: addAccount,
-              )
-            ],
-          )
-        ],
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  child: const Text("Continue"),
+                  onPressed: addAccount,
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
