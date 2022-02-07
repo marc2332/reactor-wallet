@@ -43,7 +43,10 @@ Future<void> sendTransactionDialog(
         List<Token> tokens = List.from(walletAccount.tokens);
 
         // Add Solana like if it was a Token just to make the UX easier
-        tokens.insert(0, Token(walletAccount.balance, system_program_id, "SOL"));
+        tokens.insert(
+            0,
+            Token(walletAccount.balance, system_program_id,
+                TokenInfo(name: "Solana", symbol: "SOL")));
 
         final selectedToken = useState(tokens.first);
 
@@ -54,19 +57,19 @@ Future<void> sendTransactionDialog(
               children: [
                 DropdownButton<String>(
                   iconSize: 20,
-                  value: selectedToken.value.symbol,
+                  value: selectedToken.value.info.symbol,
                   icon: const Icon(Icons.arrow_downward),
                   underline: Container(),
                   onChanged: (String? tokenSymbol) {
                     if (tokenSymbol != null) {
                       selectedToken.value =
-                          tokens.firstWhere((token) => token.symbol == tokenSymbol);
+                          tokens.firstWhere((token) => token.info.symbol == tokenSymbol);
                     }
                   },
                   items: tokens.map<DropdownMenuItem<String>>((Token token) {
                     return DropdownMenuItem<String>(
-                      value: token.symbol,
-                      child: Text(token.symbol),
+                      value: token.info.symbol,
+                      child: Text(token.info.symbol),
                     );
                   }).toList(),
                 ),

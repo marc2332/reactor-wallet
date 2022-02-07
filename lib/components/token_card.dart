@@ -14,8 +14,6 @@ class TokenCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tokensTracker = ref.watch(tokensTrackerProvider);
 
-    TokenInfo tokenInfo = tokensTracker.getTokenInfo(token.mint);
-
     String usdBalance = token.usdBalance.toStringAsFixed(2);
     String tokenBalance = token.balance.toStringAsFixed(2);
 
@@ -33,7 +31,7 @@ class TokenCard extends ConsumerWidget {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(5),
-                  child: WrapperImage(tokenInfo.logoUrl),
+                  child: WrapperImage(token.info.logoUrl),
                 ),
               ),
               Expanded(
@@ -42,7 +40,7 @@ class TokenCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tokenInfo.name,
+                      token.info.name,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(tokenBalance),

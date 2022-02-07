@@ -27,12 +27,12 @@ class Tracker {
 }
 
 class TokenInfo {
-  late String name = "Unknown";
+  late String name;
   late String logoUrl = "";
-  late String symbol = "Unknown";
+  late String symbol;
   late String mintAddress;
 
-  TokenInfo();
+  TokenInfo({required this.name, required this.symbol});
   TokenInfo.withInfo(this.mintAddress, this.name, this.logoUrl, this.symbol);
 }
 
@@ -76,23 +76,22 @@ class TokenTrackers {
     }
   }
 
-  TokenInfo getTokenInfo(String programId) {
+  TokenInfo? getTokenInfo(String programId) {
     if (tokensList.containsKey(programId)) {
       return tokensList[programId]!;
     }
-    // If not info about the token is found then an "Unknown" token is returned
-    return TokenInfo();
+    return null;
   }
 
-  Tracker? addTrackerByProgramMint(String programMint) {
+  TokenInfo addTrackerByProgramMint(String programMint, {required TokenInfo defaultValue}) {
+    TokenInfo tokenInfo = getTokenInfo(programMint) ?? defaultValue;
+
     // Add tracker if doesn't exist yet
     if (!trackers.containsKey(programMint)) {
-      TokenInfo tokenInfo = getTokenInfo(programMint);
-
       trackers[programMint] = Tracker(tokenInfo.name, programMint, tokenInfo.symbol);
-
-      return trackers[programMint];
     }
+
+    return tokenInfo;
   }
 }
 

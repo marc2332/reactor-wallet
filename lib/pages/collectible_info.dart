@@ -24,12 +24,15 @@ class CollectibleInfo extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: CachedNetworkImage(
-                      imageUrl: nft.imageInfo!.uri,
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.image_not_supported_rounded),
+                  child: Hero(
+                    tag: nft.imageInfo!.uri,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: CachedNetworkImage(
+                        imageUrl: nft.imageInfo!.uri,
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.image_not_supported_rounded),
+                      ),
                     ),
                   ),
                 ),

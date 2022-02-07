@@ -46,12 +46,12 @@ class Token {
   late double balance = 0;
   // USD equivalent of the balance
   late double usdBalance = 0;
-  // Symbol, e.g, SOL
-  final String symbol;
   // Mint of this token
   final String mint;
+  // Info about the token
+  final TokenInfo info;
 
-  Token(this.balance, this.mint, this.symbol);
+  Token(this.balance, this.mint, this.info);
 }
 
 class NFT extends Token {
@@ -60,9 +60,9 @@ class NFT extends Token {
   NFT(
     double balance,
     String mint,
-    String symbol,
+    TokenInfo info,
     this.imageInfo,
-  ) : super(balance, mint, symbol);
+  ) : super(balance, mint, info);
 }
 
 enum AccountItem {
@@ -140,12 +140,16 @@ class BaseAccount {
   Future<void> loadTokens() async {
     tokens = [];
 
+    final completer = Completer();
+
     // Get all the tokens owned by the account
     final tokenAccounts = await client.rpcClient.getTokenAccountsByOwner(
       address,
       const TokenAccountsFilter.byProgramId(TokenProgram.programId),
       encoding: Encoding.jsonParsed,
     );
+
+    int unknownN = 0;
 
     for (final tokenAccount in tokenAccounts) {
       ParsedAccountData? data = tokenAccount.account.data as ParsedAccountData?;
@@ -159,27 +163,34 @@ class BaseAccount {
                   String? uiBalance = mintData.tokenAmount.uiAmountString;
                   double balance = double.parse(uiBalance ?? "0");
 
-                  // Start tracking the token
-                  Tracker? tracker = tokensTracker.addTrackerByProgramMint(tokenMint);
+                  String defaultName = "Unknown $unknownN";
+                  TokenInfo defaultTokenInfo = TokenInfo(name: defaultName, symbol: defaultName);
 
-                  // Get the token's symbol
-                  String symbol = tracker != null
-                      ? tracker.symbol
-                      : tokensTracker.getTokenInfo(tokenMint).symbol;
+                  // Start tracking the token
+                  TokenInfo tokenInfo = tokensTracker.addTrackerByProgramMint(tokenMint,
+                      defaultValue: defaultTokenInfo);
+
+                  if (defaultTokenInfo != tokenInfo) {
+                    unknownN++;
+                  }
 
                   // Add the token to this account
                   client.rpcClient.getMetadata(mint: tokenMint).then((value) async {
+                    Token token = Token(balance, tokenMint, tokenInfo);
                     if (value != null) {
                       try {
-                        final imageInfo = await getImageFromUri(value.uri);
+                        ImageInfo imageInfo = await getImageFromUri(value.uri) as ImageInfo;
 
-                        if (imageInfo != null) {
-                          tokens.add(NFT(balance, tokenMint, symbol, imageInfo));
-                          return;
-                        }
+                        token = NFT(balance, tokenMint, tokenInfo, imageInfo);
                       } catch (_) {}
                     }
-                    tokens.add(Token(balance, tokenMint, symbol));
+
+                    tokens.add(token);
+
+                    if (tokens.length == tokenAccounts.length) {
+                      itemsLoaded[AccountItem.tokens] = true;
+                      completer.complete();
+                    }
                   });
                 },
                 mint: (_, __, ___) {},
@@ -191,7 +202,12 @@ class BaseAccount {
       }
     }
 
-    itemsLoaded[AccountItem.tokens] = true;
+    if (tokenAccounts.isEmpty) {
+      itemsLoaded[AccountItem.tokens] = true;
+      completer.complete();
+    }
+
+    return completer.future;
   }
 
   /*

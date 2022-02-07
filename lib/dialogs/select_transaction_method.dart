@@ -43,7 +43,8 @@ Future<void> selectTransactionMethod(
               context,
               tx,
               walletAccount,
-              Token(walletAccount.balance, system_program_id, "SOL"),
+              Token(walletAccount.balance, system_program_id,
+                  TokenInfo(name: "Solana", symbol: "SOL")),
             );
           } else {
             Transaction tx = Transaction(

@@ -76,7 +76,7 @@ class HomePageState extends ConsumerState<HomePage> {
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.art_track_outlined),
               icon: Icon(Icons.art_track_outlined),
-              label: 'collectibles',
+              label: 'Collectibles',
             ),
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.account_box_outlined),

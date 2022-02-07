@@ -82,14 +82,14 @@ Future<void> prepareTransaction(
                     ListTile(
                       title: Text('Amount', style: fadedTextStyle),
                       subtitle: Text(
-                        '${transaction.ammount.toStringAsFixed(9)} ${token.symbol}',
+                        '${transaction.ammount.toStringAsFixed(9)} ${token.info.symbol}',
                         style: fadedTextStyle,
                       ),
                       trailing: hasEnoughFunds.value
                           ? null
                           : CircularProgressIndicator(
                               strokeWidth: 3.0,
-                              semanticsLabel: "Loading ${token.symbol} balance",
+                              semanticsLabel: "Loading ${token.info.symbol} balance",
                             ),
                     ),
                     ListTile(
@@ -116,7 +116,7 @@ Future<void> prepareTransaction(
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                'Sending ${transaction.ammount} ${token.symbol} to ${transaction.destination.substring(0, 5)}...',
+                                'Sending ${transaction.ammount} ${token.info.symbol} to ${transaction.destination.substring(0, 5)}...',
                               ),
                             ),
                           );

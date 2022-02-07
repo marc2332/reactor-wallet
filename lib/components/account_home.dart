@@ -44,8 +44,11 @@ class AccountTokens extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Consumer(builder: (context, ref, _) {
-          int accountTokenQuantity = account.tokens.length;
           List<Token> accountTokens = List.from(account.tokens);
+          accountTokens.retainWhere((token) => token is! NFT);
+
+          int accountTokenQuantity = accountTokens.length;
+
           orderTokensByUSDBalanace(accountTokens);
 
           if (account.isItemLoaded(AccountItem.tokens)) {
