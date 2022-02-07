@@ -1,4 +1,5 @@
-import 'package:solana/solana.dart' show Ed25519HDKeyPair, ProgramAccount, SolanaClient, Wallet;
+import 'package:solana/dto.dart' show ProgramAccount;
+import 'package:solana/solana.dart' show Ed25519HDKeyPair, SolanaClient, Wallet;
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:worker_manager/worker_manager.dart';

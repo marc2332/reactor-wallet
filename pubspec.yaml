@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  solana: ^0.17.2
+  solana: ^0.18.0
   google_fonts: ^2.1.0
   bip39: ^1.0.6
   worker_manager: ^4.2.3

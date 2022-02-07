@@ -8,6 +8,7 @@ import 'package:reactor_wallet/components/clickable_card.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/dialogs/select_transaction_method.dart';
+import 'package:reactor_wallet/components/account_collectibles.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/client_account.dart';
 import 'package:reactor_wallet/utils/states.dart';
@@ -219,13 +220,24 @@ class AccountSubPage extends ConsumerWidget {
     }
 
     if (selectedAccount != null) {
-      if (route == "/home") {
-        accountBody = AccountHome(account: selectedAccount);
-      } else {
-        accountBody = AccountTransactions(
-          key: Key(selectedAccount.name),
-          account: selectedAccount,
-        );
+      switch (route) {
+        case "/transactions":
+          accountBody = AccountTransactions(
+            key: Key(selectedAccount.name),
+            account: selectedAccount,
+          );
+          break;
+
+        case "/collectibles":
+          accountBody = AccountCollectibles(
+            key: Key(selectedAccount.name),
+            account: selectedAccount,
+          );
+          break;
+
+        default:
+          accountBody = AccountHome(account: selectedAccount);
+          break;
       }
     } else {
       final sampleAccount = ClientAccount("_____", 0, "_____", NetworkUrl("", ""), tokensTracker);

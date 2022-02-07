@@ -1,7 +1,45 @@
 import 'dart:async';
+import 'package:solana/dto.dart';
 import 'package:solana/solana.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
+import 'package:solana/metaplex.dart';
+import 'package:http/http.dart' as Http;
+import 'dart:convert';
+
+class ImageInfo {
+  final String uri;
+  final OffChainMetadata? data;
+
+  const ImageInfo(this.uri, this.data);
+}
+
+Future<ImageInfo?> getImageFromUri(String uri) async {
+  try {
+    Map<String, String> headers = {};
+    headers['Accept'] = 'application/json';
+    headers['Access-Control-Allow-Origin'] = '*';
+    Http.Response response = await Http.get(
+      Uri.parse(uri),
+      headers: headers,
+    );
+
+    final body = json.decode(response.body) as Map<String, dynamic>;
+
+    final sanitizedUri = body["image"];
+
+    OffChainMetadata? data;
+
+    try {
+      data = OffChainMetadata.fromJson(body);
+    } catch (err) {
+      data = null;
+    }
+    return ImageInfo(sanitizedUri, data);
+  } catch (err) {
+    return null;
+  }
+}
 
 class Token {
   // How much of this token
@@ -14,6 +52,17 @@ class Token {
   final String mint;
 
   Token(this.balance, this.mint, this.symbol);
+}
+
+class NFT extends Token {
+  final ImageInfo? imageInfo;
+
+  NFT(
+    double balance,
+    String mint,
+    String symbol,
+    this.imageInfo,
+  ) : super(balance, mint, symbol);
 }
 
 enum AccountItem {
@@ -119,7 +168,19 @@ class BaseAccount {
                       : tokensTracker.getTokenInfo(tokenMint).symbol;
 
                   // Add the token to this account
-                  tokens.add(Token(balance, tokenMint, symbol));
+                  client.rpcClient.getMetadata(mint: tokenMint).then((value) async {
+                    if (value != null) {
+                      try {
+                        final imageInfo = await getImageFromUri(value.uri);
+
+                        if (imageInfo != null) {
+                          tokens.add(NFT(balance, tokenMint, symbol, imageInfo));
+                          return;
+                        }
+                      } catch (_) {}
+                    }
+                    tokens.add(Token(balance, tokenMint, symbol));
+                  });
                 },
                 mint: (_, __, ___) {},
                 unknown: (_) {});
@@ -139,52 +200,56 @@ class BaseAccount {
   Future<void> loadTransactions() async {
     transactions = [];
 
-    final response = await client.rpcClient.getTransactionsList(address);
+    try {
+      final response = await client.rpcClient.getTransactionsList(address);
 
-    for (var tx in response) {
-      final message = tx.transaction.message;
+      for (var tx in response) {
+        final message = tx.transaction.message;
 
-      for (final instruction in message.instructions) {
-        if (instruction is ParsedInstruction) {
-          instruction.map(
-            system: (data) {
-              data.parsed.map(
-                transfer: (data) {
-                  ParsedSystemTransferInformation transfer = data.info;
-                  bool receivedOrNot = transfer.destination == address;
-                  double ammount = transfer.lamports.toDouble() / 1000000000;
+        for (final instruction in message.instructions) {
+          if (instruction is ParsedInstruction) {
+            instruction.map(
+              system: (data) {
+                data.parsed.map(
+                  transfer: (data) {
+                    ParsedSystemTransferInformation transfer = data.info;
+                    bool receivedOrNot = transfer.destination == address;
+                    double ammount = transfer.lamports.toDouble() / 1000000000;
 
-                  transactions.add(
-                    TransactionDetails(
-                      transfer.source,
-                      transfer.destination,
-                      ammount,
-                      receivedOrNot,
-                      system_program_id,
-                      tx.blockTime!,
-                    ),
-                  );
-                },
-                transferChecked: (_) {},
-                unsupported: (_) {
-                  transactions.add(UnsupportedTransaction(tx.blockTime!));
-                },
-              );
-            },
-            splToken: (data) {
-              data.parsed.map(
-                transfer: (data) {},
-                transferChecked: (_) {},
-                generic: (_) {},
-              );
-            },
-            memo: (_) {},
-            unsupported: (_) {
-              transactions.add(UnsupportedTransaction(tx.blockTime!));
-            },
-          );
+                    transactions.add(
+                      TransactionDetails(
+                        transfer.source,
+                        transfer.destination,
+                        ammount,
+                        receivedOrNot,
+                        system_program_id,
+                        tx.blockTime!,
+                      ),
+                    );
+                  },
+                  transferChecked: (_) {},
+                  unsupported: (_) {
+                    transactions.add(UnsupportedTransaction(tx.blockTime!));
+                  },
+                );
+              },
+              splToken: (data) {
+                data.parsed.map(
+                  transfer: (data) {},
+                  transferChecked: (data) {},
+                  generic: (data) {},
+                );
+              },
+              memo: (_) {},
+              unsupported: (a) {
+                transactions.add(UnsupportedTransaction(tx.blockTime!));
+              },
+            );
+          }
         }
       }
+    } catch (err) {
+      print(err);
     }
 
     itemsLoaded[AccountItem.transactions] = true;

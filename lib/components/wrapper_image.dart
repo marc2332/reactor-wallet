@@ -8,7 +8,7 @@ class WrapperImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    RegExp isImage = RegExp(r'[\/.](jpg|jpeg|png)', caseSensitive: true);
+    RegExp isImage = RegExp(r'[\/.=](jpg|jpeg|png)', caseSensitive: true);
     if (isImage.hasMatch(url)) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 5),

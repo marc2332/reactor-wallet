@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/pages/manage_accounts.dart';
+import 'package:reactor_wallet/components/account_collectibles.dart';
 import 'home/account.dart';
 import 'home/settings.dart';
 
@@ -26,12 +27,16 @@ class HomePageState extends ConsumerState<HomePage> {
 
     switch (currentPage) {
       // Settings sub page
-      case 3:
+      case 4:
         page = const SettingsSubPage();
         break;
 
-      case 2:
+      case 3:
         page = const ManageAccountsPage();
+        break;
+
+      case 2:
+        page = const AccountSubPage("/collectibles");
         break;
 
       // Settings sub page
@@ -67,6 +72,11 @@ class HomePageState extends ConsumerState<HomePage> {
               activeIcon: Icon(Icons.timeline),
               icon: Icon(Icons.timeline),
               label: 'Transactions',
+            ),
+            BottomNavigationBarItem(
+              activeIcon: Icon(Icons.art_track_outlined),
+              icon: Icon(Icons.art_track_outlined),
+              label: 'collectibles',
             ),
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.account_box_outlined),

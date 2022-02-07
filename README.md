@@ -12,6 +12,7 @@ Its on **alpha** stage, be careful when using it.
 - Display SPL Tokens and transactions
 - Import and create multiple wallets
 - Show the USD equivalent of the address balance and all it's tokens combined
+- You can see collectives (aka NFTs)
 
 It should work fine on **Android** and **Windows**, I haven't tried on the other platforms.
 
@@ -54,7 +55,7 @@ dart format . --line-length 100
 - [x] Have some UI tweaking options, like themes.
 - [ ] Unit tests (WIP)
 - [x] Display owned tokens
-- [ ] Ability to display NFTs owned by an address 
+- [x] Ability to display NFTs owned by an address 
 - [ ] Upload to https://itsallwidgets.com/
 - [ ] Ability to add a small note when making transactions
 - [x] Ability to make transactions with SPL Tokens
