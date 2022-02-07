@@ -11,13 +11,13 @@ class TokenCardWithShimmer extends StatelessWidget {
       child: Row(
         children: [
           Padding(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.only(left: 5, right: 15),
             child: Shimmer.fromColors(
               baseColor: Colors.grey[300]!,
               highlightColor: Colors.grey[100]!,
               child: Container(
-                width: 35,
-                height: 35,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
                   color: const Color.fromARGB(150, 0, 0, 0),
                   borderRadius: BorderRadius.circular(50),

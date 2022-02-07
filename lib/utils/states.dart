@@ -60,37 +60,40 @@ class SettingsManager extends StateNotifier<Map<String, dynamic>> {
   }
 }
 
-NetworkUrl migrateFromOldUrls(dynamic url) {
-  if (url is List) {
-    return NetworkUrl(url[0], url[1]);
-  } else {
-    return NetworkUrl(url, (url as String).replaceFirst("https", "wss"));
-  }
-}
-
 /*
  * Read, parse andl load the stored data from Hive into the state providers
  */
 Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
   await Hive.initFlutter();
 
-  // Selected the configured theme
+  // Open the settings
   Box<dynamic> settingsBox = await Hive.openBox('settings');
+
+  // Create a settings manager
   SettingsManager settingsManager = ref.read(settingsProvider.notifier);
+
+  // Get the saved theme
   ThemeType selectedTheme = SettingsManager.mapType(
     settingsBox.get("theme", defaultValue: "Light"),
   );
+
+  // Configure the settings manager
   settingsManager.settingsBox = settingsBox;
   settingsManager.setTheme(selectedTheme);
 
-  // Load the accounts
+  // Open the accounts
   Box<dynamic> accountsBox = await Hive.openBox('accounts');
-  AccountsManager manager = ref.read(accountsProvider.notifier);
-  manager.accountsBox = accountsBox;
+
+  // Create an account manager
+  AccountsManager accountManager = ref.read(accountsProvider.notifier);
+
+  // Configure the accounts manager
+  accountManager.accountsBox = accountsBox;
 
   // Parse the accounts into instances
   Map<dynamic, dynamic> jsonAccounts = accountsBox.toMap();
 
+  // Map the saved accounts to instances
   Map<String, Account> accountsState = jsonAccounts.map((accountName, account) {
     AccountType accountType = account["accountType"] == AccountType.Client.toString()
         ? AccountType.Client
@@ -101,7 +104,7 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
         account["address"],
         account["balance"],
         accountName,
-        migrateFromOldUrls(account["url"]),
+        NetworkUrl(account["url"][0], account["url"][1]),
         tokensTracker,
       );
       return MapEntry(accountName, clientAccount);
@@ -110,7 +113,7 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
         account["balance"],
         account["address"],
         accountName,
-        migrateFromOldUrls(account["url"]),
+        NetworkUrl(account["url"][0], account["url"][1]),
         WalletAccount.decryptMnemonic(account["mnemonic"]),
         tokensTracker,
       );
@@ -118,17 +121,22 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
     }
   });
 
+  // Load the accounts
   ref.read(accountsProvider.notifier).state = accountsState;
 
+  // Select the first account
   if (accountsState.values.isNotEmpty) {
     ref.read(selectedAccountProvider.notifier).state = accountsState.values.first;
   }
 
+  // Mark the app as loaded
   ref.read(appLoadedProvider.notifier).state = true;
 
+  // Load the whole tokens list
   await tokensTracker.loadTokenList();
 
-  manager.loadUSDValues();
+  // Asynchronously fetch the
+  accountManager.loadUSDValues();
 
   int accountWithLoadedTokens = 0;
 
@@ -136,19 +144,16 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
     // Fetch every saved account's balance
     if (account.accountType == AccountType.Wallet) {
       account = account as WalletAccount;
-      /*
-       * Load the key's pair if it's a Wallet account
-       */
+
+      // oad the key's pair if it's a Wallet account
       account.loadKeyPair().then((_) {
-        manager.refreshAllState();
+        accountManager.refreshAllState();
       });
     }
 
-    /*
-     * Load the transactions list and the tokens list
-     */
+    // Load the transactions list and the tokens list
     account.loadTransactions().then((_) {
-      manager.refreshAllState();
+      accountManager.refreshAllState();
     });
 
     account.loadTokens().then((_) async {
@@ -156,10 +161,10 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
 
       // When all accounts have loaded it's tokens then fetch it's price
       if (accountWithLoadedTokens == accountsState.length) {
-        await manager.loadUSDValues();
+        await accountManager.loadUSDValues();
       }
 
-      manager.refreshAllState();
+      accountManager.refreshAllState();
     });
   }
 }
@@ -174,7 +179,7 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
 
   Future<void> loadUSDValues() async {
     List<String> tokenNames = tokensTracker.trackers.values
-        .where((e) => e.name != "Unknown")
+        .where((e) => !e.name.contains("Unknown"))
         .map((e) => e.name.toLowerCase())
         .toList();
 
