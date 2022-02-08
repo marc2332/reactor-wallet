@@ -1,18 +1,18 @@
 import 'package:flutter/services.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as Http;
+import 'package:http/http.dart' as http;
 import 'dart:async';
+import 'package:solana/solana.dart';
 
 /*
  * Types of accounts
  */
 enum AccountType {
+  // ignore: constant_identifier_names
   Wallet,
+  // ignore: constant_identifier_names
   Client,
 }
-
-const system_program_id = "11111111111111111111111111111111";
-const token_program_id = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 
 /*
  * Token Tracker
@@ -26,6 +26,9 @@ class Tracker {
   Tracker(this.name, this.programMint, this.symbol);
 }
 
+/*
+ * Info about a token
+ */
 class TokenInfo {
   late String name;
   late String logoUrl = "";
@@ -42,7 +45,7 @@ class TokenInfo {
 class TokenTrackers {
   // List of Token trackers
   late Map<String, Tracker> trackers = {
-    system_program_id: Tracker('solana', system_program_id, "SOL"),
+    SystemProgram.programId: Tracker('solana', SystemProgram.programId, "SOL"),
   };
 
   late Map<String, TokenInfo> tokensList = {};
@@ -103,7 +106,7 @@ Future<Map<String, double>> getTokenUsdValue(List<String> tokens) async {
     Map<String, String> headers = {};
     headers['Accept'] = 'application/json';
     headers['Access-Control-Allow-Origin'] = '*';
-    Http.Response response = await Http.get(
+    http.Response response = await http.get(
       Uri.http(
         'api.coingecko.com',
         '/api/v3/simple/price',
@@ -126,7 +129,6 @@ Future<Map<String, double>> getTokenUsdValue(List<String> tokens) async {
 
     return values;
   } catch (err) {
-    print(err);
     return {tokens[0]: 0};
   }
 }

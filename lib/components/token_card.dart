@@ -3,7 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/wrapper_image.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/states.dart';
-import 'package:reactor_wallet/utils/tracker.dart';
 
 class TokenCard extends ConsumerWidget {
   final Token token;

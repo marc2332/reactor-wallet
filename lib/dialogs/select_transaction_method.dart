@@ -3,13 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:reactor_wallet/dialogs/insufficient_funds.dart';
-import 'package:reactor_wallet/dialogs/prepare_transaction.dart';
 import 'package:reactor_wallet/dialogs/send_transaction_by_address.dart';
 import 'package:reactor_wallet/dialogs/transaction_not_suported.dart';
 import 'package:reactor_wallet/pages/scan_qr.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
-import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
 
 Future<void> selectTransactionMethod(

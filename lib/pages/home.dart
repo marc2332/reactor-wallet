@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/pages/manage_accounts.dart';
-import 'package:reactor_wallet/components/account_collectibles.dart';
 import 'home/account.dart';
 import 'home/settings.dart';
 

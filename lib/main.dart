@@ -31,10 +31,12 @@ main() async {
 
   await Executor().warmUp();
 
-  runApp(ProviderScope(child: App()));
+  runApp(const ProviderScope(child: App()));
 }
 
 class App extends HookConsumerWidget {
+  const App({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     TokenTrackers tokensTracer = ref.read(tokensTrackerProvider);

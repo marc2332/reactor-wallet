@@ -5,38 +5,39 @@ import 'package:reactor_wallet/utils/states.dart';
 
 Future<void> removeAccountDialog(BuildContext context, Account account) async {
   return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Consumer(
-          builder: (context, ref, _) {
-            return AlertDialog(
-              title: const Text('Are you sure?'),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    Text("'${account.name}' will be permanently removed. "),
-                  ],
-                ),
+    context: context,
+    builder: (BuildContext context) {
+      return Consumer(
+        builder: (context, ref, _) {
+          return AlertDialog(
+            title: const Text('Are you sure?'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text("'${account.name}' will be permanently removed. "),
+                ],
               ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: const Text('Remove'),
-                  onPressed: () {
-                    removeAccount(ref, context, account);
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      });
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Remove'),
+                onPressed: () {
+                  removeAccount(ref, context, account);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
 }
 
 /*

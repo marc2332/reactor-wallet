@@ -1,11 +1,3 @@
-// solana:
-// mvines9iiHiQTysrwkJjGf2gb9Ex9jXJX8ns3qwf2kN?
-// amount=0.01&
-// reference=82ZJ7nbGpixjeDCmEhUcmwXYfvurzAgGdtSMuHnUgyny&
-// label=Michael&
-// message=Thanks%20for%20all%20the%20fish&
-// memo=OrderId5678
-
 class TransactionSolanaPay {
   String recipient;
   double? amount;
@@ -41,7 +33,7 @@ class TransactionSolanaPay {
     );
   }
 
-  /// Serialized a Solana Pay uri
+  /// Serialized a Solana transaction into a uri
   String toUri() {
     String uri = 'solana:$recipient?amount=${amount.toString()}';
 

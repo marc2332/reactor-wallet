@@ -9,6 +9,7 @@ import 'package:reactor_wallet/utils/states.dart';
 import 'package:reactor_wallet/utils/theme.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
+import 'package:solana/solana.dart';
 import 'package:worker_manager/worker_manager.dart';
 
 Future<bool> makeTransactionWithLamports(
@@ -51,7 +52,7 @@ Future<void> prepareTransaction(
             useEffect(() {
               AccountsManager manager = ref.read(accountsProvider.notifier);
               manager.refreshAccount(walletAccount.name).then((value) {
-                if (transaction.programId == system_program_id) {
+                if (transaction.programId == SystemProgram.programId) {
                   if (walletAccount.balance > transaction.ammount) {
                     hasEnoughFunds.value = true;
                   }
@@ -122,7 +123,7 @@ Future<void> prepareTransaction(
                           );
 
                           try {
-                            if (transaction.programId == system_program_id) {
+                            if (transaction.programId == SystemProgram.programId) {
                               // Convert SOL to lamport
                               int lamports = (transaction.ammount * 1000000000).toInt();
                               walletAccount.sendLamportsTo(transaction.destination, lamports);

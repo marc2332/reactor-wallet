@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:solana/dto.dart';
-import 'package:solana/dto.dart' as dto;
 import 'package:solana/solana.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:solana/metaplex.dart';
-import 'package:http/http.dart' as Http;
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ImageInfo {
@@ -20,7 +19,7 @@ Future<ImageInfo?> getImageFromUri(String uri) async {
     Map<String, String> headers = {};
     headers['Accept'] = 'application/json';
     headers['Access-Control-Allow-Origin'] = '*';
-    Http.Response response = await Http.get(
+    http.Response response = await http.get(
       Uri.parse(uri),
       headers: headers,
     );
@@ -111,7 +110,7 @@ class BaseAccount {
     this.balance = balance.toDouble() / 1000000000;
     itemsLoaded[AccountItem.solBalance] = true;
 
-    usdBalance = this.balance * tokensTracker.getTokenValue(system_program_id);
+    usdBalance = this.balance * tokensTracker.getTokenValue(SystemProgram.programId);
 
     itemsLoaded[AccountItem.usdBalance] = true;
 
@@ -245,7 +244,7 @@ class BaseAccount {
                         transfer.destination,
                         ammount,
                         receivedOrNot,
-                        system_program_id,
+                        SystemProgram.programId,
                         tx.blockTime!,
                       ),
                     );

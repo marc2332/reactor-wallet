@@ -8,7 +8,7 @@ import 'package:reactor_wallet/utils/solana_pay.dart';
 import 'package:reactor_wallet/utils/states.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
-import 'package:solana/solana.dart' show SubscriptionClient;
+import 'package:solana/solana.dart' show SubscriptionClient, SystemProgram;
 
 class ResponsiveRotator extends StatelessWidget {
   final List<Widget> children;
@@ -42,7 +42,7 @@ List<TokenInfo> getAllPayableTokens(Account account) {
   externalTokens.removeWhere((info) => accountTokens.contains(info));
   //accountTokens.addAll(externalTokens);
 
-  accountTokens.insert(0, TokenInfo.withInfo(system_program_id, "Solana", "", "SOL"));
+  accountTokens.insert(0, TokenInfo.withInfo(SystemProgram.programId, "Solana", "", "SOL"));
 
   return accountTokens;
 }
@@ -78,7 +78,7 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
 
             var stream;
 
-            if (selectedToken.value.mintAddress == system_program_id) {
+            if (selectedToken.value.mintAddress == SystemProgram.programId) {
               stream = client.accountSubscribe(account.address);
             } else {
               final programAccount = await account.client.getAssociatedTokenAccount(

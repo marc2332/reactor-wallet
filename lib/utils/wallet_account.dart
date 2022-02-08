@@ -28,7 +28,10 @@ class WalletAccount extends BaseAccount implements Account {
     this.mnemonic,
     tokensTracker,
   ) : super(balance, name, url, tokensTracker) {
-    client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
+    client = SolanaClient(
+      rpcUrl: Uri.parse(url.rpc),
+      websocketUrl: Uri.parse(url.ws),
+    );
   }
 
   /*
@@ -43,7 +46,10 @@ class WalletAccount extends BaseAccount implements Account {
     tokensTracker,
   ) : super(balance, name, url, tokensTracker) {
     this.address = address;
-    client = SolanaClient(rpcUrl: Uri.parse(url.rpc), websocketUrl: Uri.parse(url.ws));
+    client = SolanaClient(
+      rpcUrl: Uri.parse(url.rpc),
+      websocketUrl: Uri.parse(url.ws),
+    );
   }
 
   /*
@@ -51,7 +57,10 @@ class WalletAccount extends BaseAccount implements Account {
    */
   void sendLamportsTo(String destinationAddress, int amount) async {
     await client.transferLamports(
-        source: wallet, destination: destinationAddress, lamports: amount);
+      source: wallet,
+      destination: destinationAddress,
+      lamports: amount,
+    );
   }
 
   /*
@@ -92,7 +101,10 @@ class WalletAccount extends BaseAccount implements Account {
    * Load the keys pair into the WalletAccount
    */
   Future<void> loadKeyPair() async {
-    final Ed25519HDKeyPair keyPair = await Executor().execute(arg1: mnemonic, fun1: createKeyPair);
+    final Ed25519HDKeyPair keyPair = await Executor().execute(
+      arg1: mnemonic,
+      fun1: createKeyPair,
+    );
     wallet = keyPair;
     address = wallet.address;
   }
@@ -103,7 +115,13 @@ class WalletAccount extends BaseAccount implements Account {
   static Future<WalletAccount> generate(String name, NetworkUrl url, tokensTracker) async {
     final String randomMnemonic = bip39.generateMnemonic();
 
-    WalletAccount account = WalletAccount(0, name, url, randomMnemonic, tokensTracker);
+    WalletAccount account = WalletAccount(
+      0,
+      name,
+      url,
+      randomMnemonic,
+      tokensTracker,
+    );
     await account.loadKeyPair();
     await account.refreshBalance();
     return account;
@@ -115,7 +133,10 @@ class WalletAccount extends BaseAccount implements Account {
   static String decryptMnemonic(String mnemonic) {
     final encrypter = Encrypter(AES(secureKey));
 
-    return encrypter.decrypt(Encrypted.fromBase64(mnemonic), iv: iv);
+    return encrypter.decrypt(
+      Encrypted.fromBase64(mnemonic),
+      iv: iv,
+    );
   }
 
   @override

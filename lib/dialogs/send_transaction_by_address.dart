@@ -5,6 +5,7 @@ import 'package:reactor_wallet/dialogs/prepare_transaction.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
+import 'package:solana/solana.dart';
 
 String? transactionAddressValidator(String? value) {
   if (value == null || value.isEmpty) {
@@ -50,7 +51,7 @@ Future<void> sendTransactionDialog(
           0,
           Token(
             walletAccount.balance,
-            system_program_id,
+            SystemProgram.programId,
             TokenInfo(name: "Solana", symbol: "SOL"),
           ),
         );

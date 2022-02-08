@@ -12,7 +12,7 @@ Future<void> insuficientFundsDialog(context) async {
               Column(
                 children: const [
                   Padding(
-                    padding: const EdgeInsets.all(15),
+                    padding: EdgeInsets.all(15),
                     child: Icon(
                       Icons.error_outline_outlined,
                       color: Colors.red,
