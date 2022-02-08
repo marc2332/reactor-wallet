@@ -151,6 +151,7 @@ class BaseAccount {
     );
 
     int unknownN = 0;
+    int notOwnedNFTs = 0;
 
     for (final tokenAccount in tokenAccounts) {
       ParsedAccountData? data = tokenAccount.account.data as ParsedAccountData?;
@@ -165,7 +166,10 @@ class BaseAccount {
                   double balance = double.parse(uiBalance ?? "0");
 
                   String defaultName = "Unknown $unknownN";
-                  TokenInfo defaultTokenInfo = TokenInfo(name: defaultName, symbol: defaultName);
+                  TokenInfo defaultTokenInfo = TokenInfo(
+                    name: defaultName,
+                    symbol: defaultName,
+                  );
 
                   // Start tracking the token
                   TokenInfo tokenInfo = tokensTracker.addTrackerByProgramMint(
@@ -173,26 +177,26 @@ class BaseAccount {
                     defaultValue: defaultTokenInfo,
                   );
 
-                  if (defaultTokenInfo.symbol != tokenInfo.symbol) {
+                  if (defaultTokenInfo.name != tokenInfo.name) {
                     unknownN++;
                   }
 
                   // Add the token to this account
                   client.rpcClient.getMetadata(mint: tokenMint).then((value) async {
-                    Token token = Token(balance, tokenMint, tokenInfo);
-                    if (value != null) {
-                      try {
-                        ImageInfo imageInfo = await getImageFromUri(value.uri) as ImageInfo;
-
-                        token = NFT(balance, tokenMint, tokenInfo, imageInfo);
-                      } catch (_) {}
-                    }
-
-                    tokens.add(token);
-
-                    if (tokens.length == tokenAccounts.length) {
-                      itemsLoaded[AccountItem.tokens] = true;
-                      completer.complete();
+                    try {
+                      ImageInfo imageInfo = await getImageFromUri(value!.uri) as ImageInfo;
+                      if (balance > 0) {
+                        tokens.add(NFT(balance, tokenMint, tokenInfo, imageInfo));
+                      } else {
+                        notOwnedNFTs++;
+                      }
+                    } catch (_) {
+                      tokens.add(Token(balance, tokenMint, tokenInfo));
+                    } finally {
+                      if (tokens.length + notOwnedNFTs == tokenAccounts.length) {
+                        itemsLoaded[AccountItem.tokens] = true;
+                        completer.complete();
+                      }
                     }
                   });
                 },
@@ -222,7 +226,7 @@ class BaseAccount {
     try {
       final response = await client.rpcClient.getTransactionsList(address);
 
-      for (var tx in response) {
+      for (final tx in response) {
         final message = tx.transaction.message;
 
         for (final instruction in message.instructions) {
@@ -267,9 +271,7 @@ class BaseAccount {
           }
         }
       }
-    } catch (err) {
-      print(err);
-    }
+    } catch (err) {}
 
     itemsLoaded[AccountItem.transactions] = true;
   }
@@ -385,11 +387,4 @@ class Transaction {
     this.receivedOrNot,
     this.programId,
   );
-}
-
-extension WSClient on SolanaClient {
-  Stream<dto.Account> accountSubscribe(Uri uri, String address) {
-    final client = SubscriptionClient(uri);
-    return client.accountSubscribe(address);
-  }
 }

@@ -73,14 +73,15 @@ Future<void> sendTransactionDialog(
                   underline: Container(),
                   onChanged: (String? tokenSymbol) {
                     if (tokenSymbol != null) {
-                      selectedToken.value =
-                          tokens.firstWhere((token) => token.info.symbol == tokenSymbol);
+                      selectedToken.value = tokens.firstWhere(
+                        (token) => token.info.symbol == tokenSymbol,
+                      );
                     }
                   },
                   items: tokens.map<DropdownMenuItem<String>>((Token token) {
                     return DropdownMenuItem<String>(
                       value: token.info.symbol,
-                      child: Text(token.info.symbol),
+                      child: Text(token.info.symbol + (token is NFT ? ' - NFT' : '')),
                     );
                   }).toList(),
                 ),
