@@ -105,9 +105,9 @@ class BaseAccount {
    * Refresh the account balance
    */
   Future<void> refreshBalance() async {
-    int balance = await client.rpcClient.getBalance(address);
+    int balance = await client.rpcClient.getBalance(address, commitment: Commitment.confirmed);
 
-    this.balance = balance.toDouble() / 1000000000;
+    this.balance = balance.toDouble() / lamportsPerSol;
     itemsLoaded[AccountItem.solBalance] = true;
 
     usdBalance = this.balance * tokensTracker.getTokenValue(SystemProgram.programId);
@@ -146,6 +146,7 @@ class BaseAccount {
     final tokenAccounts = await client.rpcClient.getTokenAccountsByOwner(
       address,
       const TokenAccountsFilter.byProgramId(TokenProgram.programId),
+      commitment: Commitment.confirmed,
       encoding: Encoding.jsonParsed,
     );
 
@@ -223,7 +224,10 @@ class BaseAccount {
     transactions = [];
 
     try {
-      final response = await client.rpcClient.getTransactionsList(address);
+      final response = await client.rpcClient.getTransactionsList(
+        address,
+        commitment: Commitment.confirmed,
+      );
 
       for (final tx in response) {
         final message = tx.transaction.message;
@@ -236,7 +240,7 @@ class BaseAccount {
                   transfer: (data) {
                     ParsedSystemTransferInformation transfer = data.info;
                     bool receivedOrNot = transfer.destination == address;
-                    double ammount = transfer.lamports.toDouble() / 1000000000;
+                    double ammount = transfer.lamports.toDouble() / lamportsPerSol;
 
                     transactions.add(
                       TransactionDetails(
@@ -378,6 +382,8 @@ class Transaction {
   final String programId;
   // Minf of the token, if it's a token transaction
   late String tokenMint;
+  // References used in the transaction, https://docs.solanapay.com/spec#reference
+  late List<String> references = [];
 
   Transaction(
     this.origin,

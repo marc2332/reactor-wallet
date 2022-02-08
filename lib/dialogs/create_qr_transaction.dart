@@ -8,7 +8,10 @@ import 'package:reactor_wallet/utils/solana_pay.dart';
 import 'package:reactor_wallet/utils/states.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
-import 'package:solana/solana.dart' show SubscriptionClient, SystemProgram;
+import 'package:solana/dto.dart'
+    show Commitment, ParsedInstruction, ParsedSystemTransferInformation;
+import 'package:solana/solana.dart'
+    show Ed25519HDKeyPair, SubscriptionClient, SystemProgram, lamportsPerSol;
 
 class ResponsiveRotator extends StatelessWidget {
   final List<Widget> children;
@@ -19,16 +22,17 @@ class ResponsiveRotator extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    if (screenSize.width > 700)
+    if (screenSize.width > 700) {
       return Row(
         children: children,
       );
-    else
+    } else {
       return Column(
         children: children,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
       );
+    }
   }
 }
 
@@ -47,7 +51,10 @@ List<TokenInfo> getAllPayableTokens(Account account) {
   return accountTokens;
 }
 
-enum TransactionStatus { pending, loading, received }
+enum TransactionStatus {
+  pending,
+  received,
+}
 
 Future<void> createQRTransaction(BuildContext context, Account account) async {
   List<TokenInfo> tokens = getAllPayableTokens(account);
@@ -67,11 +74,15 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
           final transactionStatus = useState(TransactionStatus.pending);
 
           void generateQR() async {
+            final transactionIdentifier = await Ed25519HDKeyPair.random();
+            var sendAmount = double.parse(amount.value);
+
             transactionData.value = TransactionSolanaPay(
               recipient: account.address,
-              amount: double.parse(amount.value),
+              amount: sendAmount,
               splToken:
                   selectedToken.value.symbol != "SOL" ? selectedToken.value.mintAddress : null,
+              references: [transactionIdentifier.address],
             );
 
             final client = SubscriptionClient(Uri.parse(account.url.ws));
@@ -79,7 +90,10 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
             var stream;
 
             if (selectedToken.value.mintAddress == SystemProgram.programId) {
-              stream = client.accountSubscribe(account.address);
+              stream = client.accountSubscribe(
+                account.address,
+                commitment: Commitment.confirmed,
+              );
             } else {
               final programAccount = await account.client.getAssociatedTokenAccount(
                 owner: account.address,
@@ -95,15 +109,23 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                 );
               }
 
-              stream = client.accountSubscribe(programAccount!.pubkey);
+              stream = client.accountSubscribe(
+                programAccount!.pubkey,
+                commitment: Commitment.confirmed,
+              );
             }
 
-            // TODO: Use reference to find the transaction and make sure the right amount / token was used
-            stream.forEach((newAccount) {
-              transactionStatus.value = TransactionStatus.loading;
-              accountsManager.refreshAccount(account.name).then(
-                    (value) => transactionStatus.value = TransactionStatus.received,
-                  );
+            stream.forEach((newAccount) async {
+              final sigs = await account.client.rpcClient.getSignaturesForAddress(
+                transactionIdentifier.address,
+                commitment: Commitment.confirmed,
+              );
+
+              if (sigs.isNotEmpty) {
+                // TODO: Check amount of the transaction is correct
+                transactionStatus.value = TransactionStatus.received;
+              }
+              accountsManager.refreshAccount(account.name);
               client.close();
             });
           }
@@ -196,8 +218,9 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                                 child: transactionData.value != null
                                     ? Center(
                                         child: QrImage(
-                                            data: transactionData.value!.toUri(),
-                                            version: QrVersions.auto),
+                                          data: transactionData.value!.toUri(),
+                                          version: QrVersions.auto,
+                                        ),
                                       )
                                     : OutlinedButton(
                                         child: const Text("Create"),
@@ -209,16 +232,7 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                         ),
                       ],
                     )
-                  : transactionStatus.value == TransactionStatus.loading
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Center(
-                              child: CircularProgressIndicator(),
-                            )
-                          ],
-                        )
-                      : const Text("Received transaction!"),
+                  : const Text("Received transaction!"),
             ),
             actions: <Widget>[
               TextButton(

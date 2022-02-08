@@ -39,12 +39,14 @@ Future<void> selectTransactionMethod(
           }
 
           Navigator.pop(context);
+
           sendTransactionDialog(
             context,
             walletAccount,
             initialDestination: txData.recipient,
             initialSendAmount: txData.amount ?? 0.0,
             defaultTokenSymbol: defaultTokenSymbol,
+            references: txData.references,
           );
         } on FormatException {
           // Invalid URI

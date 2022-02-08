@@ -110,7 +110,7 @@ Future<void> prepareTransaction(
                 TextButton(
                   child: const Text('Send'),
                   onPressed: hasEnoughFunds.value
-                      ? () {
+                      ? () async {
                           Navigator.of(context).pop();
 
                           // Show some feedback
@@ -126,11 +126,20 @@ Future<void> prepareTransaction(
                             if (transaction.programId == SystemProgram.programId) {
                               // Convert SOL to lamport
                               int lamports = (transaction.ammount * 1000000000).toInt();
-                              walletAccount.sendLamportsTo(transaction.destination, lamports);
+
+                              walletAccount.sendLamportsTo(
+                                transaction.destination,
+                                lamports,
+                                references: transaction.references,
+                              );
                             } else {
                               int amount = transaction.ammount.toInt();
                               walletAccount.sendSPLTokenTo(
-                                  transaction.destination, token.mint, amount);
+                                transaction.destination,
+                                token.mint,
+                                amount,
+                                references: transaction.references,
+                              );
                             }
 
                             // TODO: This should wait for the signature to be confirmed, and then show the "transactionHasBeenSentDialog"

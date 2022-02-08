@@ -1,5 +1,15 @@
-import 'package:solana/dto.dart' show ProgramAccount;
-import 'package:solana/solana.dart' show Ed25519HDKeyPair, SolanaClient, Wallet;
+import 'package:solana/dto.dart' show Commitment, ProgramAccount;
+import 'package:solana/encoder.dart';
+import 'package:solana/solana.dart'
+    show
+        Ed25519HDKeyPair,
+        NoAssociatedTokenAccountException,
+        RpcClientExt,
+        SolanaClient,
+        SystemInstruction,
+        TokenProgram,
+        Wallet,
+        signTransaction;
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:worker_manager/worker_manager.dart';
@@ -55,37 +65,90 @@ class WalletAccount extends BaseAccount implements Account {
   /*
    * Send SOLs to an adress
    */
-  void sendLamportsTo(String destinationAddress, int amount) async {
-    await client.transferLamports(
-      source: wallet,
+  void sendLamportsTo(
+    String destinationAddress,
+    int amount, {
+    List<String> references = const [],
+  }) async {
+    final instruction = SystemInstruction.transfer(
+      source: address,
       destination: destinationAddress,
       lamports: amount,
+    );
+
+    for (final reference in references) {
+      instruction.accounts.add(
+        AccountMeta(
+          pubKey: reference,
+          isWriteable: false,
+          isSigner: false,
+        ),
+      );
+    }
+
+    final message = Message(
+      instructions: [instruction],
+    );
+
+    final signature = await client.rpcClient.signAndSendTransaction(message, [wallet]);
+
+    await client.waitForSignatureStatus(
+      signature,
+      status: Commitment.confirmed,
     );
   }
 
   /*
    * Send a Token to an adress
    */
-  void sendSPLTokenTo(String destinationAddress, String tokenMint, int amount) async {
-    // Create a token account for the destination address if it doesn't have one yet
-    ProgramAccount? destinationTokenAccount = await client.getAssociatedTokenAccount(
+  void sendSPLTokenTo(
+    String destinationAddress,
+    String tokenMint,
+    int amount, {
+    List<String> references = const [],
+  }) async {
+    var associatedRecipientAccount = await client.getAssociatedTokenAccount(
       owner: destinationAddress,
       mint: tokenMint,
     );
+    var associatedSenderAccount = await client.getAssociatedTokenAccount(
+      owner: address,
+      mint: tokenMint,
+    );
 
-    if (destinationTokenAccount == null) {
-      await client.createAssociatedTokenAccount(
-        mint: tokenMint,
-        funder: wallet,
-        owner: destinationAddress,
+    associatedRecipientAccount ??= await client.createAssociatedTokenAccount(
+      mint: tokenMint,
+      funder: wallet,
+      owner: destinationAddress,
+    );
+
+    associatedSenderAccount ??= await client.createAssociatedTokenAccount(
+      mint: tokenMint,
+      funder: wallet,
+      owner: address,
+    );
+
+    final message = TokenProgram.transfer(
+        source: associatedRecipientAccount.pubkey,
+        destination: associatedSenderAccount.pubkey,
+        amount: amount,
+        owner: address);
+
+    for (final reference in references) {
+      message.instructions.first.accounts.add(
+        AccountMeta(
+          pubKey: reference,
+          isWriteable: false,
+          isSigner: false,
+        ),
       );
     }
 
-    await client.transferSplToken(
-      source: wallet,
-      mint: tokenMint,
-      destination: destinationAddress,
-      amount: amount,
+    final signature = await client.rpcClient.signAndSendTransaction(message, [wallet]);
+
+    await client.waitForSignatureStatus(
+      signature,
+      status: Commitment.confirmed,
     );
   }
 

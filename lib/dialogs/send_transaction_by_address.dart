@@ -35,6 +35,7 @@ Future<void> sendTransactionDialog(
   String initialDestination = "",
   double initialSendAmount = 0,
   String defaultTokenSymbol = "SOL",
+  List<String> references = const [],
 }) async {
   String destination = initialDestination;
   double sendAmount = initialSendAmount;
@@ -144,6 +145,8 @@ Future<void> sendTransactionDialog(
                     false,
                     selectedToken.value.mint,
                   );
+
+                  tx.references = references;
 
                   prepareTransaction(context, tx, walletAccount, selectedToken.value);
                 }

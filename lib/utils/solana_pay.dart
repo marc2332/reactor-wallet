@@ -1,14 +1,14 @@
 class TransactionSolanaPay {
   String recipient;
   double? amount;
-  String? reference;
+  List<String> references = [];
   String? label;
   String? message;
   String? memo;
   String? splToken;
   TransactionSolanaPay({
     required this.recipient,
-    this.reference,
+    this.references = const [],
     this.amount,
     this.label,
     this.message,
@@ -20,16 +20,16 @@ class TransactionSolanaPay {
   static TransactionSolanaPay parseUri(String uriSolanaPay) {
     Uri uri = Uri.parse(uriSolanaPay);
     String recipient = uri.path;
-    dynamic meta = uri.queryParameters;
+    dynamic meta = uri.queryParametersAll;
 
     return TransactionSolanaPay(
       recipient: recipient,
-      reference: meta['reference'],
-      amount: double.parse(meta['amount']),
-      label: meta['label'],
-      message: meta['message'],
-      memo: meta['memo'],
-      splToken: meta['spl-token'],
+      references: meta['reference'],
+      amount: double.parse(meta['amount'][0]),
+      label: meta['label'][0],
+      message: meta['message'][0],
+      memo: meta['memo'][0],
+      splToken: meta['spl-token'][0],
     );
   }
 
@@ -37,6 +37,9 @@ class TransactionSolanaPay {
   String toUri() {
     String uri = 'solana:$recipient?amount=${amount.toString()}';
 
+    for (final ref in references) {
+      uri += "&reference=$ref";
+    }
     if (label != null) uri += "&label=$label";
     if (message != null) uri += "&message=$message";
     if (memo != null) uri += "&memo=$memo";
