@@ -24,6 +24,7 @@ dependencies:
   qr_code_scanner: ^0.6.1
   intl: ^0.17.0
   desktop_window: ^0.4.0
+  qr_flutter: ^4.0.0
 
 dev_dependencies:
   flutter_lints: ^1.0.4

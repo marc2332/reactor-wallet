@@ -30,10 +30,13 @@ String? transactionAmountValidator(String? value) {
 
 Future<void> sendTransactionDialog(
   BuildContext context,
-  WalletAccount walletAccount,
-) async {
-  String destination = "";
-  double sendAmount = 0;
+  WalletAccount walletAccount, {
+  String initialDestination = "",
+  double initialSendAmount = 0,
+  String defaultTokenSymbol = "SOL",
+}) async {
+  String destination = initialDestination;
+  double sendAmount = initialSendAmount;
 
   return showDialog<void>(
     context: context,
@@ -44,11 +47,19 @@ Future<void> sendTransactionDialog(
 
         // Add Solana like if it was a Token just to make the UX easier
         tokens.insert(
-            0,
-            Token(walletAccount.balance, system_program_id,
-                TokenInfo(name: "Solana", symbol: "SOL")));
+          0,
+          Token(
+            walletAccount.balance,
+            system_program_id,
+            TokenInfo(name: "Solana", symbol: "SOL"),
+          ),
+        );
 
-        final selectedToken = useState(tokens.first);
+        final selectedToken = useState(
+          tokens.firstWhere(
+            (token) => token.info.symbol == defaultTokenSymbol,
+          ),
+        );
 
         return AlertDialog(
           title: const Text('Transfer'),
@@ -78,6 +89,7 @@ Future<void> sendTransactionDialog(
                     Form(
                       autovalidateMode: AutovalidateMode.always,
                       child: TextFormField(
+                        initialValue: initialDestination,
                         validator: transactionAddressValidator,
                         decoration: InputDecoration(
                           hintText: walletAccount.address,
@@ -90,6 +102,7 @@ Future<void> sendTransactionDialog(
                     Form(
                       autovalidateMode: AutovalidateMode.always,
                       child: TextFormField(
+                        initialValue: initialSendAmount.toString(),
                         validator: transactionAmountValidator,
                         decoration: const InputDecoration(
                           hintText: 'Amount',

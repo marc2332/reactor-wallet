@@ -100,7 +100,14 @@ class SideBar extends HookConsumerWidget {
                 child: MaterialButton(
                   height: 50,
                   shape: const CircleBorder(),
-                  onPressed: () => {},
+                  onPressed: () {
+                    // Refresh the account when pulling down
+                    final accountsProv = ref.read(accountsProvider.notifier);
+                    final selectedAccount = ref.read(selectedAccountProvider);
+                    if (selectedAccount != null) {
+                      accountsProv.refreshAccount(selectedAccount.name);
+                    }
+                  },
                   child: const Icon(Icons.refresh_outlined, color: Colors.white),
                 ),
               )

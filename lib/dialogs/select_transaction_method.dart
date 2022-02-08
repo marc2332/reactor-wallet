@@ -26,55 +26,28 @@ Future<void> selectTransactionMethod(
 
       if (uriSolanaPay != null) {
         try {
-          TransactionSolanaPay txData = parseUri(uriSolanaPay);
+          TransactionSolanaPay txData = TransactionSolanaPay.parseUri(uriSolanaPay);
 
-          if (txData.splToken == null) {
-            Transaction tx = Transaction(
-              walletAccount.address,
-              txData.recipient,
-              txData.amount,
-              false,
-              system_program_id,
-            );
+          String defaultTokenSymbol = "SOL";
 
-            Navigator.pop(context);
-
-            prepareTransaction(
-              context,
-              tx,
-              walletAccount,
-              Token(walletAccount.balance, system_program_id,
-                  TokenInfo(name: "Solana", symbol: "SOL")),
-            );
-          } else {
-            Transaction tx = Transaction(
-              walletAccount.address,
-              txData.recipient,
-              txData.amount,
-              false,
-              token_program_id,
-            );
-
-            Navigator.pop(context);
-
-            tx.tokenMint = txData.splToken!;
-
-            Token ownedToken;
-
+          if (txData.splToken != null) {
             try {
-              ownedToken = walletAccount.getTokenByMint(tx.tokenMint);
+              Token selectedToken = walletAccount.getTokenByMint(txData.splToken!);
+              defaultTokenSymbol = selectedToken.info.symbol;
             } catch (_) {
               insuficientFundsDialog(context);
               return;
             }
-
-            prepareTransaction(
-              context,
-              tx,
-              walletAccount,
-              ownedToken,
-            );
           }
+
+          Navigator.pop(context);
+          sendTransactionDialog(
+            context,
+            walletAccount,
+            initialDestination: txData.recipient,
+            initialSendAmount: txData.amount ?? 0.0,
+            defaultTokenSymbol: defaultTokenSymbol,
+          );
         } on FormatException {
           // Invalid URI
           transactionNotSupportedDialog(context);

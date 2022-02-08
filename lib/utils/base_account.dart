@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:solana/dto.dart';
+import 'package:solana/dto.dart' as dto;
 import 'package:solana/solana.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
@@ -167,10 +168,12 @@ class BaseAccount {
                   TokenInfo defaultTokenInfo = TokenInfo(name: defaultName, symbol: defaultName);
 
                   // Start tracking the token
-                  TokenInfo tokenInfo = tokensTracker.addTrackerByProgramMint(tokenMint,
-                      defaultValue: defaultTokenInfo);
+                  TokenInfo tokenInfo = tokensTracker.addTrackerByProgramMint(
+                    tokenMint,
+                    defaultValue: defaultTokenInfo,
+                  );
 
-                  if (defaultTokenInfo != tokenInfo) {
+                  if (defaultTokenInfo.symbol != tokenInfo.symbol) {
                     unknownN++;
                   }
 
@@ -382,4 +385,11 @@ class Transaction {
     this.receivedOrNot,
     this.programId,
   );
+}
+
+extension WSClient on SolanaClient {
+  Stream<dto.Account> accountSubscribe(Uri uri, String address) {
+    final client = SubscriptionClient(uri);
+    return client.accountSubscribe(address);
+  }
 }

@@ -43,6 +43,9 @@ dart format . --line-length 100
     - [x] SPL Tokens Transactions (Experimental)
     - [ ] Support for Reference, Label, Message, Memo
     - [ ] QR Generator (like https://github.com/solana-labs/solana-pay/tree/master/point-of-sale does )
+        - [x] SOL transactions
+        - [ ] SPL Tokens transaction, implemented, but not tested
+        - [ ] Compare the new received transaction by finding it with the reference
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses

@@ -2,6 +2,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reactor_wallet/dialogs/create_qr_transaction.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:reactor_wallet/components/token_card.dart';
 import 'package:reactor_wallet/components/token_card_shimmer.dart';
@@ -187,36 +188,55 @@ class USDBalance extends StatelessWidget {
 }
 
 class AddressButton extends StatelessWidget {
-  final String address;
-  final String accountTypeText;
+  final Account account;
   final bool isReady;
 
   const AddressButton({
     Key? key,
-    required this.address,
-    required this.accountTypeText,
+    required this.account,
     required this.isReady,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     if (isReady) {
-      return OutlinedButton(
-        onPressed: () {
-          Clipboard.setData(
-            ClipboardData(text: address),
-          ).then((_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Address copied to clipboard"),
-              ),
-            );
-          });
-        },
-        child: Text(
-          '$accountTypeText (${address.substring(0, 5)}...)',
-          style: Theme.of(context).textTheme.button,
-        ),
+      // Convert the account's type to String
+      String accountTypeText = "";
+      if (account.accountType == AccountType.Client) {
+        accountTypeText = "Watcher";
+      } else {
+        accountTypeText = "Wallet";
+      }
+
+      return Row(
+        children: [
+          OutlinedButton(
+            onPressed: () {
+              Clipboard.setData(
+                ClipboardData(text: account.address),
+              ).then((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Address copied to clipboard"),
+                  ),
+                );
+              });
+            },
+            child: Text(
+              '$accountTypeText (${account.address.substring(0, 5)}...)',
+              style: Theme.of(context).textTheme.button,
+            ),
+          ),
+          MaterialButton(
+            height: 40,
+            minWidth: 70,
+            shape: const CircleBorder(),
+            onPressed: () {
+              createQRTransaction(context, account);
+            },
+            child: const Icon(Icons.qr_code_2_outlined),
+          ),
+        ],
       );
     } else {
       return Shimmer.fromColors(
@@ -244,14 +264,6 @@ class AccountInfo extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     String solBalance = balanceShorter(account.balance.toString());
     String usdBalance = account.usdBalance.toStringAsFixed(2);
-
-    // Convert the account's type to String
-    String accountTypeText = "";
-    if (account.accountType == AccountType.Client) {
-      accountTypeText = "Watcher";
-    } else {
-      accountTypeText = "Wallet";
-    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -283,8 +295,7 @@ class AccountInfo extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 10),
                     child: AddressButton(
-                      address: account.address,
-                      accountTypeText: accountTypeText,
+                      account: account,
                       isReady: account.isLoaded,
                     ),
                   ),
