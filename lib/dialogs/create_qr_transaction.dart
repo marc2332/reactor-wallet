@@ -46,7 +46,10 @@ List<TokenInfo> getAllPayableTokens(Account account) {
   externalTokens.removeWhere((info) => accountTokens.contains(info));
   //accountTokens.addAll(externalTokens);
 
-  accountTokens.insert(0, TokenInfo.withInfo(SystemProgram.programId, "Solana", "", "SOL"));
+  accountTokens.insert(
+    0,
+    TokenInfo.withInfo(SystemProgram.programId, "Solana", "", "SOL"),
+  );
 
   return accountTokens;
 }
@@ -189,25 +192,29 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                             ),
                             screenSize.width > 700
                                 ? Numpad(onPressed: tapNumber)
-                                : SizedBox(
-                                    width: 100,
-                                    child: TextField(
-                                      keyboardType: TextInputType.number,
-                                      onChanged: (val) {
-                                        amount.value = val;
-                                      },
-                                    ),
-                                  )
+                                : Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: SizedBox(
+                                      width: 100,
+                                      child: TextField(
+                                        keyboardType: TextInputType.number,
+                                        onChanged: (val) {
+                                          amount.value = val;
+                                        },
+                                      ),
+                                    )),
                           ],
                         ),
                         Column(
                           children: [
-                            Center(
-                              child: Text(
-                                amount.value.toString(),
-                                style: const TextStyle(fontSize: 50),
-                              ),
-                            ),
+                            if (screenSize.width > 700) ...[
+                              Center(
+                                child: Text(
+                                  amount.value.toString(),
+                                  style: const TextStyle(fontSize: 50),
+                                ),
+                              )
+                            ],
                             Padding(
                               padding: screenSize.width > 700
                                   ? const EdgeInsets.only(left: 50, right: 25)
@@ -232,7 +239,22 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                         ),
                       ],
                     )
-                  : const Text("Received transaction!"),
+                  : Padding(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: const [
+                          Padding(
+                            child: Icon(
+                              Icons.verified_rounded,
+                            ),
+                            padding: EdgeInsets.only(right: 10),
+                          ),
+                          Text("Payment received."),
+                        ],
+                      ),
+                      padding: const EdgeInsets.only(top: 10),
+                    ),
             ),
             actions: <Widget>[
               TextButton(

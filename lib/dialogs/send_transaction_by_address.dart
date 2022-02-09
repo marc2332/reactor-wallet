@@ -18,17 +18,6 @@ String? transactionAddressValidator(String? value) {
   }
 }
 
-String? transactionAmountValidator(String? value) {
-  if (value == null || value.isEmpty) {
-    return 'Empty ammount';
-  }
-  if (double.parse(value) <= 0) {
-    return 'You must send at least 0.000000001 SOL';
-  } else {
-    return null;
-  }
-}
-
 Future<void> sendTransactionDialog(
   BuildContext context,
   WalletAccount walletAccount, {
@@ -62,6 +51,17 @@ Future<void> sendTransactionDialog(
             (token) => token.info.symbol == defaultTokenSymbol,
           ),
         );
+
+        String? transactionAmountValidator(String? value) {
+          if (value == null || value.isEmpty) {
+            return 'Empty ammount';
+          }
+          if (double.parse(value) <= 0) {
+            return 'You must send at least 0.000000001 ${selectedToken.value.info.symbol}';
+          } else {
+            return null;
+          }
+        }
 
         return AlertDialog(
           title: const Text('Transfer'),

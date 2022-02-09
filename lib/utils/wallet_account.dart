@@ -65,7 +65,7 @@ class WalletAccount extends BaseAccount implements Account {
   /*
    * Send SOLs to an adress
    */
-  void sendLamportsTo(
+  Future<String> sendLamportsTo(
     String destinationAddress,
     int amount, {
     List<String> references = const [],
@@ -92,16 +92,13 @@ class WalletAccount extends BaseAccount implements Account {
 
     final signature = await client.rpcClient.signAndSendTransaction(message, [wallet]);
 
-    await client.waitForSignatureStatus(
-      signature,
-      status: Commitment.confirmed,
-    );
+    return signature;
   }
 
   /*
    * Send a Token to an adress
    */
-  void sendSPLTokenTo(
+  Future<String> sendSPLTokenTo(
     String destinationAddress,
     String tokenMint,
     int amount, {
@@ -146,10 +143,7 @@ class WalletAccount extends BaseAccount implements Account {
 
     final signature = await client.rpcClient.signAndSendTransaction(message, [wallet]);
 
-    await client.waitForSignatureStatus(
-      signature,
-      status: Commitment.confirmed,
-    );
+    return signature;
   }
 
   /*

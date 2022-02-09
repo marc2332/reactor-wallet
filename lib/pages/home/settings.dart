@@ -35,6 +35,18 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
         child: ListView(
           physics: const BouncingScrollPhysics(),
           children: [
+            ClickableCard(
+              onTap: () async {
+                Navigator.pushNamed(context, "/manage_accounts");
+              },
+              child: ListTile(
+                title: const Text('Manage Accounts'),
+                trailing: Icon(
+                  Icons.manage_accounts_outlined,
+                  color: Theme.of(context).iconColor,
+                ),
+              ),
+            ),
             Consumer(builder: (context, ref, _) {
               ref.watch(settingsProvider);
               ThemeType selectedTheme = ref.read(settingsProvider.notifier).getTheme();

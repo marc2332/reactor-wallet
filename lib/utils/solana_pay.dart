@@ -20,30 +20,48 @@ class TransactionSolanaPay {
   static TransactionSolanaPay parseUri(String uriSolanaPay) {
     Uri uri = Uri.parse(uriSolanaPay);
     String recipient = uri.path;
-    dynamic meta = uri.queryParametersAll;
+    Map<String, dynamic> meta = uri.queryParametersAll;
 
     return TransactionSolanaPay(
       recipient: recipient,
-      references: meta['reference'],
-      amount: double.parse(meta['amount'][0]),
-      label: meta['label'][0],
-      message: meta['message'][0],
-      memo: meta['memo'][0],
-      splToken: meta['spl-token'][0],
+      references: meta['reference'] ?? [],
+      amount: meta["amount"] != null ? double.parse(meta['amount'][0]) : null,
+      label: meta["label"] != null ? meta["label"][0] : null,
+      message: meta["message"] != null ? meta["message"][0] : null,
+      memo: meta["memo"] != null ? meta["memo"][0] : null,
+      splToken: meta["spl-token"] != null ? meta["spl-token"][0] : null,
     );
   }
 
   /// Serialized a Solana transaction into a uri
   String toUri() {
-    String uri = 'solana:$recipient?amount=${amount.toString()}';
+    String uri = 'solana:$recipient';
+    bool addQueryDelimeter = true;
 
-    for (final ref in references) {
-      uri += "&reference=$ref";
+    if (amount != null) {
+      uri += "?amount=${amount.toString()}";
+      addQueryDelimeter = false;
     }
-    if (label != null) uri += "&label=$label";
-    if (message != null) uri += "&message=$message";
-    if (memo != null) uri += "&memo=$memo";
-    if (splToken != null) uri += "&spl-token=$splToken";
+    for (final ref in references) {
+      uri += "${addQueryDelimeter ? "?" : "&"}reference=$ref";
+      addQueryDelimeter = false;
+    }
+    if (label != null) {
+      uri += "${addQueryDelimeter ? "?" : "&"}label=$label";
+      addQueryDelimeter = false;
+    }
+    if (message != null) {
+      uri += "${addQueryDelimeter ? "?" : "&"}message=$message";
+      addQueryDelimeter = false;
+    }
+    if (memo != null) {
+      uri += "${addQueryDelimeter ? "?" : "&"}memo=$memo";
+      addQueryDelimeter = false;
+    }
+    if (splToken != null) {
+      uri += "${addQueryDelimeter ? "?" : "&"}spl-token=$splToken";
+      addQueryDelimeter = false;
+    }
 
     return uri;
   }

@@ -11,6 +11,7 @@ import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
 import 'package:solana/solana.dart';
 import 'package:worker_manager/worker_manager.dart';
+import 'dart:developer' as logger;
 
 Future<bool> makeTransactionWithLamports(
     WalletAccount account, String destination, int supply) async {
@@ -113,28 +114,21 @@ Future<void> prepareTransaction(
                       ? () async {
                           Navigator.of(context).pop();
 
-                          // Show some feedback
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Sending ${transaction.ammount} ${token.info.symbol} to ${transaction.destination.substring(0, 5)}...',
-                              ),
-                            ),
-                          );
+                          Future future;
 
                           try {
                             if (transaction.programId == SystemProgram.programId) {
                               // Convert SOL to lamport
-                              int lamports = (transaction.ammount * 1000000000).toInt();
+                              int lamports = (transaction.ammount * lamportsPerSol).toInt();
 
-                              walletAccount.sendLamportsTo(
+                              future = walletAccount.sendLamportsTo(
                                 transaction.destination,
                                 lamports,
                                 references: transaction.references,
                               );
                             } else {
                               int amount = transaction.ammount.toInt();
-                              walletAccount.sendSPLTokenTo(
+                              future = walletAccount.sendSPLTokenTo(
                                 transaction.destination,
                                 token.mint,
                                 amount,
@@ -142,13 +136,12 @@ Future<void> prepareTransaction(
                               );
                             }
 
-                            // TODO: This should wait for the signature to be confirmed, and then show the "transactionHasBeenSentDialog"
-
-                            // Display the "Transaction went OK" dialog
-                            transactionHasBeenSentDialog(
+                            transactionIsBeingConfirmedDialog(
                               context,
-                              transaction.destination,
-                              transaction.ammount,
+                              future,
+                              transaction,
+                              token.info,
+                              walletAccount,
                             );
                           } catch (_) {
                             // Display the "Transaction went wrong" dialog

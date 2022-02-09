@@ -11,10 +11,13 @@ class RoundedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(5),
-      child: Container(
+      child: SizedBox(
         height: 50,
         width: 50,
         child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          ),
           onPressed: () => onPressed(value),
           child: Text(value.toString()),
         ),

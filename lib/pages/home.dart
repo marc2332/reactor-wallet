@@ -25,25 +25,18 @@ class HomePageState extends ConsumerState<HomePage> {
     Widget page;
 
     switch (currentPage) {
-      // Settings sub page
-      case 4:
-        page = const SettingsSubPage();
-        break;
-
       case 3:
-        page = const ManageAccountsPage();
+        page = const SettingsSubPage();
         break;
 
       case 2:
         page = const AccountSubPage("/collectibles");
         break;
 
-      // Settings sub page
       case 1:
         page = const AccountSubPage("/transactions");
         break;
 
-      // Account sub page
       default:
         page = const AccountSubPage("/home");
     }
@@ -76,11 +69,6 @@ class HomePageState extends ConsumerState<HomePage> {
               activeIcon: Icon(Icons.art_track_outlined),
               icon: Icon(Icons.art_track_outlined),
               label: 'Collectibles',
-            ),
-            BottomNavigationBarItem(
-              activeIcon: Icon(Icons.account_box_outlined),
-              icon: Icon(Icons.account_box_outlined),
-              label: 'Accounts',
             ),
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.settings),
