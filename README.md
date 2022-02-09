@@ -38,10 +38,12 @@ dart format . --line-length 100
 
 ### 🤔 To-do / Ideas
 - [x] **A name for the app**
+- [ ] Handle `solana:` links, this way the wallet will be prompted to the user
+- [ ] Add password/fingerprint authorization
 - [ ] Integrate QR Scanner for Solana Pay (https://solana-pay-docs.vercel.app/core/wallet-integration)
     - [x] SOL Transactions (Experimental)
     - [x] SPL Tokens Transactions (Experimental)
-    - [ ] Support for Reference, Label, Message, Memo
+    - [ ] Support for Label, Message, Memo
     - [ ] QR Generator (like https://github.com/solana-labs/solana-pay/tree/master/point-of-sale does )
         - [x] SOL transactions
         - [ ] SPL Tokens transaction, implemented, but not tested
