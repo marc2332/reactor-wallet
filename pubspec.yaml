@@ -25,6 +25,7 @@ dependencies:
   intl: ^0.17.0
   desktop_window: ^0.4.0
   qr_flutter: ^4.0.0
+  uni_links: ^0.5.1
 
 dev_dependencies:
   flutter_lints: ^1.0.4

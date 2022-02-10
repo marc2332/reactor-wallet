@@ -1,30 +1,33 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
-import 'package:reactor_wallet/pages/manage_accounts.dart';
+import 'package:reactor_wallet/dialogs/insufficient_funds.dart';
+import 'package:reactor_wallet/dialogs/select_account.dart';
+import 'package:reactor_wallet/dialogs/send_transaction_by_address.dart';
+import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/solana_pay.dart';
+import 'package:reactor_wallet/utils/wallet_account.dart';
 import 'home/account.dart';
 import 'home/settings.dart';
+import 'package:uni_links/uni_links.dart';
 
 /*
  * Home Page
  */
-class HomePage extends ConsumerStatefulWidget {
+class HomePage extends HookConsumerWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  HomePageState createState() => HomePageState();
-}
-
-class HomePageState extends ConsumerState<HomePage> {
-  int currentPage = 0;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Widget page;
 
-    switch (currentPage) {
+    final currentPage = useState(0);
+
+    switch (currentPage.value) {
       case 3:
         page = const SettingsSubPage();
         break;
@@ -41,18 +44,55 @@ class HomePageState extends ConsumerState<HomePage> {
         page = const AccountSubPage("/home");
     }
 
+    useEffect(() {
+      try {
+        getInitialLink().then(
+          (String? uri) {
+            if (uri != null) {
+              final payment = TransactionSolanaPay.parseUri(uri);
+
+              WidgetsBinding.instance?.addPostFrameCallback(
+                (_) async {
+                  final account = await selectAccount(context);
+                  if (account is WalletAccount) {
+                    String defaultTokenSymbol = "SOL";
+
+                    if (payment.splToken != null) {
+                      try {
+                        Token selectedToken = account.getTokenByMint(payment.splToken!);
+                        defaultTokenSymbol = selectedToken.info.symbol;
+                      } catch (_) {
+                        insuficientFundsDialog(context);
+                        return;
+                      }
+                    }
+
+                    sendTransactionDialog(
+                      context,
+                      account,
+                      initialDestination: payment.recipient,
+                      initialSendAmount: payment.amount ?? 0,
+                      defaultTokenSymbol: defaultTokenSymbol,
+                    );
+                  }
+                },
+              );
+            }
+          },
+        );
+      } on PlatformException {}
+    }, []);
+
     return Scaffold(
       body: page,
       bottomNavigationBar: ResponsiveSizer(
         child: BottomNavigationBar(
           onTap: (int page) {
-            setState(() {
-              currentPage = page;
-            });
+            currentPage.value = page;
           },
           elevation: 0,
           showUnselectedLabels: Platform.isWindows | Platform.isMacOS | Platform.isLinux,
-          currentIndex: currentPage,
+          currentIndex: currentPage.value,
           type: BottomNavigationBarType.fixed,
           items: const [
             BottomNavigationBarItem(
