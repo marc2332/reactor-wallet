@@ -41,14 +41,15 @@ dart format . --line-length 100
 - [x] Handle `solana:` links, this way the wallet will be prompted to the user (experimental)
 - [ ] Add a contacts list
 - [ ] Add password/fingerprint authorization
-- [ ] Integrate QR Scanner for Solana Pay (https://solana-pay-docs.vercel.app/core/wallet-integration)
+- [ ] [Solana Pay](https://solana-pay-docs.vercel.app/core/wallet-integration) integration, implemented, but highly experimental
+    - [x] QR Reader
     - [x] SOL Transactions (Experimental)
     - [x] SPL Tokens Transactions (Experimental)
     - [ ] Support for Label, Message, Memo
     - [ ] QR Generator (like https://github.com/solana-labs/solana-pay/tree/master/point-of-sale does )
         - [x] SOL transactions
         - [ ] SPL Tokens transaction, implemented, but not tested
-        - [ ] Compare the new received transaction by finding it with the reference
+        - [ ] Compare the new received transaction by finding it with the reference, just to make sure the amount is correct
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses
