@@ -12,7 +12,7 @@ class AccountCollectibles extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final collectibles = account.tokens.whereType<NFT>();
+    final collectibles = account.tokens.values.whereType<NFT>();
     final screenSize = MediaQuery.of(context).size;
     final columnsNumber = screenSize.width > 750 ? 3 : 2;
 

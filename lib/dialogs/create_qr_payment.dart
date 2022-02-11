@@ -34,7 +34,7 @@ class ResponsiveRotator extends StatelessWidget {
 }
 
 List<Token> getAllPayableTokens(Account account) {
-  List<Token> accountTokens = List.from(account.tokens);
+  List<Token> accountTokens = List.from(account.tokens.values);
   accountTokens = accountTokens.where((token) => token is! NFT).toList();
 
   accountTokens.insert(0, SOL(account.balance));
@@ -83,6 +83,8 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
               splToken: selectedToken.value.info.symbol != "SOL" ? selectedToken.value.mint : null,
               references: [transactionIdentifier.address],
             );
+
+            print(account.url.ws);
 
             final client = SubscriptionClient(Uri.parse(account.url.ws));
 

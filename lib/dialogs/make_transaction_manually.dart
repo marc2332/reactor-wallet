@@ -32,7 +32,7 @@ Future<void> makePaymentManuallyDialog(
       return HookConsumer(
         builder: (context, ref, _) {
           // Retrieve all the tokens owned by the account
-          List<Token> tokens = List.from(walletAccount.tokens);
+          List<Token> tokens = List.from(walletAccount.tokens.values);
 
           // Add SOL (Solana) like if it was a Token just to make the UX easier
           tokens.insert(
