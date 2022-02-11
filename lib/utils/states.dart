@@ -366,11 +366,16 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   void renameAccount(Account account, String accountName) {
     if (state.containsKey(accountName)) throw AccountAlreadyExists();
 
+    // Remove from the db and state
     accountsBox.delete(account.name);
+    state.remove(account.name);
 
+    // Rename
     account.name = accountName;
 
+    // Re-add to the DB and state
     accountsBox.put(account.name, account.toJson());
+    state.putIfAbsent(account.name, () => account);
 
     refreshAllState();
   }

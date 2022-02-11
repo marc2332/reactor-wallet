@@ -45,42 +45,42 @@ class HomePage extends HookConsumerWidget {
     }
 
     useEffect(() {
-      try {
-        getInitialLink().then(
-          (String? uri) {
-            if (uri != null) {
-              final payment = TransactionSolanaPay.parseUri(uri);
+      getInitialLink().catchError((_) {
+        return null;
+      }).then(
+        (String? uri) {
+          if (uri != null) {
+            final payment = TransactionSolanaPay.parseUri(uri);
 
-              WidgetsBinding.instance?.addPostFrameCallback(
-                (_) async {
-                  final account = await selectAccount(context);
-                  if (account is WalletAccount) {
-                    String defaultTokenSymbol = "SOL";
+            WidgetsBinding.instance?.addPostFrameCallback(
+              (_) async {
+                final account = await selectAccount(context);
+                if (account is WalletAccount) {
+                  String defaultTokenSymbol = "SOL";
 
-                    if (payment.splToken != null) {
-                      try {
-                        Token selectedToken = account.getTokenByMint(payment.splToken!);
-                        defaultTokenSymbol = selectedToken.info.symbol;
-                      } catch (_) {
-                        insuficientFundsDialog(context);
-                        return;
-                      }
+                  if (payment.splToken != null) {
+                    try {
+                      Token selectedToken = account.getTokenByMint(payment.splToken!);
+                      defaultTokenSymbol = selectedToken.info.symbol;
+                    } catch (_) {
+                      insuficientFundsDialog(context);
+                      return;
                     }
-
-                    sendTransactionDialog(
-                      context,
-                      account,
-                      initialDestination: payment.recipient,
-                      initialSendAmount: payment.amount ?? 0,
-                      defaultTokenSymbol: defaultTokenSymbol,
-                    );
                   }
-                },
-              );
-            }
-          },
-        );
-      } on PlatformException {}
+
+                  sendTransactionDialog(
+                    context,
+                    account,
+                    initialDestination: payment.recipient,
+                    initialSendAmount: payment.amount ?? 0,
+                    defaultTokenSymbol: defaultTokenSymbol,
+                  );
+                }
+              },
+            );
+          }
+        },
+      );
     }, []);
 
     return Scaffold(

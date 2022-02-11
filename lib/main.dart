@@ -82,40 +82,46 @@ class LinkListenerWrapper extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     useEffect(
       () {
-        final _sub = uriLinkStream.listen((Uri? uri) {
-          if (uri != null) {
-            final payment = TransactionSolanaPay.parseUri(uri.toString());
+        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) return () => {};
+        try {
+          final listener = uriLinkStream.listen(
+            (Uri? uri) {
+              if (uri != null) {
+                final payment = TransactionSolanaPay.parseUri(uri.toString());
 
-            WidgetsBinding.instance?.addPostFrameCallback(
-              (_) async {
-                final account = await selectAccount(context);
-                if (account is WalletAccount) {
-                  String defaultTokenSymbol = "SOL";
+                WidgetsBinding.instance?.addPostFrameCallback(
+                  (_) async {
+                    final account = await selectAccount(context);
+                    if (account is WalletAccount) {
+                      String defaultTokenSymbol = "SOL";
 
-                  if (payment.splToken != null) {
-                    try {
-                      Token selectedToken = account.getTokenByMint(payment.splToken!);
-                      defaultTokenSymbol = selectedToken.info.symbol;
-                    } catch (_) {
-                      insuficientFundsDialog(context);
-                      return;
+                      if (payment.splToken != null) {
+                        try {
+                          Token selectedToken = account.getTokenByMint(payment.splToken!);
+                          defaultTokenSymbol = selectedToken.info.symbol;
+                        } catch (_) {
+                          insuficientFundsDialog(context);
+                          return;
+                        }
+                      }
+
+                      sendTransactionDialog(
+                        context,
+                        account,
+                        initialDestination: payment.recipient,
+                        initialSendAmount: payment.amount ?? 0,
+                        defaultTokenSymbol: defaultTokenSymbol,
+                      );
                     }
-                  }
+                  },
+                );
+              }
+            },
+            onError: (err) {},
+          );
 
-                  sendTransactionDialog(
-                    context,
-                    account,
-                    initialDestination: payment.recipient,
-                    initialSendAmount: payment.amount ?? 0,
-                    defaultTokenSymbol: defaultTokenSymbol,
-                  );
-                }
-              },
-            );
-          }
-        }, onError: (err) {});
-
-        return () => _sub.cancel();
+          return () => listener.cancel();
+        } catch (err) {}
       },
     );
 

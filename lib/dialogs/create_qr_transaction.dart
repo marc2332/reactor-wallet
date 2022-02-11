@@ -72,13 +72,22 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
           final amount = useState("0");
           final selectedToken = useState(tokens.first);
           final transactionData = useState<TransactionSolanaPay?>(null);
+          final errorMessage = useState<String?>(null);
           final accountsManager = ref.read(accountsProvider.notifier);
 
           final transactionStatus = useState(TransactionStatus.pending);
 
           void generateQR() async {
             final transactionIdentifier = await Ed25519HDKeyPair.random();
-            var sendAmount = double.parse(amount.value);
+            var sendAmount = 0.0;
+
+            try {
+              sendAmount = double.parse(amount.value);
+              if (sendAmount == 0) throw Exception();
+            } catch (_) {
+              errorMessage.value = "Invalid amount";
+              return;
+            }
 
             transactionData.value = TransactionSolanaPay(
               recipient: account.address,
@@ -139,6 +148,11 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
               transactionData.value = null;
             }
 
+            // Remove any error when the amount changes
+            if (errorMessage.value != null) {
+              errorMessage.value = null;
+            }
+
             String currentValue = amount.value;
 
             // Remove the last character
@@ -170,7 +184,7 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
 
           return AlertDialog(
             title: transactionStatus.value == TransactionStatus.pending
-                ? const Text('Create transaction')
+                ? const Text('Prepare payment')
                 : null,
             content: SingleChildScrollView(
               child: transactionStatus.value == TransactionStatus.pending
@@ -202,7 +216,8 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                                           amount.value = val;
                                         },
                                       ),
-                                    )),
+                                    ),
+                                  ),
                           ],
                         ),
                         Column(
@@ -211,17 +226,17 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                               Center(
                                 child: Text(
                                   amount.value.toString(),
-                                  style: const TextStyle(fontSize: 50),
+                                  style: const TextStyle(fontSize: 40),
                                 ),
                               )
                             ],
                             Padding(
                               padding: screenSize.width > 700
-                                  ? const EdgeInsets.only(left: 50, right: 25)
+                                  ? const EdgeInsets.only(left: 25, right: 25, top: 15)
                                   : EdgeInsets.zero,
                               child: SizedBox(
-                                height: screenSize.width > 700 ? 250 : 150,
-                                width: 250,
+                                height: screenSize.width > 700 ? 225 : 150,
+                                width: 225,
                                 child: transactionData.value != null
                                     ? Center(
                                         child: QrImage(
@@ -235,6 +250,24 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                                       ),
                               ),
                             ),
+                            SizedBox(
+                              height: 25,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: errorMessage.value != null
+                                      ? [
+                                          const Padding(
+                                            padding: EdgeInsets.only(right: 7),
+                                            child: Icon(Icons.error_outline_outlined),
+                                          ),
+                                          Text(errorMessage.value.toString())
+                                        ]
+                                      : [],
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ],

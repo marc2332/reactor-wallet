@@ -58,11 +58,12 @@ Future<void> prepareTransaction(
                     hasEnoughFunds.value = true;
                   }
                 } else {
-                  walletAccount.tokens.forEach((token) {
-                    if (token.balance >= transaction.ammount) {
+                  for (var token in walletAccount.tokens) {
+                    if (token.mint == transaction.tokenMint &&
+                        token.balance >= transaction.ammount) {
                       hasEnoughFunds.value = true;
                     }
-                  });
+                  }
                 }
 
                 if (!hasEnoughFunds.value) {
@@ -128,6 +129,7 @@ Future<void> prepareTransaction(
                               );
                             } else {
                               int amount = transaction.ammount.toInt();
+                              // TODO: token.mint is the account
                               future = walletAccount.sendSPLTokenTo(
                                 transaction.destination,
                                 token.mint,

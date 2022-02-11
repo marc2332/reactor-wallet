@@ -4,8 +4,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class RoundedButton extends StatelessWidget {
   final void Function(String) onPressed;
   final String value;
+  final IconData? icon;
 
-  const RoundedButton({Key? key, required this.onPressed, required this.value}) : super(key: key);
+  const RoundedButton({Key? key, required this.onPressed, required this.value, this.icon})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,12 @@ class RoundedButton extends StatelessWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           ),
           onPressed: () => onPressed(value),
-          child: Text(value.toString()),
+          child: icon != null
+              ? Icon(
+                  icon,
+                  size: 17,
+                )
+              : Text(value.toString()),
         ),
       ),
     );
@@ -97,6 +104,7 @@ class Numpad extends HookConsumerWidget {
               ),
               RoundedButton(
                 value: "D",
+                icon: Icons.backspace_outlined,
                 onPressed: onPressed,
               ),
             ],
