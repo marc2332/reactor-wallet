@@ -9,6 +9,7 @@ import 'package:solana/solana.dart'
         SystemInstruction,
         TokenProgram,
         Wallet,
+        lamportsPerSol,
         signTransaction;
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
@@ -108,10 +109,11 @@ class WalletAccount extends BaseAccount implements Account {
       owner: destinationAddress,
       mint: tokenMint,
     );
-    var associatedSenderAccount = await client.getAssociatedTokenAccount(
+
+    final associatedSenderAccount = await client.getAssociatedTokenAccount(
       owner: address,
       mint: tokenMint,
-    );
+    ) as ProgramAccount;
 
     associatedRecipientAccount ??= await client.createAssociatedTokenAccount(
       mint: tokenMint,
@@ -119,17 +121,12 @@ class WalletAccount extends BaseAccount implements Account {
       owner: destinationAddress,
     );
 
-    associatedSenderAccount ??= await client.createAssociatedTokenAccount(
-      mint: tokenMint,
-      funder: wallet,
+    final message = TokenProgram.transfer(
+      source: associatedSenderAccount.pubkey,
+      destination: associatedRecipientAccount.pubkey,
+      amount: amount,
       owner: address,
     );
-
-    final message = TokenProgram.transfer(
-        source: associatedRecipientAccount.pubkey,
-        destination: associatedSenderAccount.pubkey,
-        amount: amount,
-        owner: address);
 
     for (final reference in references) {
       message.instructions.first.accounts.add(
@@ -144,6 +141,32 @@ class WalletAccount extends BaseAccount implements Account {
     final signature = await client.rpcClient.signAndSendTransaction(message, [wallet]);
 
     return signature;
+  }
+
+  Future<String> sendTransaction(Transaction transaction) {
+    if (transaction.token is SOL) {
+      // Convert SOL to lamport
+      int lamports = (transaction.ammount * lamportsPerSol).toInt();
+
+      return sendLamportsTo(
+        transaction.destination,
+        lamports,
+        references: transaction.references,
+      );
+    } else {
+      // Input by the user
+      int userAmount = transaction.ammount.toInt();
+      // Token's configured decimals
+      int tokenDecimals = transaction.token.info.decimals;
+      int amount = int.parse('$userAmount${'0' * tokenDecimals}');
+
+      return sendSPLTokenTo(
+        transaction.destination,
+        transaction.token.mint,
+        amount,
+        references: transaction.references,
+      );
+    }
   }
 
   /*

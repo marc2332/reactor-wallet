@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-Future<void> transactionNotSupportedDialog(context) async {
+Future<void> paymentErrorDialog(context, String destination, double ammount) async {
   return showDialog<void>(
     context: context,
     builder: (BuildContext dialogContext) {
       return AlertDialog(
-        title: const Text('Transaction not supported'),
+        title: const Text('Transaction error'),
         content: SingleChildScrollView(
           child: ListBody(
             children: <Widget>[
               Column(
-                children: const [
-                  Padding(
+                children: [
+                  const Padding(
                     padding: EdgeInsets.all(15),
                     child: Icon(
                       Icons.error_outline_outlined,
@@ -19,7 +19,16 @@ Future<void> transactionNotSupportedDialog(context) async {
                       size: 35,
                     ),
                   ),
-                  Text("Unfortunately, token transactions are not supported yet."),
+                  Text("Could not sent $ammount SOL to"),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      destination,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
                 ],
               ),
             ],

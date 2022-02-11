@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/dialogs/insufficient_funds.dart';
 import 'package:reactor_wallet/dialogs/select_account.dart';
-import 'package:reactor_wallet/dialogs/send_transaction_by_address.dart';
+import 'package:reactor_wallet/dialogs/make_transaction_manually.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
@@ -50,7 +50,7 @@ class HomePage extends HookConsumerWidget {
       }).then(
         (String? uri) {
           if (uri != null) {
-            final payment = TransactionSolanaPay.parseUri(uri);
+            final transaction = TransactionSolanaPay.parseUri(uri);
 
             WidgetsBinding.instance?.addPostFrameCallback(
               (_) async {
@@ -58,9 +58,9 @@ class HomePage extends HookConsumerWidget {
                 if (account is WalletAccount) {
                   String defaultTokenSymbol = "SOL";
 
-                  if (payment.splToken != null) {
+                  if (transaction.splToken != null) {
                     try {
-                      Token selectedToken = account.getTokenByMint(payment.splToken!);
+                      Token selectedToken = account.getTokenByMint(transaction.splToken!);
                       defaultTokenSymbol = selectedToken.info.symbol;
                     } catch (_) {
                       insuficientFundsDialog(context);
@@ -68,11 +68,11 @@ class HomePage extends HookConsumerWidget {
                     }
                   }
 
-                  sendTransactionDialog(
+                  makePaymentManuallyDialog(
                     context,
                     account,
-                    initialDestination: payment.recipient,
-                    initialSendAmount: payment.amount ?? 0,
+                    initialDestination: transaction.recipient,
+                    initialSendAmount: transaction.amount ?? 0,
                     defaultTokenSymbol: defaultTokenSymbol,
                   );
                 }
@@ -103,7 +103,7 @@ class HomePage extends HookConsumerWidget {
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.timeline),
               icon: Icon(Icons.timeline),
-              label: 'Transactions',
+              label: 'Payments',
             ),
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.art_track_outlined),

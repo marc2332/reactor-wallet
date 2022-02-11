@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/theme.dart';
 
-Future<void> transactionInfo(
+Future<void> paymentInfo(
   BuildContext context,
   TransactionDetails transaction,
 ) async {

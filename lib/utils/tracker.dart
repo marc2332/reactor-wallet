@@ -34,9 +34,20 @@ class TokenInfo {
   late String logoUrl = "";
   late String symbol;
   late String mintAddress;
+  late int decimals;
 
-  TokenInfo({required this.name, required this.symbol});
-  TokenInfo.withInfo(this.mintAddress, this.name, this.logoUrl, this.symbol);
+  TokenInfo({
+    required this.name,
+    required this.symbol,
+    this.decimals = 1,
+  });
+  TokenInfo.withInfo(
+    this.mintAddress,
+    this.name,
+    this.logoUrl,
+    this.symbol,
+    this.decimals,
+  );
 }
 
 /*
@@ -54,8 +65,8 @@ class TokenTrackers {
     var tokensFile = await rootBundle.loadString('assets/tokens_list.json');
     Map tokensList = json.decode(tokensFile);
     for (final token in tokensList["tokens"]) {
-      this.tokensList[token['address']] =
-          TokenInfo.withInfo(token["address"], token["name"], token["logoURI"], token["symbol"]);
+      this.tokensList[token['address']] = TokenInfo.withInfo(
+          token["address"], token["name"], token["logoURI"], token["symbol"], token["decimals"]);
     }
   }
 

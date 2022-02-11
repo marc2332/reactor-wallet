@@ -98,7 +98,7 @@ class AccountTransactions extends HookConsumerWidget {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Text("No recent transactions found"),
+                        Text("No recent payments found"),
                       ],
                     ),
                   ],

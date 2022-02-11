@@ -6,12 +6,9 @@ import 'package:reactor_wallet/components/numpad.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
 import 'package:reactor_wallet/utils/states.dart';
-import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
-import 'package:solana/dto.dart'
-    show Commitment, ParsedInstruction, ParsedSystemTransferInformation;
-import 'package:solana/solana.dart'
-    show Ed25519HDKeyPair, SubscriptionClient, SystemProgram, lamportsPerSol;
+import 'package:solana/dto.dart' show Commitment;
+import 'package:solana/solana.dart' show Ed25519HDKeyPair, SubscriptionClient;
 
 class ResponsiveRotator extends StatelessWidget {
   final List<Widget> children;
@@ -36,20 +33,11 @@ class ResponsiveRotator extends StatelessWidget {
   }
 }
 
-List<TokenInfo> getAllPayableTokens(Account account) {
-  List<TokenInfo> externalTokens = List.from(account.tokensTracker.tokensList.values.toList());
-  List<TokenInfo> accountTokens = List.from(account.tokens)
-      .where((token) => token is! NFT)
-      .map<TokenInfo>((token) => token.info)
-      .toList();
+List<Token> getAllPayableTokens(Account account) {
+  List<Token> accountTokens = List.from(account.tokens);
+  accountTokens = accountTokens.where((token) => token is! NFT).toList();
 
-  externalTokens.removeWhere((info) => accountTokens.contains(info));
-  //accountTokens.addAll(externalTokens);
-
-  accountTokens.insert(
-    0,
-    TokenInfo.withInfo(SystemProgram.programId, "Solana", "", "SOL"),
-  );
+  accountTokens.insert(0, SOL(account.balance));
 
   return accountTokens;
 }
@@ -60,7 +48,7 @@ enum TransactionStatus {
 }
 
 Future<void> createQRTransaction(BuildContext context, Account account) async {
-  List<TokenInfo> tokens = getAllPayableTokens(account);
+  List<Token> tokens = getAllPayableTokens(account);
 
   return showDialog<void>(
     context: context,
@@ -92,8 +80,7 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
             transactionData.value = TransactionSolanaPay(
               recipient: account.address,
               amount: sendAmount,
-              splToken:
-                  selectedToken.value.symbol != "SOL" ? selectedToken.value.mintAddress : null,
+              splToken: selectedToken.value.info.symbol != "SOL" ? selectedToken.value.mint : null,
               references: [transactionIdentifier.address],
             );
 
@@ -101,7 +88,7 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
 
             var stream;
 
-            if (selectedToken.value.mintAddress == SystemProgram.programId) {
+            if (selectedToken.value is SOL) {
               stream = client.accountSubscribe(
                 account.address,
                 commitment: Commitment.confirmed,
@@ -109,13 +96,13 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
             } else {
               final programAccount = await account.client.getAssociatedTokenAccount(
                 owner: account.address,
-                mint: selectedToken.value.mintAddress,
+                mint: selectedToken.value.mint,
               );
 
               // Try to create a token account if there is none
               if (programAccount == null && account is WalletAccount) {
                 await account.client.createAssociatedTokenAccount(
-                  mint: selectedToken.value.mintAddress,
+                  mint: selectedToken.value.mint,
                   funder: account.wallet,
                   owner: account.address,
                 );
@@ -172,7 +159,7 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
             }
           }
 
-          void selectToken(TokenInfo? token) {
+          void selectToken(Token? token) {
             if (token != null) {
               selectedToken.value = token;
             }
@@ -184,7 +171,7 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
 
           return AlertDialog(
             title: transactionStatus.value == TransactionStatus.pending
-                ? const Text('Prepare payment')
+                ? const Text('Prepare transaction')
                 : null,
             content: SingleChildScrollView(
               child: transactionStatus.value == TransactionStatus.pending
@@ -192,12 +179,12 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                       children: [
                         Column(
                           children: [
-                            DropdownButton<TokenInfo>(
+                            DropdownButton<Token>(
                               value: selectedToken.value,
                               items: tokens
-                                  .map<DropdownMenuItem<TokenInfo>>(
-                                    (token) => DropdownMenuItem<TokenInfo>(
-                                      child: Text(token.symbol),
+                                  .map(
+                                    (token) => DropdownMenuItem<Token>(
+                                      child: Text(token.info.symbol),
                                       value: token,
                                     ),
                                   )
@@ -283,7 +270,7 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                             ),
                             padding: EdgeInsets.only(right: 10),
                           ),
-                          Text("Payment received."),
+                          Text("Transaction received."),
                         ],
                       ),
                       padding: const EdgeInsets.only(top: 10),

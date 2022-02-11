@@ -2,7 +2,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:reactor_wallet/dialogs/create_qr_transaction.dart';
+import 'package:reactor_wallet/dialogs/create_qr_payment.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:reactor_wallet/components/token_card.dart';
 import 'package:reactor_wallet/components/token_card_shimmer.dart';

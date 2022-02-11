@@ -34,7 +34,7 @@ class TransactionCard extends StatelessWidget {
         Expanded(
           child: ClickableCard(
             onTap: () {
-              transactionInfo(context, transaction);
+              paymentInfo(context, transaction);
             },
             child: Padding(
               padding: const EdgeInsets.all(15),

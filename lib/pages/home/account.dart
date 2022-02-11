@@ -279,11 +279,11 @@ class AccountSubPage extends ConsumerWidget {
           : null,
       floatingActionButton: selectedAccount is WalletAccount
           ? FloatingActionButton(
-              tooltip: "Make a payment",
+              tooltip: "Make a transaction",
               onPressed: () {
                 selectTransactionMethod(context, selectedAccount);
               },
-              child: const Icon(Icons.payment, color: Colors.white),
+              child: const Icon(Icons.payment_outlined, color: Colors.white),
             )
           : null,
       body: SizedBox(

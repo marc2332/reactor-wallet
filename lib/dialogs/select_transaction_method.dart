@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:reactor_wallet/dialogs/insufficient_funds.dart';
-import 'package:reactor_wallet/dialogs/send_transaction_by_address.dart';
-import 'package:reactor_wallet/dialogs/transaction_not_suported.dart';
+import 'package:reactor_wallet/dialogs/make_transaction_manually.dart';
+import 'package:reactor_wallet/dialogs/transaction_not_supported.dart';
 import 'package:reactor_wallet/pages/scan_qr.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
@@ -40,7 +40,7 @@ Future<void> selectTransactionMethod(
 
           Navigator.pop(context);
 
-          sendTransactionDialog(
+          makePaymentManuallyDialog(
             context,
             walletAccount,
             initialDestination: txData.recipient,
@@ -50,12 +50,12 @@ Future<void> selectTransactionMethod(
           );
         } on FormatException {
           // Invalid URI
-          transactionNotSupportedDialog(context);
+          paymentNotSupportedDialog(context);
         } catch (err) {
-          transactionNotSupportedDialog(context);
+          paymentNotSupportedDialog(context);
         }
       } else {
-        transactionNotSupportedDialog(context);
+        paymentNotSupportedDialog(context);
       }
     }
   }
@@ -99,7 +99,7 @@ Future<void> selectTransactionMethod(
                     borderRadius: BorderRadius.circular(5),
                     onTap: () {
                       Navigator.pop(context);
-                      sendTransactionDialog(context, walletAccount);
+                      makePaymentManuallyDialog(context, walletAccount);
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(15),

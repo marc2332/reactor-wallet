@@ -65,6 +65,12 @@ class NFT extends Token {
   ) : super(balance, mint, info);
 }
 
+class SOL extends Token {
+  SOL(
+    double balance,
+  ) : super(balance, "", TokenInfo(name: "Solana", symbol: "SOL"));
+}
+
 enum AccountItem {
   tokens,
   usdBalance,
@@ -150,10 +156,9 @@ class BaseAccount {
       encoding: Encoding.jsonParsed,
     );
 
-    int unknownN = 0;
     int notOwnedNFTs = 0;
 
-    for (final tokenAccount in tokenAccounts) {
+    tokenAccounts.asMap().forEach((index, tokenAccount) {
       ParsedAccountData? data = tokenAccount.account.data as ParsedAccountData?;
 
       if (data != null) {
@@ -162,24 +167,19 @@ class BaseAccount {
             data.when(
                 account: (mintData, type, accountType) {
                   String tokenMint = mintData.mint;
+                  int decimals = mintData.tokenAmount.decimals;
                   String? uiBalance = mintData.tokenAmount.uiAmountString;
                   double balance = double.parse(uiBalance ?? "0");
 
-                  String defaultName = "Unknown $unknownN";
-                  TokenInfo defaultTokenInfo = TokenInfo(
-                    name: defaultName,
-                    symbol: defaultName,
-                  );
+                  String defaultName = "Unknown $index";
+                  TokenInfo defaultTokenInfo =
+                      TokenInfo(name: defaultName, symbol: defaultName, decimals: decimals);
 
                   // Start tracking the token
                   TokenInfo tokenInfo = tokensTracker.addTrackerByProgramMint(
                     tokenMint,
                     defaultValue: defaultTokenInfo,
                   );
-
-                  if (defaultTokenInfo.name != tokenInfo.name) {
-                    unknownN++;
-                  }
 
                   // Add the token to this account
                   client.rpcClient.getMetadata(mint: tokenMint).then((value) async {
@@ -207,7 +207,7 @@ class BaseAccount {
           stake: (_) {},
         );
       }
-    }
+    });
 
     if (tokenAccounts.isEmpty) {
       itemsLoaded[AccountItem.tokens] = true;
@@ -380,8 +380,8 @@ class Transaction {
   final bool receivedOrNot;
   // The Program ID of this transaction, e.g, System Program, Token Program...
   final String programId;
-  // Minf of the token, if it's a token transaction
-  late String tokenMint;
+  // Token used in the transaction
+  late Token token;
   // References used in the transaction, https://docs.solanapay.com/spec#reference
   late List<String> references = [];
 
