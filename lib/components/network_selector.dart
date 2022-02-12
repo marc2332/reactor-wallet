@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 const options = [
-  'Mainnet-beta (default)',
+  'Mainnet Beta (recommended)',
   'Devnet',
   'Testnet',
   'Custom',
 ];
 
 var urlOptions = {
-  'Mainnet-beta (default)':
+  'Mainnet Beta (recommended)':
       NetworkUrl('https://solana-api.projectserum.com', 'ws://solana-api.projectserum.com'),
   'Devnet': NetworkUrl('https://api.devnet.solana.com', 'ws://api.devnet.solana.com'),
   'Testnet': NetworkUrl('https://api.testnet.solana.com', 'ws://api.testnet.solana.com'),
@@ -42,6 +42,7 @@ class NetworkSelectorState extends State<NetworkSelector> {
     onSelected(urlOptions[selectedOption]);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 15),
@@ -49,7 +50,6 @@ class NetworkSelectorState extends State<NetworkSelector> {
             value: selectedOption,
             iconSize: 24,
             elevation: 16,
-            isDense: true,
             onChanged: (String? newValue) {
               setState(() {
                 selectedOption = newValue!;
@@ -70,44 +70,43 @@ class NetworkSelectorState extends State<NetworkSelector> {
         ),
         if (selectedOption == 'Custom') ...[
           Padding(
-            padding: const EdgeInsets.only(top: 15),
-            child: Column(
-              children: [
-                TextFormField(
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Empty URL';
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: const InputDecoration(
-                    hintText: 'Enter a custom network URL',
-                  ),
-                  onChanged: (String value) async {
-                    customNetwork.rpc = value;
-                    onSelected(customNetwork);
-                  },
-                ),
-                TextFormField(
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Empty URL';
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: const InputDecoration(
-                    hintText: 'Enter a custom WebSockets URL',
-                  ),
-                  onChanged: (String value) async {
-                    customNetwork.ws = value;
-                    onSelected(customNetwork);
-                  },
-                ),
-              ],
+            padding: const EdgeInsets.only(top: 10),
+            child: TextFormField(
+              validator: (String? value) {
+                if (value == null || value.isEmpty) {
+                  return 'Empty URL';
+                } else {
+                  return null;
+                }
+              },
+              decoration: const InputDecoration(
+                hintText: 'Enter a custom network URL',
+              ),
+              onChanged: (String value) async {
+                customNetwork.rpc = value;
+                onSelected(customNetwork);
+              },
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: TextFormField(
+              validator: (String? value) {
+                if (value == null || value.isEmpty) {
+                  return 'Empty URL';
+                } else {
+                  return null;
+                }
+              },
+              decoration: const InputDecoration(
+                hintText: 'Enter a custom WebSockets URL',
+              ),
+              onChanged: (String value) async {
+                customNetwork.ws = value;
+                onSelected(customNetwork);
+              },
+            ),
+          )
         ]
       ],
     );

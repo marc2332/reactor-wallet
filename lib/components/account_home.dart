@@ -44,58 +44,60 @@ class AccountTokens extends StatelessWidget {
           border: Border.all(color: Theme.of(context).dividerColor),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Consumer(builder: (context, ref, _) {
-          List<Token> accountTokens = List.from(account.tokens.values);
-          accountTokens.retainWhere((token) => token is! NFT);
+        child: Consumer(
+          builder: (context, ref, _) {
+            List<Token> accountTokens = List.from(account.tokens.values);
+            accountTokens.retainWhere((token) => token is! NFT);
 
-          int accountTokenQuantity = accountTokens.length;
+            int accountTokenQuantity = accountTokens.length;
 
-          orderTokensByUSDBalanace(accountTokens);
+            orderTokensByUSDBalanace(accountTokens);
 
-          if (account.isItemLoaded(AccountItem.tokens)) {
-            if (accountTokenQuantity == 0) {
-              return SizedBox(
-                height: MediaQuery.of(context).size.height - 350,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(top: 20),
-                          child: Text("This address doesn't own any token"),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              );
+            if (account.isItemLoaded(AccountItem.tokens)) {
+              if (accountTokenQuantity == 0) {
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height - 350,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(top: 20),
+                            child: Text("This address doesn't own any token"),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              } else {
+                return ListView.builder(
+                  controller: listController,
+                  itemCount: accountTokens.length,
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  itemBuilder: (context, index) {
+                    return TokenCard(accountTokens[index]);
+                  },
+                );
+              }
             } else {
               return ListView.builder(
                 controller: listController,
-                itemCount: accountTokens.length,
+                itemCount: 7,
                 shrinkWrap: true,
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
+                physics: const BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return TokenCard(accountTokens[index]);
+                  return const TokenCardWithShimmer();
                 },
               );
             }
-          } else {
-            return ListView.builder(
-              controller: listController,
-              itemCount: 7,
-              shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                return const TokenCardWithShimmer();
-              },
-            );
-          }
-        }),
+          },
+        ),
       ),
     );
   }

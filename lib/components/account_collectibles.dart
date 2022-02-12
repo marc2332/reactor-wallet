@@ -49,7 +49,6 @@ class AccountCollectibles extends ConsumerWidget {
                               child: CachedNetworkImage(
                                 height: 120,
                                 width: 120,
-                                fit: BoxFit.cover,
                                 imageUrl: nft.imageInfo!.uri,
                                 errorWidget: (context, url, error) =>
                                     const Icon(Icons.image_not_supported_rounded),
@@ -97,7 +96,7 @@ class AccountCollectibles extends ConsumerWidget {
                               }
                             },
                           ),
-                          Text(nft.info.name)
+                          Text(name.length > 18 ? '${name.substring(0, 16)}...' : name),
                         ],
                       );
                     },

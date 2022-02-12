@@ -16,70 +16,101 @@ class WatchAddress extends ConsumerStatefulWidget {
 
 class WatchAddressState extends ConsumerState<WatchAddress> {
   late String address;
+  late String accountName;
   late NetworkUrl networkURL;
 
   WatchAddressState();
 
   @override
   Widget build(BuildContext context) {
+    final accountsManager = ref.read(accountsProvider.notifier);
+
+    accountName = accountsManager.generateAccountName();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Watch an address')),
       body: ResponsiveSizer(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Form(
-                  autovalidateMode: AutovalidateMode.always,
-                  child: Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Empty address';
-                              } else if (value.length < 43 || value.length > 50) {
-                                return 'Address length is not correct';
-                              } else {
-                                return null;
-                              }
-                            },
-                            decoration: const InputDecoration(
-                              hintText: 'Enter your address',
-                            ),
-                            onChanged: (String value) async {
-                              address = value;
-                            },
+            Form(
+              autovalidateMode: AutovalidateMode.always,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Text("Think a name, don't worry, you can change it later."),
+                    ),
+                    TextFormField(
+                      initialValue: accountName,
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                        hintText: "Account name",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.only(bottom: 6, right: 5),
+                          child: Icon(Icons.account_box_rounded),
+                        ),
+                      ),
+                      autofocus: true,
+                      validator: (String? value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Empty account name';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onChanged: (String value) async {
+                        accountName = value;
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: TextFormField(
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          hintText: "Wallet address",
+                          prefixIcon: Padding(
+                            padding: EdgeInsets.only(bottom: 6, right: 5),
+                            child: Icon(Icons.account_balance_wallet_outlined),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20, bottom: 5),
-                            child: NetworkSelector(
-                              onSelected: (NetworkUrl? url) {
-                                if (url != null) {
-                                  networkURL = url;
-                                }
-                              },
-                            ),
-                          )
-                        ],
+                        ),
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Empty address';
+                          } else if (value.length < 43 || value.length > 50) {
+                            return 'Address length is not correct';
+                          } else {
+                            return null;
+                          }
+                        },
+                        onChanged: (String value) async {
+                          address = value;
+                        },
                       ),
                     ),
-                  ),
-                )
-              ],
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 30),
+                      child: NetworkSelector(
+                        onSelected: (NetworkUrl? url) {
+                          if (url != null) {
+                            networkURL = url;
+                          }
+                        },
+                      ),
+                    ),
+                    ElevatedButton(
+                      child: const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Text("Continue"),
+                      ),
+                      onPressed: addAccount,
+                    )
+                  ],
+                ),
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  child: const Text("Continue"),
-                  onPressed: addAccount,
-                )
-              ],
-            )
           ],
         ),
       ),
@@ -90,7 +121,7 @@ class WatchAddressState extends ConsumerState<WatchAddress> {
     final accountsProv = ref.read(accountsProvider.notifier);
 
     // Create the account
-    accountsProv.createWatcher(address, networkURL).then((account) {
+    accountsProv.createWatcher(address, networkURL, accountName).then((account) {
       ref.read(selectedAccountProvider.notifier).state = account;
       Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
     });
