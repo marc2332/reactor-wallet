@@ -105,7 +105,7 @@ class WalletAccount extends BaseAccount implements Account {
     int amount, {
     List<String> references = const [],
   }) async {
-    var associatedRecipientAccount = await client.getAssociatedTokenAccount(
+    final associatedRecipientAccount = await client.getAssociatedTokenAccount(
       owner: destinationAddress,
       mint: tokenMint,
     );
@@ -115,15 +115,9 @@ class WalletAccount extends BaseAccount implements Account {
       mint: tokenMint,
     ) as ProgramAccount;
 
-    associatedRecipientAccount ??= await client.createAssociatedTokenAccount(
-      mint: tokenMint,
-      funder: wallet,
-      owner: destinationAddress,
-    );
-
     final message = TokenProgram.transfer(
       source: associatedSenderAccount.pubkey,
-      destination: associatedRecipientAccount.pubkey,
+      destination: associatedRecipientAccount!.pubkey,
       amount: amount,
       owner: address,
     );
