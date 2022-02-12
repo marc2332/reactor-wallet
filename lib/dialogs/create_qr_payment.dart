@@ -84,8 +84,6 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
               references: [transactionIdentifier.address],
             );
 
-            print(account.url.ws);
-
             final client = SubscriptionClient(Uri.parse(account.url.ws));
 
             var stream;
@@ -100,15 +98,6 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                 owner: account.address,
                 mint: selectedToken.value.mint,
               );
-
-              // Try to create a token account if there is none
-              if (programAccount == null && account is WalletAccount) {
-                await account.client.createAssociatedTokenAccount(
-                  mint: selectedToken.value.mint,
-                  funder: account.wallet,
-                  owner: account.address,
-                );
-              }
 
               stream = client.accountSubscribe(
                 programAccount!.pubkey,

@@ -281,7 +281,7 @@ class AccountInfo extends ConsumerWidget {
               return true;
             },
             child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
               child: Column(
                 children: [
                   SolBalance(

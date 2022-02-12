@@ -189,17 +189,18 @@ class BaseAccount {
                         try {
                           ImageInfo imageInfo = await getImageFromUri(value!.uri) as ImageInfo;
                           if (balance > 0) {
-                            tokens.putIfAbsent(
-                                tokenMint, () => NFT(balance, tokenMint, tokenInfo, imageInfo));
+                            tokens[tokenMint] = NFT(balance, tokenMint, tokenInfo, imageInfo);
                           } else {
                             notOwnedNFTs++;
                           }
                         } catch (_) {
-                          tokens.putIfAbsent(tokenMint, () => Token(balance, tokenMint, tokenInfo));
+                          tokens[tokenMint] = Token(balance, tokenMint, tokenInfo);
                         } finally {
                           if (tokens.length + notOwnedNFTs == tokenAccounts.length) {
                             itemsLoaded[AccountItem.tokens] = true;
-                            completer.complete();
+                            try {
+                              completer.complete();
+                            } catch (_) {}
                           }
                         }
                       },
