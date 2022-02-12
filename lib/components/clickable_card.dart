@@ -13,6 +13,7 @@ class ClickableCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         borderRadius: BorderRadius.circular(5),
         splashColor: Theme.of(context).hoverColor,
