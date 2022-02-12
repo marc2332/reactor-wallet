@@ -39,7 +39,6 @@ dart format . --line-length 100
 ### 🤔 To-do / Ideas
 - [x] **A name for the app**
 - [x] Handle `solana:` links, this way the wallet will be prompted to the user (experimental)
-- [ ] Add a contacts list
 - [ ] Add password/fingerprint authorization
 - [ ] [Solana Pay](https://solana-pay-docs.vercel.app/core/wallet-integration) integration, implemented, but highly experimental
     - [x] QR Reader
@@ -47,8 +46,8 @@ dart format . --line-length 100
     - [x] SPL Tokens Transactions (Experimental)
     - [ ] Support for Label, Message, Memo
     - [ ] QR Generator (like https://github.com/solana-labs/solana-pay/tree/master/point-of-sale does )
-        - [x] SOL transactions
-        - [ ] SPL Tokens transaction, implemented, but not tested
+        - [x] SOL transactions (Experimental)
+        - [x] SPL Tokens transaction (Experimental)
         - [ ] Compare the new received transaction by finding it with the reference, just to make sure the amount is correct
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
@@ -69,5 +68,7 @@ dart format . --line-length 100
 - [ ] Better UX (specially when creating accounts)
 - [x] Transactions Timestamps
 - [ ] Better Windows UX (e.g, using split views)
+- [ ] Send notifications when the app is closed and new transactions are received
+- [ ] Add a contacts list
 
 MIT License
