@@ -25,11 +25,18 @@ You can support this project by donating any amount you want to these addresses;
 - Bitcoin: `1HCBeYD564Y3AjQ3Ci6Fp2zosfZvevJuu6`
 
 ### 🏭 Building
+
+For Android:
 ```
 flutter build apk --tree-shake-icons --split-per-abi --dart-define secureKey=<32CharactersLengthSecretKey>
 ```
 
-Note: `secureKey` is used to internally encrypt and decrypt the wallets's passphrases when using the app.
+For Windows:
+```
+flutter build windows --tree-shake-icons --dart-define secureKey=<32CharactersLengthSecretKey>
+```
+
+Note: `secureKey` is used to encrypt and decrypt the wallets's passphrases when using the app.
 
 ### 📝 Formatting
 ```
