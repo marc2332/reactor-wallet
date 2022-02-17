@@ -241,16 +241,38 @@ class AddressButton extends StatelessWidget {
         ],
       );
     } else {
-      return Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Container(
-          width: 80,
-          height: 20,
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(150, 0, 0, 0),
-            borderRadius: BorderRadius.circular(3),
-          ),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                width: 120,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(150, 0, 0, 0),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 22),
+              child: Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(150, 0, 0, 0),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       );
     }
