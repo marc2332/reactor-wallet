@@ -41,6 +41,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - fonts/
 
 msix_config:
   display_name: Reactor Wallet
