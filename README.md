@@ -69,7 +69,7 @@ dart format . --line-length 100
 - [ ] Unit tests (WIP)
 - [x] Display owned tokens
 - [x] Ability to display NFTs owned by an address 
-- [ ] Upload to https://itsallwidgets.com/
+- [x] Upload to https://itsallwidgets.com/ (done: https://itsallwidgets.com/reactor-wallet)
 - [ ] Ability to add a small note when making transactions
 - [x] Ability to make transactions with SPL Tokens
 - [ ] Better UX (specially when creating accounts)
