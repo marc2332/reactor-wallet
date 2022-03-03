@@ -68,7 +68,9 @@ class NFT extends Token {
 class SOL extends Token {
   SOL(
     double balance,
-  ) : super(balance, "", TokenInfo(name: "Solana", symbol: "SOL"));
+  ) : super(balance, "", TokenInfo(name: "Solana", symbol: "SOL")) {
+    info.logoUrl = "https://solana.com/src/img/branding/solanaLogoMark.png";
+  }
 }
 
 enum AccountItem {

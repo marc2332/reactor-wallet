@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 
 class WrapperImage extends StatelessWidget {
   final String url;
+  final IconData defaultIcon;
 
-  const WrapperImage(this.url, {Key? key}) : super(key: key);
+  const WrapperImage(this.url, {Key? key, this.defaultIcon = Icons.no_accounts_outlined})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,13 +16,13 @@ class WrapperImage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: CachedNetworkImage(
           imageUrl: url,
-          height: 20,
+          height: 25,
           width: 35,
-          errorWidget: (context, url, error) => const Icon(Icons.no_accounts_outlined),
+          errorWidget: (context, url, error) => Icon(defaultIcon),
         ),
       );
     } else {
-      return const SizedBox(width: 30, height: 30, child: Icon(Icons.no_accounts_outlined));
+      return SizedBox(width: 30, height: 30, child: Icon(defaultIcon));
     }
   }
 }
