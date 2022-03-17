@@ -46,7 +46,7 @@ dart format . --line-length 100
 ### 🤔 To-do / Ideas
 - [x] **A name for the app**
 - [x] Handle `solana:` links, this way the wallet will be prompted to the user (experimental)
-- [ ] Add password/fingerprint authorization
+- [ ] Add password/fingerprint authorization/encryption
 - [ ] [Solana Pay](https://solana-pay-docs.vercel.app/core/wallet-integration) integration, implemented, but highly experimental
     - [x] QR Reader
     - [x] SOL Transactions (Experimental)
