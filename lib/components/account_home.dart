@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/dialogs/create_qr_payment.dart';
+import 'package:reactor_wallet/utils/theme.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:reactor_wallet/components/token_card.dart';
 import 'package:reactor_wallet/components/token_card_shimmer.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/states.dart';
-import 'package:reactor_wallet/utils/tracker.dart';
 
 String balanceShorter(String balance) {
   if (balance.length >= 6) {
@@ -44,58 +44,60 @@ class AccountTokens extends StatelessWidget {
           border: Border.all(color: Theme.of(context).dividerColor),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Consumer(builder: (context, ref, _) {
-          List<Token> accountTokens = List.from(account.tokens);
-          accountTokens.retainWhere((token) => token is! NFT);
+        child: Consumer(
+          builder: (context, ref, _) {
+            List<Token> accountTokens = List.from(account.tokens.values);
+            accountTokens.retainWhere((token) => token is! NFT);
 
-          int accountTokenQuantity = accountTokens.length;
+            int accountTokenQuantity = accountTokens.length;
 
-          orderTokensByUSDBalanace(accountTokens);
+            orderTokensByUSDBalanace(accountTokens);
 
-          if (account.isItemLoaded(AccountItem.tokens)) {
-            if (accountTokenQuantity == 0) {
-              return SizedBox(
-                height: MediaQuery.of(context).size.height - 350,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(top: 20),
-                          child: Text("This address doesn't own any token"),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              );
+            if (account.isItemLoaded(AccountItem.tokens)) {
+              if (accountTokenQuantity == 0) {
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height - 350,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(top: 20),
+                            child: Text("This address doesn't own any token"),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              } else {
+                return ListView.builder(
+                  controller: listController,
+                  itemCount: accountTokens.length,
+                  shrinkWrap: true,
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  itemBuilder: (context, index) {
+                    return TokenCard(accountTokens[index]);
+                  },
+                );
+              }
             } else {
               return ListView.builder(
                 controller: listController,
-                itemCount: accountTokens.length,
+                itemCount: 7,
                 shrinkWrap: true,
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
+                physics: const BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return TokenCard(accountTokens[index]);
+                  return const TokenCardWithShimmer();
                 },
               );
             }
-          } else {
-            return ListView.builder(
-              controller: listController,
-              itemCount: 7,
-              shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                return const TokenCardWithShimmer();
-              },
-            );
-          }
-        }),
+          },
+        ),
       ),
     );
   }
@@ -109,41 +111,43 @@ class SolBalance extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10, top: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+    if (isReady) {
+      return Row(
         children: [
-          if (isReady) ...[
-            Text(
-              solBalance,
-              style: GoogleFonts.poppins(
-                textStyle: const TextStyle(
-                  fontSize: 40,
-                ),
+          Text(
+            solBalance,
+            style: GoogleFonts.lato(
+              textStyle: const TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.w900,
               ),
             ),
-            const Text(' SOL'),
-          ] else ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 15),
-              child: Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  width: 90,
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(150, 0, 0, 0),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-              ),
-            )
-          ],
+          ),
+          Text(
+            '  SOL',
+            style: GoogleFonts.lato(
+              textStyle: const TextStyle(fontSize: 15),
+            ),
+          ),
         ],
-      ),
-    );
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            width: 110,
+            height: 30,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(150, 0, 0, 0),
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+        ),
+      );
+    }
   }
 }
 
@@ -156,30 +160,26 @@ class USDBalance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isReady) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '$usdBalance\$',
-            style: GoogleFonts.lato(
-              textStyle: const TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.w900,
-              ),
+      return Text('\$$usdBalance',
+          style: GoogleFonts.poppins(
+            textStyle: const TextStyle(
+              fontSize: 33,
             ),
-          )
-        ],
-      );
+          ),
+          textAlign: TextAlign.left);
     } else {
-      return Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Container(
-          width: 70,
-          height: 30,
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(150, 0, 0, 0),
-            borderRadius: BorderRadius.circular(3),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            width: 150,
+            height: 36,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(150, 0, 0, 0),
+              borderRadius: BorderRadius.circular(3),
+            ),
           ),
         ),
       );
@@ -187,11 +187,11 @@ class USDBalance extends StatelessWidget {
   }
 }
 
-class AddressButton extends StatelessWidget {
+class ReceiveButton extends StatelessWidget {
   final Account account;
   final bool isReady;
 
-  const AddressButton({
+  const ReceiveButton({
     Key? key,
     required this.account,
     required this.isReady,
@@ -200,56 +200,81 @@ class AddressButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isReady) {
-      // Convert the account's type to String
-      String accountTypeText = "";
-      if (account.accountType == AccountType.Client) {
-        accountTypeText = "Watcher";
-      } else {
-        accountTypeText = "Wallet";
-      }
-
-      return Row(
+      return Column(
         children: [
-          OutlinedButton(
-            onPressed: () {
-              Clipboard.setData(
-                ClipboardData(text: account.address),
-              ).then((_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Address copied to clipboard"),
-                  ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: OutlinedButton(
+              style: const ButtonStyle(visualDensity: VisualDensity.comfortable),
+              onPressed: () {
+                Clipboard.setData(
+                  ClipboardData(text: account.address),
+                ).then(
+                  (_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Address copied to clipboard"),
+                      ),
+                    );
+                  },
                 );
-              });
-            },
-            child: Text(
-              '$accountTypeText (${account.address.substring(0, 5)}...)',
-              style: Theme.of(context).textTheme.button,
+              },
+              child: Text(
+                'Share address',
+                style: Theme.of(context).textTheme.button,
+              ),
             ),
           ),
-          MaterialButton(
-            height: 40,
-            minWidth: 70,
-            shape: const CircleBorder(),
+          OutlinedButton(
+            style: const ButtonStyle(visualDensity: VisualDensity.comfortable),
             onPressed: () {
               createQRTransaction(context, account);
             },
-            child: const Icon(Icons.qr_code_2_outlined),
+            child: Row(
+              children: [
+                Text(
+                  'Receive',
+                  style: Theme.of(context).textTheme.button,
+                ),
+                Padding(
+                    padding: const EdgeInsets.only(left: 5),
+                    child: Icon(Icons.qr_code_2_outlined, color: Theme.of(context).iconColor)),
+              ],
+            ),
           ),
         ],
       );
     } else {
-      return Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Container(
-          width: 80,
-          height: 20,
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(150, 0, 0, 0),
-            borderRadius: BorderRadius.circular(3),
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey[300]!,
+              highlightColor: Colors.grey[100]!,
+              child: Container(
+                width: 120,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(150, 0, 0, 0),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
           ),
-        ),
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              width: 110,
+              height: 30,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(150, 0, 0, 0),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+          ),
+        ],
       );
     }
   }
@@ -265,46 +290,71 @@ class AccountInfo extends ConsumerWidget {
     String solBalance = balanceShorter(account.balance.toString());
     String usdBalance = account.usdBalance.toStringAsFixed(2);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        RefreshIndicator(
-          key: Key(account.address),
-          onRefresh: () async {
-            // Refresh the account when pulling down
-            final accountsProv = ref.read(accountsProvider.notifier);
-            await accountsProv.refreshAccount(account.name);
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 15,
+        right: 15,
+        top: 10,
+      ),
+      child: RefreshIndicator(
+        key: Key(account.address),
+        onRefresh: () async {
+          // Refresh the account when pulling down
+          final accountsProv = ref.read(accountsProvider.notifier);
+          await accountsProv.refreshAccount(account.name);
+        },
+        child: NotificationListener<OverscrollIndicatorNotification>(
+          onNotification: (OverscrollIndicatorNotification overscroll) {
+            overscroll.disallowIndicator();
+            return true;
           },
-          child: NotificationListener<OverscrollIndicatorNotification>(
-            onNotification: (OverscrollIndicatorNotification overscroll) {
-              overscroll.disallowIndicator();
-              return true;
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  SolBalance(
-                    solBalance: solBalance,
-                    isReady: account.isLoaded && account.isItemLoaded(AccountItem.solBalance),
-                  ),
-                  USDBalance(
-                    usdBalance: usdBalance,
-                    isReady: account.isLoaded && account.isItemLoaded(AccountItem.usdBalance),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: AddressButton(
-                      account: account,
-                      isReady: account.isLoaded,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 25, top: 15),
+                            child: USDBalance(
+                              usdBalance: usdBalance,
+                              isReady:
+                                  account.isLoaded && account.isItemLoaded(AccountItem.usdBalance),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 25, bottom: 20, top: 15),
+                            child: SolBalance(
+                              solBalance: solBalance,
+                              isReady:
+                                  account.isLoaded && account.isItemLoaded(AccountItem.solBalance),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: ReceiveButton(
+                        account: account,
+                        isReady: account.isLoaded,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

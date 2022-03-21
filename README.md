@@ -4,7 +4,7 @@ Rector Wallet is an **experimental** wallet for the [Solana Blockchain](https://
 
 Its on **alpha** stage, be careful when using it.
 
-**NOTE**: This project was started as side project, but now, I will showcase it in [Solana Riptide Hackathon](https://solana.com/riptide). I will also work on it when the hackathon is over.
+**NOTE**: This project was started as side project, but, it has also been submitted to [Solana Riptide Hackathon](https://solana.com/riptide).
 
 ### 😎 Features
 - Experimental [Solana Pay](https://solanapay.com) integration
@@ -25,11 +25,18 @@ You can support this project by donating any amount you want to these addresses;
 - Bitcoin: `1HCBeYD564Y3AjQ3Ci6Fp2zosfZvevJuu6`
 
 ### 🏭 Building
+
+For Android:
 ```
 flutter build apk --tree-shake-icons --split-per-abi --dart-define secureKey=<32CharactersLengthSecretKey>
 ```
 
-Note: `secureKey` is used to internally encrypt and decrypt the wallets's passphrases when using the app.
+For Windows:
+```
+flutter build windows --tree-shake-icons --dart-define secureKey=<32CharactersLengthSecretKey>
+```
+
+Note: `secureKey` is used to encrypt and decrypt the wallets's passphrases when using the app.
 
 ### 📝 Formatting
 ```
@@ -39,16 +46,15 @@ dart format . --line-length 100
 ### 🤔 To-do / Ideas
 - [x] **A name for the app**
 - [x] Handle `solana:` links, this way the wallet will be prompted to the user (experimental)
-- [ ] Add a contacts list
-- [ ] Add password/fingerprint authorization
+- [ ] Add password/fingerprint authorization/encryption
 - [ ] [Solana Pay](https://solana-pay-docs.vercel.app/core/wallet-integration) integration, implemented, but highly experimental
     - [x] QR Reader
     - [x] SOL Transactions (Experimental)
     - [x] SPL Tokens Transactions (Experimental)
     - [ ] Support for Label, Message, Memo
     - [ ] QR Generator (like https://github.com/solana-labs/solana-pay/tree/master/point-of-sale does )
-        - [x] SOL transactions
-        - [ ] SPL Tokens transaction, implemented, but not tested
+        - [x] SOL transactions (Experimental)
+        - [x] SPL Tokens transaction (Experimental)
         - [ ] Compare the new received transaction by finding it with the reference, just to make sure the amount is correct
 - [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
@@ -63,11 +69,13 @@ dart format . --line-length 100
 - [ ] Unit tests (WIP)
 - [x] Display owned tokens
 - [x] Ability to display NFTs owned by an address 
-- [ ] Upload to https://itsallwidgets.com/
+- [x] Upload to https://itsallwidgets.com/ (done: https://itsallwidgets.com/reactor-wallet)
 - [ ] Ability to add a small note when making transactions
 - [x] Ability to make transactions with SPL Tokens
 - [ ] Better UX (specially when creating accounts)
 - [x] Transactions Timestamps
 - [ ] Better Windows UX (e.g, using split views)
+- [ ] Send notifications when the app is closed and new transactions are received
+- [ ] Add a contacts list
 
 MIT License

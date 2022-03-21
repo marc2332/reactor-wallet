@@ -32,8 +32,10 @@ main() async {
   }
 
   LicenseRegistry.addLicense(() async* {
-    final license = await rootBundle.loadString('fonts/OFL.txt');
-    yield LicenseEntryWithLineBreaks(['fonts'], license);
+    final latoLicense = await rootBundle.loadString('fonts/Lato_OFL.txt');
+    yield LicenseEntryWithLineBreaks(['fonts'], latoLicense);
+    final poppinsLicense = await rootBundle.loadString('fonts/Poppins_OFL.txt');
+    yield LicenseEntryWithLineBreaks(['fonts'], poppinsLicense);
   });
 
   await Executor().warmUp();

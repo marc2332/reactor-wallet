@@ -253,10 +253,9 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   /*
    * Import a wallet
    */
-  Future<WalletAccount> importWallet(String mnemonic, NetworkUrl url) async {
+  Future<WalletAccount> importWallet(String mnemonic, NetworkUrl url, String accountName) async {
     // Create the account
-    WalletAccount walletAccount =
-        WalletAccount(0, generateAccountName(), url, mnemonic, tokensTracker);
+    WalletAccount walletAccount = WalletAccount(0, accountName, url, mnemonic, tokensTracker);
 
     // Create key pair
     await walletAccount.loadKeyPair();
@@ -298,11 +297,11 @@ class AccountsManager extends StateNotifier<Map<String, Account>> {
   /*
    * Create an address watcher
    */
-  Future<ClientAccount> createWatcher(String address, NetworkUrl url) async {
+  Future<ClientAccount> createWatcher(String address, NetworkUrl url, String accountName) async {
     ClientAccount account = ClientAccount(
       address,
       0,
-      generateAccountName(),
+      accountName,
       url,
       tokensTracker,
     );

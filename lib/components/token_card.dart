@@ -11,7 +11,7 @@ class TokenCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tokensTracker = ref.watch(tokensTrackerProvider);
+    ref.watch(tokensTrackerProvider);
 
     String usdBalance = token.usdBalance.toStringAsFixed(2);
     String tokenBalance = token.balance.toStringAsFixed(2);
@@ -51,7 +51,7 @@ class TokenCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Padding(padding: const EdgeInsets.only(right: 10), child: Text('$usdBalance\$'))
+                    Padding(padding: const EdgeInsets.only(right: 10), child: Text('\$$usdBalance'))
                   ],
                 ),
               ),

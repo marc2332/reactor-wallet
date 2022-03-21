@@ -34,7 +34,7 @@ class ResponsiveRotator extends StatelessWidget {
 }
 
 List<Token> getAllPayableTokens(Account account) {
-  List<Token> accountTokens = List.from(account.tokens);
+  List<Token> accountTokens = List.from(account.tokens.values);
   accountTokens = accountTokens.where((token) => token is! NFT).toList();
 
   accountTokens.insert(0, SOL(account.balance));
@@ -98,15 +98,6 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
                 owner: account.address,
                 mint: selectedToken.value.mint,
               );
-
-              // Try to create a token account if there is none
-              if (programAccount == null && account is WalletAccount) {
-                await account.client.createAssociatedTokenAccount(
-                  mint: selectedToken.value.mint,
-                  funder: account.wallet,
-                  owner: account.address,
-                );
-              }
 
               stream = client.accountSubscribe(
                 programAccount!.pubkey,

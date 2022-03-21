@@ -24,62 +24,70 @@ class CreateWalletState extends ConsumerState<CreateWallet> {
 
   @override
   Widget build(BuildContext context) {
+    final accountsManager = ref.read(accountsProvider.notifier);
+
+    accountName = accountsManager.generateAccountName();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Create wallet')),
       body: ResponsiveSizer(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Form(
-                  autovalidateMode: AutovalidateMode.always,
-                  child: Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            validator: (String? value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Empty account name';
-                              } else {
-                                return null;
-                              }
-                            },
-                            decoration: const InputDecoration(
-                              hintText: 'Enter an account name',
-                            ),
-                            onChanged: (String value) async {
-                              accountName = value;
-                            },
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20, bottom: 5),
-                            child: NetworkSelector(
-                              onSelected: (NetworkUrl? url) {
-                                if (url != null) {
-                                  networkURL = url;
-                                }
-                              },
-                            ),
-                          )
-                        ],
+            Form(
+              autovalidateMode: AutovalidateMode.always,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Text("Think a name, don't worry, you can change it later."),
+                    ),
+                    TextFormField(
+                      initialValue: accountName,
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(vertical: 10),
+                        hintText: "Account name",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.only(bottom: 6, right: 5),
+                          child: Icon(Icons.account_box_rounded),
+                        ),
+                      ),
+                      autofocus: true,
+                      validator: (String? value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Empty account name';
+                        } else {
+                          return null;
+                        }
+                      },
+                      onChanged: (String value) async {
+                        accountName = value;
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 30),
+                      child: NetworkSelector(
+                        onSelected: (NetworkUrl? url) {
+                          if (url != null) {
+                            networkURL = url;
+                          }
+                        },
                       ),
                     ),
-                  ),
+                    ElevatedButton(
+                      child: const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Text("Create Wallet"),
+                      ),
+                      onPressed: createWallet,
+                    )
+                  ],
                 ),
-              ],
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  child: const Text("Create Wallet"),
-                  onPressed: createWallet,
-                )
-              ],
-            )
           ],
         ),
       ),

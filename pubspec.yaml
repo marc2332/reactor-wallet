@@ -9,7 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  solana: ^0.18.0
+  solana: 
+    git: 
+      url: https://github.com/marc2332/cryptoplease-dart
+      path: packages/solana
   google_fonts: ^2.1.0
   bip39: ^1.0.6
   worker_manager: ^4.2.3
@@ -38,6 +41,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - fonts/
 
 msix_config:
   display_name: Reactor Wallet

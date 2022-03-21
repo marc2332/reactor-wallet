@@ -19,7 +19,7 @@ class TransactionCard extends StatelessWidget {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(transaction.blockTime * 1000);
     String readableDate = hourMinutFormatter.format(date);
 
-    String transactionAmount = transaction.ammount.toString().length >= 7
+    String transactionAmount = transaction.ammount.toString().contains("-")
         ? transaction.ammount.toStringAsFixed(9)
         : transaction.ammount.toString();
 

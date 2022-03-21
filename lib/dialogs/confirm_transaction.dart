@@ -62,11 +62,9 @@ Future<void> confirmTransactionDialog(
                 }
               } else {
                 // Find the owned token and make sure the balance is enough
-                for (var token in walletAccount.tokens) {
-                  if (token.mint == transaction.token.mint &&
-                      token.balance >= transaction.ammount) {
-                    hasEnoughFunds.value = true;
-                  }
+                Token? token = walletAccount.tokens[transaction.token.mint];
+                if (token != null && token.balance > transaction.ammount) {
+                  hasEnoughFunds.value = true;
                 }
               }
 

@@ -90,9 +90,9 @@ class TokenTrackers {
     }
   }
 
-  TokenInfo? getTokenInfo(String programId) {
-    if (tokensList.containsKey(programId)) {
-      return tokensList[programId]!;
+  TokenInfo? getTokenInfo(String programMint) {
+    if (tokensList.containsKey(programMint)) {
+      return tokensList[programMint]!;
     }
     return null;
   }

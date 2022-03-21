@@ -521,9 +521,11 @@ packages:
   solana:
     dependency: "direct main"
     description:
-      name: solana
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "packages/solana"
+      ref: HEAD
+      resolved-ref: e3e4df3eae721fe01889b38ece633d63e21c1024
+      url: "git://github.com/marc2332/cryptoplease-dart.git"
+    source: git
     version: "0.18.0"
   source_span:
     dependency: transitive

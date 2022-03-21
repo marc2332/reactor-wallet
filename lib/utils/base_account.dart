@@ -68,7 +68,9 @@ class NFT extends Token {
 class SOL extends Token {
   SOL(
     double balance,
-  ) : super(balance, "", TokenInfo(name: "Solana", symbol: "SOL"));
+  ) : super(balance, "", TokenInfo(name: "Solana", symbol: "SOL")) {
+    info.logoUrl = "https://solana.com/src/img/branding/solanaLogoMark.png";
+  }
 }
 
 enum AccountItem {
@@ -88,7 +90,7 @@ class BaseAccount {
   late double usdBalance = 0;
   late TokenTrackers tokensTracker;
   late List<TransactionDetails> transactions = [];
-  late List<Token> tokens = [];
+  late Map<String, Token> tokens = {};
   final itemsLoaded = <AccountItem, bool>{};
 
   BaseAccount(this.balance, this.name, this.url, this.tokensTracker);
@@ -104,7 +106,7 @@ class BaseAccount {
    * Get a token by it's mint address
    */
   Token getTokenByMint(String mint) {
-    return tokens.firstWhere((token) => token.mint == mint);
+    return tokens[mint] as Token;
   }
 
   /*
@@ -120,7 +122,7 @@ class BaseAccount {
 
     itemsLoaded[AccountItem.usdBalance] = true;
 
-    for (final token in tokens) {
+    for (final token in tokens.values) {
       updateUsdFromTokenValue(token);
     }
   }
@@ -144,8 +146,6 @@ class BaseAccount {
    * Loads all the tokens (spl-program mints) owned by this account
    */
   Future<void> loadTokens() async {
-    tokens = [];
-
     final completer = Completer();
 
     // Get all the tokens owned by the account
@@ -158,56 +158,65 @@ class BaseAccount {
 
     int notOwnedNFTs = 0;
 
-    tokenAccounts.asMap().forEach((index, tokenAccount) {
-      ParsedAccountData? data = tokenAccount.account.data as ParsedAccountData?;
+    tokenAccounts.asMap().forEach(
+      (index, tokenAccount) {
+        ParsedAccountData? data = tokenAccount.account.data as ParsedAccountData?;
 
-      if (data != null) {
-        data.when(
-          splToken: (data) {
-            data.when(
-                account: (mintData, type, accountType) {
-                  String tokenMint = mintData.mint;
-                  int decimals = mintData.tokenAmount.decimals;
-                  String? uiBalance = mintData.tokenAmount.uiAmountString;
-                  double balance = double.parse(uiBalance ?? "0");
+        if (data != null) {
+          data.when(
+            splToken: (data) {
+              data.when(
+                  account: (mintData, type, accountType) {
+                    String tokenMint = mintData.mint;
+                    int decimals = mintData.tokenAmount.decimals;
+                    String? uiBalance = mintData.tokenAmount.uiAmountString;
+                    double balance = double.parse(uiBalance ?? "0");
 
-                  String defaultName = "Unknown $index";
-                  TokenInfo defaultTokenInfo =
-                      TokenInfo(name: defaultName, symbol: defaultName, decimals: decimals);
+                    String defaultName = "Unknown $index";
+                    TokenInfo defaultTokenInfo = TokenInfo(
+                      name: defaultName,
+                      symbol: defaultName,
+                      decimals: decimals,
+                    );
 
-                  // Start tracking the token
-                  TokenInfo tokenInfo = tokensTracker.addTrackerByProgramMint(
-                    tokenMint,
-                    defaultValue: defaultTokenInfo,
-                  );
+                    // Start tracking the token
+                    TokenInfo tokenInfo = tokensTracker.addTrackerByProgramMint(
+                      tokenMint,
+                      defaultValue: defaultTokenInfo,
+                    );
 
-                  // Add the token to this account
-                  client.rpcClient.getMetadata(mint: tokenMint).then((value) async {
-                    try {
-                      ImageInfo imageInfo = await getImageFromUri(value!.uri) as ImageInfo;
-                      if (balance > 0) {
-                        tokens.add(NFT(balance, tokenMint, tokenInfo, imageInfo));
-                      } else {
-                        notOwnedNFTs++;
-                      }
-                    } catch (_) {
-                      tokens.add(Token(balance, tokenMint, tokenInfo));
-                    } finally {
-                      if (tokens.length + notOwnedNFTs == tokenAccounts.length) {
-                        itemsLoaded[AccountItem.tokens] = true;
-                        completer.complete();
-                      }
-                    }
-                  });
-                },
-                mint: (_, __, ___) {},
-                unknown: (_) {});
-          },
-          unsupported: (_) {},
-          stake: (_) {},
-        );
-      }
-    });
+                    // Add the token to this account
+                    client.rpcClient.getMetadata(mint: tokenMint).then(
+                      (value) async {
+                        try {
+                          ImageInfo imageInfo = await getImageFromUri(value!.uri) as ImageInfo;
+                          if (balance > 0) {
+                            tokens[tokenMint] = NFT(balance, tokenMint, tokenInfo, imageInfo);
+                          } else {
+                            notOwnedNFTs++;
+                          }
+                        } catch (_) {
+                          tokens[tokenMint] = Token(balance, tokenMint, tokenInfo);
+                        } finally {
+                          if (tokens.length + notOwnedNFTs == tokenAccounts.length) {
+                            itemsLoaded[AccountItem.tokens] = true;
+                            try {
+                              completer.complete();
+                            } catch (_) {}
+                          }
+                        }
+                      },
+                    );
+                  },
+                  mint: (_, __, ___) {},
+                  unknown: (_) {});
+            },
+            unsupported: (_) {},
+            stake: (_) {},
+          );
+        }
+      },
+    );
 
     if (tokenAccounts.isEmpty) {
       itemsLoaded[AccountItem.tokens] = true;
@@ -304,7 +313,7 @@ abstract class Account {
   // Recent transactions
   late List<TransactionDetails> transactions = [];
   // Tokens owned by this account
-  late List<Token> tokens = [];
+  late Map<String, Token> tokens = {};
 
   // Flag used only to easily create an account with shimmer effects on the Home page
   late bool isLoaded = true;
