@@ -4,7 +4,7 @@ Rector Wallet is an **experimental** wallet for the [Solana Blockchain](https://
 
 Its on **alpha** stage, be careful when using it.
 
-**NOTE**: This project was started as side project, but now, I will showcase it in [Solana Riptide Hackathon](https://solana.com/riptide). I will also work on it when the hackathon is over.
+**NOTE**: This project was started as side project, but, it has also been submitted to [Solana Riptide Hackathon](https://solana.com/riptide).
 
 ### 😎 Features
 - Experimental [Solana Pay](https://solanapay.com) integration
