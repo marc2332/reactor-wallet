@@ -6,6 +6,8 @@ import 'package:reactor_wallet/utils/states.dart';
 import 'package:reactor_wallet/utils/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../utils/links.dart';
+
 class SettingsSubPage extends ConsumerStatefulWidget {
   const SettingsSubPage({Key? key}) : super(key: key);
 
@@ -65,7 +67,7 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
             }),
             ClickableCard(
               onTap: () async {
-                openURL('https://github.com/marc2332/reactor-wallet');
+                openURL('https://github.com/marc2332/reactor-wallet', context);
               },
               child: ListTile(
                 title: const Text('Contribute'),
@@ -77,7 +79,8 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
             ),
             ClickableCard(
               onTap: () async {
-                openURL('https://github.com/marc2332/reactor-wallet#-support-this-project');
+                openURL(
+                    'https://github.com/marc2332/reactor-wallet#-support-this-project', context);
               },
               child: ListTile(
                 title: const Text('Donate'),
@@ -89,7 +92,7 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
             ),
             ClickableCard(
               onTap: () {
-                openURL('https://github.com/marc2332');
+                openURL('https://github.com/marc2332', context);
               },
               child: ListTile(
                 title: const Text('Made by Marc Espín'),
@@ -103,19 +106,5 @@ class SettingsSubPageState extends ConsumerState<SettingsSubPage> {
         ),
       ),
     );
-  }
-
-  void openURL(url) async {
-    bool canOpen = await canLaunch(url);
-
-    if (canOpen) {
-      await launch(url);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Could not open browser."),
-        ),
-      );
-    }
   }
 }

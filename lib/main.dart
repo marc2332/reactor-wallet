@@ -12,6 +12,7 @@ import 'package:reactor_wallet/pages/create_wallet.dart';
 import 'package:reactor_wallet/pages/import_wallet.dart';
 import 'package:reactor_wallet/pages/manage_accounts.dart';
 import 'package:reactor_wallet/pages/watch_address.dart';
+import 'package:reactor_wallet/pages/welcome.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
 import 'package:reactor_wallet/utils/states.dart';
@@ -66,6 +67,7 @@ class App extends HookConsumerWidget {
       routes: {
         '/home': (_) => const LinkListenerWrapper(child: HomePage()),
         '/account_selection': (_) => const LinkListenerWrapper(child: AccountSelectionPage()),
+        '/welcome': (_) => const WelcomePage(),
         '/watch_address': (_) => const LinkListenerWrapper(child: WatchAddress()),
         '/create_wallet': (_) => const LinkListenerWrapper(child: CreateWallet()),
         '/import_wallet': (_) => const LinkListenerWrapper(child: ImportWallet()),

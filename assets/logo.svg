@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 439 137.29" enable-background="new 0 0 439 137.29" xml:space="preserve">
+<g filter="url(#filter0_d_18_51)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M102.52 54.8573C103.498 57.9886 105.951 60.4409 109.082 61.4194L148.917 73.8675C156.092 76.1094 158.321 85.1684 153.006 90.4833L92.4834 151.006C87.1684 156.32 78.1094 154.091 75.8675 146.917L63.4194 107.082C62.4409 103.951 59.9886 101.498 56.8573 100.52L17.0222 88.0719C9.84785 85.83 7.61885 76.771 12.9338 71.456L73.456 10.9338C78.771 5.61885 87.83 7.84785 90.0719 15.0222L102.52 54.8573Z" fill="url(#paint0_linear_18_51)"/>
+</g>
+
+<filter id="filter0_d_18_51" x="0" y="0" width="165.939" height="165.939" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="2"/>
+<feGaussianBlur stdDeviation="5"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_18_51"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_18_51" result="shape"/>
+</filter>
+<linearGradient id="paint0_linear_18_51" x1="16.9303" y1="3.28751" x2="139.856" y2="221.744" gradientUnits="userSpaceOnUse">
+<stop stop-color="#59AFFF"/>
+<stop offset="1" stop-color="#0476E0"/>
+</linearGradient>
+
+</svg>

@@ -6,11 +6,16 @@ class TokenCard extends StatelessWidget {
   final Widget image;
   final Widget tail;
 
-  const TokenCard({Key? key, required this.title, required this.subtitle, required this.image, required this.tail}) : super(key: key);
+  const TokenCard(
+      {Key? key,
+      required this.title,
+      required this.subtitle,
+      required this.image,
+      required this.tail})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.all(4),
       child: InkWell(
@@ -25,10 +30,7 @@ class TokenCard extends StatelessWidget {
               SizedBox(
                 width: 70,
                 height: 40,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 20),
-                  child: image
-                ),
+                child: Padding(padding: const EdgeInsets.only(left: 10, right: 20), child: image),
               ),
               Expanded(
                 flex: 3,
@@ -41,11 +43,9 @@ class TokenCard extends StatelessWidget {
                 ),
               ),
               Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Padding(padding: const EdgeInsets.only(right: 10), child: tail)
-                  ],
-                ),
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [Padding(padding: const EdgeInsets.only(right: 10), child: tail)],
+              ),
             ],
           ),
         ),

@@ -8,7 +8,7 @@ class TokenCardWithShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TokenCard(
-      image:  Shimmer.fromColors(
+      image: Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,
         child: Container(
@@ -17,7 +17,7 @@ class TokenCardWithShimmer extends StatelessWidget {
             borderRadius: BorderRadius.circular(50),
           ),
         ),
-          ),
+      ),
       title: Shimmer.fromColors(
         baseColor: Colors.grey[300]!,
         highlightColor: Colors.grey[100]!,

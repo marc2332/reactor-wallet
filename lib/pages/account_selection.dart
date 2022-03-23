@@ -1,5 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:reactor_wallet/components/clickable_card.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
+import 'package:reactor_wallet/pages/create_wallet.dart';
+import 'package:reactor_wallet/pages/import_wallet.dart';
+import 'package:reactor_wallet/pages/watch_address.dart';
 
 /*
  * Account Selection Page
@@ -22,82 +27,91 @@ class AccountSelectionPage extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 1,
-                  child: Card(
-                    child: InkWell(
-                      splashColor: Theme.of(context).hoverColor,
-                      onTap: () async {
-                        Navigator.pushNamed(context, "/watch_address");
-                      },
-                      child: Flex(
-                        direction: Axis.horizontal,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Padding(
-                            padding: EdgeInsets.all(15),
-                            child: Icon(
-                              Icons.person_pin_outlined,
-                              size: 30.0,
-                            ),
+                  child: ClickableCard(
+                    onTap: () async {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (BuildContext context) {
+                            return const ImportWallet();
+                          },
+                        ),
+                      );
+                    },
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(15),
+                          child: Icon(
+                            Icons.import_export_outlined,
+                            size: 30.0,
                           ),
-                          Text("Watch address"),
-                        ],
-                      ),
+                        ),
+                        Text("Import wallet"),
+                      ],
                     ),
                   ),
                 ),
                 Expanded(
                   flex: 1,
-                  child: Card(
-                    child: InkWell(
-                      splashColor: Theme.of(context).hoverColor,
-                      onTap: () async {
-                        Navigator.pushNamed(context, "/import_wallet");
-                      },
-                      child: Flex(
-                        direction: Axis.horizontal,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Padding(
-                            padding: EdgeInsets.all(15),
-                            child: Icon(
-                              Icons.import_export_outlined,
-                              size: 30.0,
-                            ),
+                  child: ClickableCard(
+                    onTap: () async {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (BuildContext context) {
+                            return const CreateWallet();
+                          },
+                        ),
+                      );
+                    },
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(15),
+                          child: Icon(
+                            Icons.create_outlined,
+                            size: 30.0,
                           ),
-                          Text("Import wallet"),
-                        ],
-                      ),
+                        ),
+                        Text("Create wallet"),
+                      ],
                     ),
                   ),
                 ),
                 Expanded(
                   flex: 1,
-                  child: Card(
-                    child: InkWell(
-                      splashColor: Theme.of(context).hoverColor,
-                      onTap: () async {
-                        Navigator.pushNamed(context, "/create_wallet");
-                      },
-                      child: Flex(
-                        direction: Axis.horizontal,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Padding(
-                            padding: EdgeInsets.all(15),
-                            child: Icon(
-                              Icons.create_outlined,
-                              size: 30.0,
-                            ),
+                  child: ClickableCard(
+                    onTap: () async {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (BuildContext context) {
+                            return const WatchAddress();
+                          },
+                        ),
+                      );
+                    },
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(15),
+                          child: Icon(
+                            Icons.person_pin_outlined,
+                            size: 30.0,
                           ),
-                          Text("Create wallet"),
-                        ],
-                      ),
+                        ),
+                        Text("Watch address"),
+                      ],
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),

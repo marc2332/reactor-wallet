@@ -140,7 +140,7 @@ class AccountSubPage extends ConsumerWidget {
     // If the account is loaded and no account is found then open the Account Selection page in order to create an account
     if (isAppLoaded && selectedAccount == null) {
       WidgetsBinding.instance?.addPostFrameCallback((_) {
-        Navigator.pushReplacementNamed(context, "/account_selection");
+        Navigator.pushReplacementNamed(context, "/welcome");
       });
     }
 
