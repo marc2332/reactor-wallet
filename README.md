@@ -36,7 +36,7 @@ For Windows:
 flutter build windows --tree-shake-icons --dart-define secureKey=<32CharactersLengthSecretKey>
 ```
 
-Note: `secureKey` is used to encrypt and decrypt the wallets's passphrases when using the app.
+Note: `--dart-define secureKey=<32CharactersLengthSecretKey>` optional, and is used to encrypt and decrypt the wallets's passphrases when using the app. This will be replaced by a password/pin/fingerprint/etc made by the user.
 
 ### 📝 Formatting
 ```
