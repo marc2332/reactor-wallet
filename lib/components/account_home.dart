@@ -2,10 +2,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reactor_wallet/components/token_card_info.dart';
 import 'package:reactor_wallet/dialogs/create_qr_payment.dart';
 import 'package:reactor_wallet/utils/theme.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:reactor_wallet/components/token_card.dart';
 import 'package:reactor_wallet/components/token_card_shimmer.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/states.dart';
@@ -81,7 +81,7 @@ class AccountTokens extends StatelessWidget {
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
                   itemBuilder: (context, index) {
-                    return TokenCard(accountTokens[index]);
+                    return TokenCardInfo(accountTokens[index]);
                   },
                 );
               }
