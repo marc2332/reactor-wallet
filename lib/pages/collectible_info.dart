@@ -6,8 +6,10 @@ import 'package:reactor_wallet/utils/base_account.dart';
 class CollectibleInfo extends ConsumerWidget {
   final NFT nft;
   final bool isBig;
+  final String tag;
 
-  const CollectibleInfo({Key? key, required this.nft, required this.isBig}) : super(key: key);
+  const CollectibleInfo({Key? key, required this.nft, required this.isBig, required this.tag})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,7 +27,7 @@ class CollectibleInfo extends ConsumerWidget {
               children: [
                 Expanded(
                   child: Hero(
-                    tag: nft.imageInfo!.uri,
+                    tag: tag,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(6),
                       child: CachedNetworkImage(

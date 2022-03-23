@@ -13,7 +13,7 @@ class AccountCollectibles extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final collectibles = account.tokens.values.whereType<NFT>();
+    final collectibles = account.tokens.values.whereType<NFT>().toList();
     final screenSize = MediaQuery.of(context).size;
     final columnsNumber = screenSize.width > 750 ? 3 : 2;
 
@@ -38,14 +38,16 @@ class AccountCollectibles extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   children: collectibles.map(
                     (nft) {
+                      int nftIndex = collectibles.indexOf(nft);
                       final screenSize = MediaQuery.of(context).size;
                       final name = nft.imageInfo?.data?.name ?? "Unknown";
+                      final tag = nft.imageInfo!.uri + nftIndex.toString();
 
                       return Column(
                         children: [
                           ClickableCard(
                             child: Hero(
-                              tag: nft.imageInfo!.uri,
+                              tag: tag,
                               child: CachedNetworkImage(
                                 height: 120,
                                 width: 120,
@@ -62,10 +64,7 @@ class AccountCollectibles extends ConsumerWidget {
                                     return AlertDialog(
                                       title: Text(name),
                                       content: SingleChildScrollView(
-                                        child: CollectibleInfo(
-                                          nft: nft,
-                                          isBig: true,
-                                        ),
+                                        child: CollectibleInfo(nft: nft, isBig: true, tag: tag),
                                       ),
                                       actions: [
                                         TextButton(
@@ -85,10 +84,7 @@ class AccountCollectibles extends ConsumerWidget {
                                     builder: (_) {
                                       return Scaffold(
                                         appBar: AppBar(title: Text(name)),
-                                        body: CollectibleInfo(
-                                          nft: nft,
-                                          isBig: false,
-                                        ),
+                                        body: CollectibleInfo(nft: nft, isBig: false, tag: tag),
                                       );
                                     },
                                   ),
