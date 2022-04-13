@@ -4,7 +4,7 @@ import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/dialogs/editing_account.dart';
 import 'package:reactor_wallet/dialogs/account_info.dart';
 import 'package:reactor_wallet/dialogs/remove_account.dart';
-import 'package:reactor_wallet/utils/states.dart';
+import 'package:reactor_wallet/utils/state/providers.dart';
 
 class ManageAccountsPage extends StatefulWidget {
   const ManageAccountsPage({Key? key}) : super(key: key);

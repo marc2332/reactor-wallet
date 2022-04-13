@@ -7,10 +7,11 @@ import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/dialogs/insufficient_funds.dart';
 import 'package:reactor_wallet/dialogs/select_account.dart';
 import 'package:reactor_wallet/dialogs/make_transaction_manually.dart';
-import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
-import 'package:reactor_wallet/utils/states.dart';
-import 'package:reactor_wallet/utils/wallet_account.dart';
+import 'package:reactor_wallet/utils/state/providers.dart';
+
+import 'package:reactor_wallet/utils/accounts/wallet_account.dart';
 import 'home/account.dart';
 import 'home/settings.dart';
 import 'package:uni_links/uni_links.dart';

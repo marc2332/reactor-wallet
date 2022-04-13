@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
 
 class CollectibleInfo extends ConsumerWidget {
   final NFT nft;

@@ -2,17 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:reactor_wallet/components/account_home.dart';
-import 'package:reactor_wallet/components/accounts_transaction.dart';
+import 'package:reactor_wallet/components/account/account_home.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/dialogs/select_transaction_method.dart';
-import 'package:reactor_wallet/components/account_collectibles.dart';
-import 'package:reactor_wallet/utils/base_account.dart';
-import 'package:reactor_wallet/utils/client_account.dart';
-import 'package:reactor_wallet/utils/states.dart';
+import 'package:reactor_wallet/pages/home/collectibles.dart';
+import 'package:reactor_wallet/pages/home/transactions.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
+import 'package:reactor_wallet/utils/accounts/client_account.dart';
+import 'package:reactor_wallet/utils/state/providers.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
-import 'package:reactor_wallet/utils/wallet_account.dart';
+import 'package:reactor_wallet/utils/accounts/wallet_account.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:reactor_wallet/utils/theme.dart';
 
@@ -132,7 +132,6 @@ class AccountSubPage extends ConsumerWidget {
     final accounts = ref.watch(accountsProvider).values.toList();
 
     final selectedAccount = ref.watch(selectedAccountProvider);
-    final isAppLoaded = ref.watch(appLoadedProvider);
 
     Widget? accountBody;
     Widget? accountHeader;

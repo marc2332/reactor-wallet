@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:reactor_wallet/components/accounts_transaction.dart';
 import 'package:reactor_wallet/components/clickable_card.dart';
 import 'package:reactor_wallet/dialogs/transaction_info.dart';
-import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/pages/home/transactions.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
 import 'package:reactor_wallet/utils/theme.dart';
 
 class TransactionCard extends StatelessWidget {

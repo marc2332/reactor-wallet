@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/dialogs/confirm_transaction.dart';
-import 'package:reactor_wallet/utils/base_account.dart';
-import 'package:reactor_wallet/utils/wallet_account.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
+import 'package:reactor_wallet/utils/accounts/wallet_account.dart';
 
-import '../components/account_home.dart';
+import '../components/account/account_home.dart';
 import '../components/wrapper_image.dart';
 
 String? transactionAddressValidator(String? value) {

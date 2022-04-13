@@ -3,9 +3,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:reactor_wallet/components/numpad.dart';
-import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
-import 'package:reactor_wallet/utils/states.dart';
+import 'package:reactor_wallet/utils/state/providers.dart';
+
 import 'package:solana/dto.dart' show Commitment;
 import 'package:solana/dto.dart' as dto;
 import 'package:solana/solana.dart' show Ed25519HDKeyPair, SubscriptionClient;

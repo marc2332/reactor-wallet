@@ -7,7 +7,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/pages/setup_password.dart';
 import 'package:reactor_wallet/utils/links.dart';
+import 'package:reactor_wallet/utils/state/providers.dart';
 import 'package:reactor_wallet/utils/states.dart';
+
 import 'account_selection.dart';
 
 class WelcomePage extends HookConsumerWidget {

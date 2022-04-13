@@ -8,21 +8,22 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/dialogs/insufficient_funds.dart';
 import 'package:reactor_wallet/dialogs/select_account.dart';
 import 'package:reactor_wallet/dialogs/make_transaction_manually.dart';
+import 'package:reactor_wallet/pages/account_selection.dart';
 import 'package:reactor_wallet/pages/create_wallet.dart';
+import 'package:reactor_wallet/pages/home.dart';
 import 'package:reactor_wallet/pages/import_wallet.dart';
 import 'package:reactor_wallet/pages/manage_accounts.dart';
 import 'package:reactor_wallet/pages/splashscreen.dart';
 import 'package:reactor_wallet/pages/watch_address.dart';
 import 'package:reactor_wallet/pages/welcome.dart';
-import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
-import 'package:reactor_wallet/utils/states.dart';
+import 'package:reactor_wallet/utils/state/providers.dart';
+import 'package:reactor_wallet/utils/state/settings.dart';
 import 'package:reactor_wallet/utils/theme.dart';
-import 'package:reactor_wallet/utils/wallet_account.dart';
+import 'package:reactor_wallet/utils/accounts/wallet_account.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:worker_manager/worker_manager.dart';
-import 'pages/home.dart';
-import 'pages/account_selection.dart';
 import 'package:desktop_window/desktop_window.dart';
 
 main() async {
@@ -73,13 +74,49 @@ class App extends HookConsumerWidget {
   }
 }
 
-class LinkListenerWrapper extends HookConsumerWidget {
+class LinkListenerWrapper extends HookWidget {
   final Widget child;
 
   const LinkListenerWrapper({Key? key, required this.child}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final ValueNotifier<String?> uri = useState(null);
+
+    useEffect(() {
+      final transactionUri = uri.value;
+      if (transactionUri != null) {
+        final transaction = TransactionSolanaPay.parseUri(transactionUri);
+
+        WidgetsBinding.instance?.addPostFrameCallback(
+          (_) async {
+            final account = await selectAccount(context);
+            if (account is WalletAccount) {
+              String defaultTokenSymbol = "SOL";
+
+              if (transaction.splToken != null) {
+                try {
+                  Token selectedToken = account.getTokenByMint(transaction.splToken!);
+                  defaultTokenSymbol = selectedToken.info.symbol;
+                } catch (_) {
+                  insuficientFundsDialog(context);
+                  return;
+                }
+              }
+
+              makePaymentManuallyDialog(
+                context,
+                account,
+                initialDestination: transaction.recipient,
+                initialSendAmount: transaction.amount ?? 0,
+                defaultTokenSymbol: defaultTokenSymbol,
+              );
+            }
+          },
+        );
+      }
+    }, [uri.value]);
+
     useEffect(
       () {
         if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
@@ -87,44 +124,20 @@ class LinkListenerWrapper extends HookConsumerWidget {
         }
         try {
           final listener = uriLinkStream.listen(
-            (Uri? uri) {
-              if (uri != null) {
-                final transaction = TransactionSolanaPay.parseUri(uri.toString());
-
-                WidgetsBinding.instance?.addPostFrameCallback(
-                  (_) async {
-                    final account = await selectAccount(context);
-                    if (account is WalletAccount) {
-                      String defaultTokenSymbol = "SOL";
-
-                      if (transaction.splToken != null) {
-                        try {
-                          Token selectedToken = account.getTokenByMint(transaction.splToken!);
-                          defaultTokenSymbol = selectedToken.info.symbol;
-                        } catch (_) {
-                          insuficientFundsDialog(context);
-                          return;
-                        }
-                      }
-
-                      makePaymentManuallyDialog(
-                        context,
-                        account,
-                        initialDestination: transaction.recipient,
-                        initialSendAmount: transaction.amount ?? 0,
-                        defaultTokenSymbol: defaultTokenSymbol,
-                      );
-                    }
-                  },
-                );
+            (Uri? newUri) {
+              if (newUri != null) {
+                uri.value = newUri.toString();
               }
             },
             onError: (err) {},
           );
 
           return () => listener.cancel();
+          // ignore: empty_catches
         } catch (err) {}
+        return null;
       },
+      [],
     );
 
     return child;

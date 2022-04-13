@@ -11,7 +11,7 @@ import 'package:reactor_wallet/pages/setup_password.dart';
 import 'package:reactor_wallet/pages/splashscreen.dart';
 import 'package:reactor_wallet/pages/watch_address.dart';
 import 'package:reactor_wallet/pages/welcome.dart';
-import 'package:reactor_wallet/utils/states.dart';
+import 'package:reactor_wallet/utils/state/providers.dart';
 
 final appLoadedProviderTesting = StateProvider<bool>((_) {
   return true;

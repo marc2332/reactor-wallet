@@ -4,10 +4,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/dialogs/insufficient_funds.dart';
 import 'package:reactor_wallet/dialogs/transaction_error.dart';
 import 'package:reactor_wallet/dialogs/transaction_sent.dart';
-import 'package:reactor_wallet/utils/base_account.dart';
-import 'package:reactor_wallet/utils/states.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
+import 'package:reactor_wallet/utils/state/account.dart';
+import 'package:reactor_wallet/utils/state/providers.dart';
+
 import 'package:reactor_wallet/utils/theme.dart';
-import 'package:reactor_wallet/utils/wallet_account.dart';
+import 'package:reactor_wallet/utils/accounts/wallet_account.dart';
 
 /*
  * Ask the user to confirm the transactio

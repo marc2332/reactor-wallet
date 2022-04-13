@@ -1,4 +1,4 @@
-import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
 import 'package:solana/solana.dart' show SolanaClient;
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/utils/tracker.dart';

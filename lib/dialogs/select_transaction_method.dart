@@ -6,9 +6,9 @@ import 'package:reactor_wallet/dialogs/insufficient_funds.dart';
 import 'package:reactor_wallet/dialogs/make_transaction_manually.dart';
 import 'package:reactor_wallet/dialogs/transaction_not_supported.dart';
 import 'package:reactor_wallet/pages/scan_qr.dart';
-import 'package:reactor_wallet/utils/base_account.dart';
+import 'package:reactor_wallet/utils/accounts/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
-import 'package:reactor_wallet/utils/wallet_account.dart';
+import 'package:reactor_wallet/utils/accounts/wallet_account.dart';
 
 Future<void> selectTransactionMethod(
   BuildContext context,
