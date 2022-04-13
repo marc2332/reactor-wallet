@@ -54,6 +54,26 @@ class App extends HookConsumerWidget {
     ThemeType selectedTheme = ref.read(settingsProvider.notifier).getTheme();
     bool isDarkTheme = selectedTheme == ThemeType.dark;
 
+    useEffect(() {
+      if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        return () => {};
+      }
+      try {
+        final listener = uriLinkStream.listen(
+          (Uri? newUri) {
+            if (newUri != null) {
+              ref.read(deepLinkProvider.notifier).state = newUri.toString();
+            }
+          },
+          onError: (err) {},
+        );
+
+        return () => listener.cancel();
+        // ignore: empty_catches
+      } catch (err) {}
+      return null;
+    }, []);
+
     return MaterialApp(
       title: 'Reactor Wallet',
       theme: lighTheme,
@@ -74,22 +94,24 @@ class App extends HookConsumerWidget {
   }
 }
 
-class LinkListenerWrapper extends HookWidget {
+class LinkListenerWrapper extends HookConsumerWidget {
   final Widget child;
 
   const LinkListenerWrapper({Key? key, required this.child}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final ValueNotifier<String?> uri = useState(null);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final transactionUri = ref.watch(deepLinkProvider);
 
     useEffect(() {
-      final transactionUri = uri.value;
       if (transactionUri != null) {
         final transaction = TransactionSolanaPay.parseUri(transactionUri);
 
         WidgetsBinding.instance?.addPostFrameCallback(
           (_) async {
+            // Leave empty the provider state again
+            ref.read(deepLinkProvider.notifier).state = null;
+
             final account = await selectAccount(context);
             if (account is WalletAccount) {
               String defaultTokenSymbol = "SOL";
@@ -115,30 +137,7 @@ class LinkListenerWrapper extends HookWidget {
           },
         );
       }
-    }, [uri.value]);
-
-    useEffect(
-      () {
-        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-          return () => {};
-        }
-        try {
-          final listener = uriLinkStream.listen(
-            (Uri? newUri) {
-              if (newUri != null) {
-                uri.value = newUri.toString();
-              }
-            },
-            onError: (err) {},
-          );
-
-          return () => listener.cancel();
-          // ignore: empty_catches
-        } catch (err) {}
-        return null;
-      },
-      [],
-    );
+    }, [transactionUri]);
 
     return child;
   }

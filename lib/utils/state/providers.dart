@@ -4,8 +4,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/utils/accounts/base_account.dart';
 import 'package:reactor_wallet/utils/state/account.dart';
 import 'package:reactor_wallet/utils/state/settings.dart';
-
 import 'package:reactor_wallet/utils/tracker.dart';
+
+final deepLinkProvider = StateProvider<String?>((ref) {
+  return null;
+});
 
 final appLoadedProvider = StateProvider<bool>((_) {
   return false;
