@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/dialogs/insufficient_funds.dart';
@@ -11,6 +14,9 @@ import 'package:reactor_wallet/dialogs/make_transaction_manually.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
 import 'package:reactor_wallet/utils/wallet_account.dart';
+import '../utils/states.dart';
+import '../utils/tracker.dart';
+import 'setup_password.dart';
 import 'home/account.dart';
 import 'home/settings.dart';
 import 'package:uni_links/uni_links.dart';
@@ -43,6 +49,17 @@ class HomePage extends HookConsumerWidget {
       default:
         page = const AccountSubPage("/home");
     }
+
+    final accounts = ref.watch(accountsProvider);
+
+    useEffect(() {
+      if (accounts.isEmpty) {
+        WidgetsBinding.instance?.addPostFrameCallback((_) async {
+          Navigator.of(context).pushNamedAndRemoveUntil("/account_selection", (_) => false);
+        });
+      }
+      return null;
+    }, [accounts, currentPage.value]);
 
     useEffect(() {
       getInitialLink().catchError((_) {

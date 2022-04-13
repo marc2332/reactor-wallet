@@ -1,15 +1,33 @@
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reactor_wallet/pages/setup_password.dart';
+import 'package:reactor_wallet/utils/states.dart';
 import '../components/size_wrapper.dart';
 import '../utils/links.dart';
 import 'account_selection.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends HookConsumerWidget {
   const WelcomePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tokensTracer = ref.read(tokensTrackerProvider);
+    final encryptionKey = ref.watch(encryptionKeyProvider);
+    final appLoaded = ref.watch(appLoadedProvider);
+
+    useEffect(() {
+      if (encryptionKey != null && !appLoaded) {
+        loadState(tokensTracer, ref, encryptionKey);
+      }
+    }, [encryptionKey]);
+
     return Scaffold(
       body: ResponsiveSizer(
         child: Padding(
@@ -53,33 +71,69 @@ class WelcomePage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        CupertinoPageRoute(
-                          builder: (BuildContext context) {
-                            return const AccountSelectionPage();
-                          },
+                  if (encryptionKey == null) ...[
+                    ElevatedButton(
+                      onPressed: () {
+                        const secureStorage = FlutterSecureStorage();
+                        // Ask the user to add a password if was not found
+                        Navigator.of(context).push(
+                          CupertinoPageRoute(
+                            builder: (context) => SetupPasswordPage(secureStorage: secureStorage),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 8,
                         ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 17,
-                        horizontal: 10,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Text("Get Started  "),
-                          Icon(
-                            Icons.arrow_forward_outlined,
-                            size: 17,
-                          )
-                        ],
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Padding(
+                              padding: EdgeInsets.only(right: 10),
+                              child: Icon(
+                                Icons.security_rounded,
+                                size: 17,
+                              ),
+                            ),
+                            Text("Setup Password"),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+                  ] else ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            CupertinoPageRoute(
+                              builder: (BuildContext context) {
+                                return const AccountSelectionPage();
+                              },
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 17,
+                            horizontal: 10,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text("Get Started  "),
+                              Icon(
+                                Icons.arrow_forward_outlined,
+                                size: 17,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
                     child: MaterialButton(

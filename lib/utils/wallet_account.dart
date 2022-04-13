@@ -1,29 +1,19 @@
-import 'package:solana/dto.dart' show Commitment, ProgramAccount;
+import 'package:solana/dto.dart' show ProgramAccount;
 import 'package:solana/encoder.dart';
 import 'package:solana/solana.dart'
     show
         Ed25519HDKeyPair,
-        NoAssociatedTokenAccountException,
         RpcClientExt,
         SolanaClient,
         SystemInstruction,
         TokenProgram,
         Wallet,
-        lamportsPerSol,
-        signTransaction;
+        lamportsPerSol;
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/utils/tracker.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'base_account.dart';
-import 'package:encrypt/encrypt.dart';
-
-// Master key to encrypt and decrypt mnemonics, aka passphrases, this is included when creating the build
-final secureKey = Key.fromUtf8(
-  // ignore: prefer_const_constructors
-  String.fromEnvironment("secureKey", defaultValue: "IthinkRustIsBetterLanguageThanJS"),
-);
-final iv = IV.fromLength(16);
 
 class WalletAccount extends BaseAccount implements Account {
   @override
@@ -201,28 +191,14 @@ class WalletAccount extends BaseAccount implements Account {
     return account;
   }
 
-  /*
-   * Decrypt the mnemonic using the master key
-   */
-  static String decryptMnemonic(String mnemonic) {
-    final encrypter = Encrypter(AES(secureKey));
-
-    return encrypter.decrypt(
-      Encrypted.fromBase64(mnemonic),
-      iv: iv,
-    );
-  }
-
   @override
   Map<String, dynamic> toJson() {
-    final encrypter = Encrypter(AES(secureKey));
-
     return {
       "name": name,
       "address": address,
       "balance": balance,
       "url": [url.rpc, url.ws],
-      "mnemonic": encrypter.encrypt(mnemonic, iv: iv).base64,
+      "mnemonic": mnemonic,
       "accountType": accountType.toString(),
       "transactions": transactions.map((tx) => tx.toJson()).toList()
     };

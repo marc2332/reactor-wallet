@@ -28,15 +28,13 @@ You can support this project by donating any amount you want to these addresses;
 
 For Android:
 ```
-flutter build apk --tree-shake-icons --split-per-abi --dart-define secureKey=<32CharactersLengthSecretKey>
+flutter build apk --tree-shake-icons --split-per-abi
 ```
 
 For Windows:
 ```
-flutter build windows --tree-shake-icons --dart-define secureKey=<32CharactersLengthSecretKey>
+flutter build windows --tree-shake-icons
 ```
-
-Note: `--dart-define secureKey=<32CharactersLengthSecretKey>` optional, and is used to encrypt and decrypt the wallets's passphrases when using the app. This will be replaced by a password/pin/fingerprint/etc made by the user.
 
 ### 📝 Formatting
 ```
@@ -46,7 +44,7 @@ dart format . --line-length 100
 ### 🤔 To-do / Ideas
 - [x] **A name for the app**
 - [x] Handle `solana:` links, this way the wallet will be prompted to the user (experimental)
-- [ ] Add password/fingerprint authorization/encryption
+- [x] Add password encryption
 - [ ] [Solana Pay](https://solana-pay-docs.vercel.app/core/wallet-integration) integration, implemented, but highly experimental
     - [x] QR Reader
     - [x] SOL Transactions (Experimental)
@@ -56,7 +54,6 @@ dart format . --line-length 100
         - [x] SOL transactions (Experimental)
         - [x] SPL Tokens transaction (Experimental)
         - [ ] Compare the new received transaction by finding it with the reference, just to make sure the amount is correct
-- [x] Seedphrases encryption
 - [x] Mainnet/betanet/custom net support besides devnet
 - [x] Ability to name and rename imported and created wallets, and watched addresses
 - [x] Ability to make SOL transactions

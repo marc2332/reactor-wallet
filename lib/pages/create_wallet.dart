@@ -49,7 +49,7 @@ class CreateWalletState extends ConsumerState<CreateWallet> {
                       initialValue: accountName,
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(vertical: 10),
-                        hintText: "Account name",
+                        hintText: "Name",
                         prefixIcon: Padding(
                           padding: EdgeInsets.only(bottom: 6, right: 5),
                           child: Icon(Icons.account_box_rounded),

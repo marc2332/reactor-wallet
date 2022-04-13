@@ -137,13 +137,6 @@ class AccountSubPage extends ConsumerWidget {
     Widget? accountBody;
     Widget? accountHeader;
 
-    // If the account is loaded and no account is found then open the Account Selection page in order to create an account
-    if (isAppLoaded && selectedAccount == null) {
-      WidgetsBinding.instance?.addPostFrameCallback((_) {
-        Navigator.pushReplacementNamed(context, "/welcome");
-      });
-    }
-
     if (selectedAccount != null) {
       accountHeader = InkWell(
         borderRadius: BorderRadius.circular(5),

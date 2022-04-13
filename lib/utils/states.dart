@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
@@ -14,6 +18,10 @@ enum ThemeType {
   light,
   dark,
 }
+
+final encryptionKeyProvider = StateProvider<Uint8List?>((_) {
+  return null;
+});
 
 final settingsProvider = StateNotifierProvider<SettingsManager, Map<String, dynamic>>((ref) {
   return SettingsManager(ref);
@@ -63,7 +71,7 @@ class SettingsManager extends StateNotifier<Map<String, dynamic>> {
 /*
  * Read, parse andl load the stored data from Hive into the state providers
  */
-Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
+Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref, Uint8List? encryptionKey) async {
   await Hive.initFlutter();
 
   // Open the settings
@@ -82,7 +90,8 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
   settingsManager.setTheme(selectedTheme);
 
   // Open the accounts
-  Box<dynamic> accountsBox = await Hive.openBox('accounts');
+  Box<dynamic> accountsBox = await Hive.openBox('accounts',
+      encryptionCipher: encryptionKey != null ? HiveAesCipher(encryptionKey) : null);
 
   // Create an account manager
   AccountsManager accountManager = ref.read(accountsProvider.notifier);
@@ -114,7 +123,7 @@ Future<void> loadState(TokenTrackers tokensTracker, WidgetRef ref) async {
         account["address"],
         accountName,
         NetworkUrl(account["url"][0], account["url"][1]),
-        WalletAccount.decryptMnemonic(account["mnemonic"]),
+        account["mnemonic"],
         tokensTracker,
       );
       return MapEntry(accountName, walletAccount);
