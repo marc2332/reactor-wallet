@@ -50,7 +50,7 @@ dart format . --line-length 100
     - [x] SOL Transactions (Experimental)
     - [x] SPL Tokens Transactions (Experimental)
     - [ ] Support for Label, Message, Memo
-    - [ ] QR Generator (like https://github.com/solana-labs/solana-pay/tree/master/point-of-sale does )
+    - [ ] QR Generator (WIP, like https://github.com/solana-labs/solana-pay/tree/master/point-of-sale does )
         - [x] SOL transactions (Experimental)
         - [x] SPL Tokens transaction (Experimental)
         - [ ] Compare the new received transaction by finding it with the reference, just to make sure the amount is correct

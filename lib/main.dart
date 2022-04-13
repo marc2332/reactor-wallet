@@ -59,6 +59,14 @@ class App extends HookConsumerWidget {
         return () => {};
       }
       try {
+        getInitialLink().catchError((_) {
+          return null;
+        }).then((String? newUri) {
+          if (newUri != null) {
+            ref.read(deepLinkProvider.notifier).state = newUri.toString();
+          }
+        });
+
         final listener = uriLinkStream.listen(
           (Uri? newUri) {
             if (newUri != null) {
