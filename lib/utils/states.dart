@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/network_selector.dart';

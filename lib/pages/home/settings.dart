@@ -4,7 +4,6 @@ import 'package:reactor_wallet/components/clickable_card.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/utils/states.dart';
 import 'package:reactor_wallet/utils/theme.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../utils/links.dart';
 

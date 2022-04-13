@@ -6,8 +6,8 @@ import 'package:reactor_wallet/components/numpad.dart';
 import 'package:reactor_wallet/utils/base_account.dart';
 import 'package:reactor_wallet/utils/solana_pay.dart';
 import 'package:reactor_wallet/utils/states.dart';
-import 'package:reactor_wallet/utils/wallet_account.dart';
 import 'package:solana/dto.dart' show Commitment;
+import 'package:solana/dto.dart' as dto;
 import 'package:solana/solana.dart' show Ed25519HDKeyPair, SubscriptionClient;
 
 class ResponsiveRotator extends StatelessWidget {
@@ -86,7 +86,7 @@ Future<void> createQRTransaction(BuildContext context, Account account) async {
 
             final client = SubscriptionClient(Uri.parse(account.url.ws));
 
-            var stream;
+            Stream<dto.Account> stream;
 
             if (selectedToken.value is SOL) {
               stream = client.accountSubscribe(

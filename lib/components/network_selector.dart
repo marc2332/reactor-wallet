@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const options = [
   'Mainnet Beta (recommended)',
@@ -21,25 +23,17 @@ class NetworkUrl {
   NetworkUrl(this.rpc, this.ws);
 }
 
-class NetworkSelector extends StatefulWidget {
+class NetworkSelector extends HookConsumerWidget {
+  final NetworkUrl customNetwork = NetworkUrl("", "");
   final Function(NetworkUrl?) onSelected;
 
-  const NetworkSelector({Key? key, required this.onSelected}) : super(key: key);
+  NetworkSelector({Key? key, required this.onSelected}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => NetworkSelectorState(onSelected);
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedOption = useState(urlOptions.keys.first);
 
-class NetworkSelectorState extends State<NetworkSelector> {
-  String selectedOption = urlOptions.keys.first;
-  NetworkUrl customNetwork = NetworkUrl("", "");
-  Function(NetworkUrl?) onSelected;
-
-  NetworkSelectorState(this.onSelected);
-
-  @override
-  Widget build(BuildContext context) {
-    onSelected(urlOptions[selectedOption]);
+    onSelected(urlOptions[selectedOption.value]);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,16 +41,14 @@ class NetworkSelectorState extends State<NetworkSelector> {
         Padding(
           padding: const EdgeInsets.only(top: 15),
           child: DropdownButton<String>(
-            value: selectedOption,
+            value: selectedOption.value,
             iconSize: 24,
             elevation: 16,
             onChanged: (String? newValue) {
-              setState(() {
-                selectedOption = newValue!;
-                if (selectedOption != 'Custom') {
-                  onSelected(urlOptions[selectedOption]);
-                }
-              });
+              selectedOption.value = newValue!;
+              if (selectedOption.value != 'Custom') {
+                onSelected(urlOptions[selectedOption]);
+              }
             },
             items: options.map<DropdownMenuItem<String>>(
               (String option) {
@@ -68,19 +60,19 @@ class NetworkSelectorState extends State<NetworkSelector> {
             ).toList(),
           ),
         ),
-        if (selectedOption == 'Custom') ...[
+        if (selectedOption.value == 'Custom') ...[
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: TextFormField(
               validator: (String? value) {
                 if (value == null || value.isEmpty) {
-                  return 'Empty URL';
+                  return 'Empty RPC URL';
                 } else {
                   return null;
                 }
               },
               decoration: const InputDecoration(
-                hintText: 'Enter a custom network URL',
+                hintText: 'Enter a custom RPC URL',
               ),
               onChanged: (String value) async {
                 customNetwork.rpc = value;
@@ -93,7 +85,7 @@ class NetworkSelectorState extends State<NetworkSelector> {
             child: TextFormField(
               validator: (String? value) {
                 if (value == null || value.isEmpty) {
-                  return 'Empty URL';
+                  return 'Empty WebSockets URL';
                 } else {
                   return null;
                 }

@@ -1,16 +1,13 @@
-import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reactor_wallet/components/size_wrapper.dart';
 import 'package:reactor_wallet/pages/setup_password.dart';
+import 'package:reactor_wallet/utils/links.dart';
 import 'package:reactor_wallet/utils/states.dart';
-import '../components/size_wrapper.dart';
-import '../utils/links.dart';
 import 'account_selection.dart';
 
 class WelcomePage extends HookConsumerWidget {

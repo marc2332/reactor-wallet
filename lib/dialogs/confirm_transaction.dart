@@ -74,6 +74,8 @@ Future<void> confirmTransactionDialog(
                 insuficientFundsDialog(context);
               }
             });
+
+            return null;
           }, []);
 
           return AlertDialog(
