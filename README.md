@@ -74,5 +74,6 @@ dart format . --line-length 100
 - [ ] Better Windows UX (e.g, using split views)
 - [ ] Send notifications when the app is closed and new transactions are received
 - [ ] Add a contacts list
+- [ ] Ability to update the encryption password once it's set
 
 MIT License

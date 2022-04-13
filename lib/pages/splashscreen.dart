@@ -56,19 +56,17 @@ class SplashScreen extends HookConsumerWidget {
     // Retrieve the encryption key if exists
     useEffect(() {
       WidgetsBinding.instance?.addPostFrameCallback((_) async {
-        if (Platform.isIOS || Platform.isAndroid) {
-          const secureStorage = FlutterSecureStorage();
-          secureStorage.read(key: 'encrypt_key').then(
-            (encryprionKey) async {
-              if (encryprionKey != null) {
-                Uint8List newEncryptedKey = base64Url.decode(encryprionKey);
-                ref.read(encryptionKeyProvider.notifier).state = newEncryptedKey;
-              } else {
-                Navigator.of(context).pushReplacementNamed("/welcome");
-              }
-            },
-          );
-        }
+        const secureStorage = FlutterSecureStorage();
+        secureStorage.read(key: 'encrypt_key').then(
+          (encryprionKey) async {
+            if (encryprionKey != null) {
+              Uint8List newEncryptedKey = base64Url.decode(encryprionKey);
+              ref.read(encryptionKeyProvider.notifier).state = newEncryptedKey;
+            } else {
+              Navigator.of(context).pushReplacementNamed("/welcome");
+            }
+          },
+        );
       });
     }, []);
 
