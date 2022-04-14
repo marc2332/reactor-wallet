@@ -11,9 +11,9 @@ const options = [
 
 var urlOptions = {
   'Mainnet Beta (recommended)':
-      NetworkUrl('https://solana-api.projectserum.com', 'ws://solana-api.projectserum.com'),
-  'Devnet': NetworkUrl('https://api.devnet.solana.com', 'ws://api.devnet.solana.com'),
-  'Testnet': NetworkUrl('https://api.testnet.solana.com', 'ws://api.testnet.solana.com'),
+      NetworkUrl('https://solana-api.projectserum.com', 'wss://solana-api.projectserum.com'),
+  'Devnet': NetworkUrl('https://api.devnet.solana.com', 'wss://api.devnet.solana.com'),
+  'Testnet': NetworkUrl('https://api.testnet.solana.com', 'wss://api.testnet.solana.com'),
   'Custom': NetworkUrl('', ''),
 };
 
