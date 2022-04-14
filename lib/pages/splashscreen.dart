@@ -1,11 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reactor_wallet/pages/welcome.dart';
 import 'package:reactor_wallet/utils/state/providers.dart';
 
 import '../utils/states.dart';
@@ -45,7 +46,8 @@ class SplashScreen extends HookConsumerWidget {
             Navigator.of(context).pushReplacementNamed("/home");
           } else {
             // Go to the welcome page if no account is found
-            Navigator.of(context).pushReplacementNamed("/welcome");
+            Navigator.of(context)
+                .pushReplacement(CupertinoPageRoute(builder: (_) => const WelcomePage()));
           }
         }
       });
@@ -86,13 +88,6 @@ class SplashScreen extends HookConsumerWidget {
                       height: 190,
                       image: AssetImage('assets/logo.png'),
                     ),
-                  ),
-                ),
-                Text(
-                  "Loading accounts...",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.normal,
                   ),
                 )
               ],

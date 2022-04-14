@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
+import 'package:reactor_wallet/components/stretched_button.dart';
 import 'package:reactor_wallet/utils/state/providers.dart';
 
 /*
@@ -100,11 +101,8 @@ class WatchAddressState extends ConsumerState<WatchAddress> {
                         },
                       ),
                     ),
-                    ElevatedButton(
-                      child: const Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Text("Continue"),
-                      ),
+                    StretchedButton(
+                      child: const Text("Continue"),
                       onPressed: addAccount,
                     )
                   ],

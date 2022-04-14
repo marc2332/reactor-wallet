@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:reactor_wallet/components/stretched_button.dart';
 import 'package:reactor_wallet/utils/state/providers.dart';
 
 import '../components/size_wrapper.dart';
@@ -35,8 +36,8 @@ class SetupPasswordPage extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
                     child: Text("Write down a password to secure your wallets.")),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -60,32 +61,17 @@ class SetupPasswordPage extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 60,
-                  width: double.infinity,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: isValidPassword
-                            ? () async {
-                                final userPassword = password.value;
-                                if (userPassword != null) {
-                                  await setupPassword(userPassword, ref);
-                                  Navigator.pop(context);
-                                }
-                              }
-                            : null,
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 50,
-                          ),
-                          child: Text("Continue"),
-                        ),
-                      ),
-                    ],
-                  ),
+                StretchedButton(
+                  child: const Text("Continue"),
+                  onPressed: isValidPassword
+                      ? () async {
+                          final userPassword = password.value;
+                          if (userPassword != null) {
+                            await setupPassword(userPassword, ref);
+                            Navigator.pop(context);
+                          }
+                        }
+                      : null,
                 )
               ],
             ),

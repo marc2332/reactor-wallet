@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:reactor_wallet/components/network_selector.dart';
 import 'package:reactor_wallet/components/size_wrapper.dart';
+import 'package:reactor_wallet/components/stretched_button.dart';
 import 'package:reactor_wallet/dialogs/error_popup.dart';
 import 'package:reactor_wallet/utils/state/providers.dart';
 
@@ -77,11 +78,8 @@ class CreateWalletState extends ConsumerState<CreateWallet> {
                         },
                       ),
                     ),
-                    ElevatedButton(
-                      child: const Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Text("Create Wallet"),
-                      ),
+                    StretchedButton(
+                      child: const Text("Create Wallet"),
                       onPressed: createWallet,
                     )
                   ],
