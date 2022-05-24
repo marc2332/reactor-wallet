@@ -26,7 +26,7 @@ class SplashScreen extends HookConsumerWidget {
     // Load the app's state when the encryption key is retrieved
     useEffect(() {
       if (encryptedKey != null && !appLoaded) {
-        WidgetsBinding.instance!.addPostFrameCallback((_) async {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
           await loadState(
             tokensTracer,
             ref,
@@ -40,7 +40,7 @@ class SplashScreen extends HookConsumerWidget {
 
     // Load /welcome or /home when the app loads
     useEffect(() {
-      WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (appLoaded) {
           if (accounts.isNotEmpty) {
             Navigator.of(context).pushReplacementNamed("/home");
@@ -57,7 +57,7 @@ class SplashScreen extends HookConsumerWidget {
 
     // Retrieve the encryption key if exists
     useEffect(() {
-      WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         const secureStorage = FlutterSecureStorage();
         secureStorage.read(key: 'encrypt_key').then(
           (encryprionKey) async {

@@ -41,7 +41,7 @@ class HomePage extends HookConsumerWidget {
 
     useEffect(() {
       if (accounts.isEmpty) {
-        WidgetsBinding.instance?.addPostFrameCallback((_) async {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
           Navigator.of(context).pushNamedAndRemoveUntil("/account_selection", (_) => false);
         });
       }
