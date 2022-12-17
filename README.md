@@ -1,3 +1,5 @@
+# ⚠️ NOT MAINTAINED ⚠️
+
 ## 💳 Reactor Wallet
 
 Rector Wallet is an **experimental** wallet for [Solana](https://solana.com/). It's work in progress, expect bugs, use carefully.
